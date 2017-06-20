@@ -1,0 +1,10 @@
+.idea
+*.iml
+.vscode
+build/
+src/
+test/
+.travis.yml
+*.bash
+tsconfig.json
+tslint.json
