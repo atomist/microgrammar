@@ -21,7 +21,7 @@ function main() {
     fi
     shift
 
-    if ! npm version --allow-same-version "$module_version"; then
+    if ! npm version --allow-same-version --no-git-tag-version "$module_version"; then
         err "failed to set version to $module_version"
         return 1
     fi
