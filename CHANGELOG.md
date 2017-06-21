@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.1.0...HEAD
 
-## [0.1.0] - 2017-06-19
+## [0.1.0] - 2017-06-20
 
 [0.1.0]: https://github.com/atomist/microgrammar/tree/0.1.0
 
