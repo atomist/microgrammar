@@ -6,7 +6,7 @@ import { toMatchingLogic } from "../Concat";
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { DismatchReport, TerminalPatternMatch } from "../PatternMatch";
+import { DismatchReport, isPatternMatch, TerminalPatternMatch } from "../PatternMatch";
 import { Literal } from "../Primitives";
 
 /**
@@ -29,8 +29,8 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            new TerminalPatternMatch(this.$id, matched, is.offset, currentIs) :
-            new DismatchReport(this.$id, is.offset);
+            new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) :
+            new DismatchReport(this.$id, is.offset, context);
     }
 }
 
@@ -51,28 +51,28 @@ export class Break implements MatchingLogic {
 
     private inner: MatchingLogic;
 
-    // tslint:disable-next-line:member-ordering
-    public $id = `Break[${this.breakOn}]`;
-
     constructor(private breakOn: any) {
         this.inner = toMatchingLogic(breakOn);
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    // tslint:disable-next-line:member-ordering
+    public $id = `Break[${this.breakOn}]`;
+
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new TerminalPatternMatch(this.$id, "", is.offset, is);
+            return new TerminalPatternMatch(this.$id, "", is.offset, is, context);
         }
 
         let currentIs = is;
         let matched = "";
-        while (!currentIs.exhausted() && !this.fits(currentIs)) { // if it fits, it sits
+        while (!currentIs.exhausted() && !this.fits(currentIs, context)) { // if it fits, it sits
             matched += currentIs.peek(1);
             currentIs = currentIs.advance();
         }
-        return new TerminalPatternMatch(this.$id, matched, is.offset);
+        return new TerminalPatternMatch(this.$id, matched, is.offset, matched, context);
     }
 
-    private fits(is: InputState): boolean {
-        return this.inner.matchPrefix(is).$isMatch;
+    private fits(is: InputState, context: {}): boolean {
+        return isPatternMatch(this.inner.matchPrefix(is, context));
     }
 }

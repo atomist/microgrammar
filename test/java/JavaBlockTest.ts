@@ -3,7 +3,7 @@ import { InputState } from "../../src/InputState";
 import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
 import { AnonymousDefinition } from "../../src/Matchers";
 import { Microgrammar } from "../../src/Microgrammar";
-import { PatternMatch } from "../../src/PatternMatch";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { matchEverything, Regex } from "../../src/Primitives";
 
 describe("JavaBlockTest", () => {
@@ -49,8 +49,8 @@ describe("JavaBlockTest", () => {
     it("should match till balance", () => {
         const balanced = "{  x = y; { }  2; }";
         const is = InputState.fromString(balanced + "// this is a comment }");
-        const m = JavaBlock.matchPrefix(is) as PatternMatch;
-        expect(m.$isMatch).to.equal(true);
+        const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
+        expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal(balanced);
     });
 
@@ -64,8 +64,8 @@ describe("JavaBlockTest", () => {
             _whatever: matchEverything,
             ...AnonymousDefinition,
         });
-        const m: any = javaBlockContaining(inner.matcher).matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal(balanced);
         expect(m.block.left).to.equal("x");
         expect(m.block.left$match.$offset).to.equal(2);
@@ -75,15 +75,15 @@ describe("JavaBlockTest", () => {
 
     function match(what: string) {
         const is = InputState.fromString(what);
-        const m = JavaBlock.matchPrefix(is) as PatternMatch;
-        expect(m.$isMatch).to.equal(true);
+        const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
+        expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal(what);
     }
 
     function shouldNotMatch(what: string) {
         const is = InputState.fromString(what);
-        const m = JavaBlock.matchPrefix(is);
-        expect(m.$isMatch).to.equal(false);
+        const m = JavaBlock.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(false);
     }
 
 });

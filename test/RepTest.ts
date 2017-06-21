@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { InputState } from "../src/InputState";
-import { PatternMatch } from "../src/PatternMatch";
+import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Rep, Rep1, Rep1Sep, RepSep } from "../src/Rep";
 import { LEGAL_VALUE } from "./MavenGrammars";
 
@@ -9,30 +9,30 @@ describe("RepTest", () => {
     it("rep(0) should match 0 when matcher doesn't match", () => {
         const rep = new Rep("A");
         const is = InputState.fromString("friday 14");
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         // expect(is.peek(2)).to.equal(m.$resultingInputState.peek(2));
     });
 
     it("rep(1) should NOT match 0 when matcher doesn't match", () => {
         const rep = new Rep1("A");
         const is = InputState.fromString("friday 14");
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(false);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(false);
     });
 
     it("should match when matcher matches once", () => {
         const rep = new Rep("A");
         const is = InputState.fromString("And there was light!");
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
     });
 
     it("repsep should match when matcher matches once", () => {
         const rep = new RepSep("A", "abcd");
         const is = InputState.fromString("And there was light!");
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
     });
 
     it("rep matches several times", () => {
@@ -40,8 +40,8 @@ describe("RepTest", () => {
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal(toMatch);
     });
 
@@ -50,8 +50,8 @@ describe("RepTest", () => {
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("And");
     });
 
@@ -60,7 +60,7 @@ describe("RepTest", () => {
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is) as PatternMatch;
+        const m = rep.matchPrefix(is, {}) as PatternMatch;
         expect(m.$value.length).to.equal(4);
     });
 
@@ -69,8 +69,8 @@ describe("RepTest", () => {
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal(toMatch);
     });
 
@@ -79,8 +79,8 @@ describe("RepTest", () => {
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal(toMatch);
     });
 
@@ -89,8 +89,8 @@ describe("RepTest", () => {
         const toMatch = "And";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(true);
     });
 
     it("rep1sep does not match zero times", () => {
@@ -98,8 +98,8 @@ describe("RepTest", () => {
         const toMatch = "16And";
         const content = toMatch + "!"; // The last char won't match
         const is = InputState.fromString(content);
-        const m = rep.matchPrefix(is);
-        expect(m.$isMatch).to.equal(false);
+        const m = rep.matchPrefix(is, {});
+        expect(isPatternMatch(m)).to.equal(false);
     });
 
     it("Maven property", () => {
@@ -110,8 +110,8 @@ describe("RepTest", () => {
 	</properties>
         `;
         const is = InputState.fromString(toMatch);
-        const m = rep.matchPrefix(is) as PatternMatch;
-        expect(m.$isMatch).to.equal(true);
+        const m = rep.matchPrefix(is, {}) as PatternMatch;
+        expect(isPatternMatch(m)).to.equal(true);
         expect(m.$value.length).to.equal(3);
     });
 

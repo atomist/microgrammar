@@ -6,22 +6,22 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
  */
 export class DismatchReport implements MatchPrefixResult {
 
-    public $isMatch = false;
-
-    public constructor(public readonly $matcherId: string, public $offset: number, private cause?: DismatchReport) {
+    public constructor(
+        public readonly $matcherId: string,
+        public $offset: number,
+        public $context: {},
+        private cause?: DismatchReport) {
     }
 
 }
 
 export abstract class PatternMatch implements MatchPrefixResult {
 
-    public $isMatch = true;
-
     /**
      * @return the $value that is extracted from this matcher. May be a
      * scalar or an array, or a nested structure
      */
-    public readonly $value: any;
+    public $value: any;
 
     /**
      * Represents a match
@@ -32,7 +32,9 @@ export abstract class PatternMatch implements MatchPrefixResult {
     constructor(
         public readonly $matcherId: string,
         public readonly $matched: string,
-        public readonly $offset: number) { }
+        public readonly $offset: number,
+        public readonly $context: {}) {
+    }
 
     public abstract addOffset(additionalOffset: number): PatternMatch;
 
@@ -43,15 +45,20 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
 }
 
+export function isPatternMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
+    return (mpr as PatternMatch).$matched !== undefined;
+}
+
 export class TerminalPatternMatch extends PatternMatch {
 
     constructor(
         matcherId: string,
         matched: string,
         offset: number,
-        public readonly $value: any = matched) {
+        public readonly $value: any,
+        context: {}) {
 
-        super(matcherId, matched, offset);
+        super(matcherId, matched, offset, context);
     }
 
     public addOffset(additionalOffset: number) {
@@ -64,7 +71,8 @@ export class TerminalPatternMatch extends PatternMatch {
             this.$matcherId,
             this.$matched,
             this.$offset + additionalOffset,
-            this.$value);
+            this.$value,
+            this.$context);
     }
 
 }
@@ -80,7 +88,7 @@ export class UndefinedPatternMatch extends PatternMatch {
         matcherId: string,
         offset: number) {
 
-        super(matcherId, "", offset);
+        super(matcherId, "", offset, {});
     }
 
     public addOffset(additionalOffset: number) {
@@ -120,10 +128,17 @@ export class TreePatternMatch extends PatternMatch {
         $matched: string,
         $offset: number,
         public $matchers: Matcher[],
-        public $subMatches: PatternMatch[]) {
+        public $subMatches: PatternMatch[],
+        context: {}) {
 
-        super($matcherId, $matched, $offset);
+        super($matcherId, $matched, $offset, context);
         this.$value = {};
+        // Copy top level context properties
+        // tslint:disable-next-line:forin
+        for (const p in context) {
+            this[p] = context[p];
+        }
+
         // TODO address code duplication with prepare method
         for (let i = 0; i < $subMatches.length; i++) {
             this.prepareMatch($matchers[i].name, $subMatches[i]);
@@ -150,7 +165,8 @@ export class TreePatternMatch extends PatternMatch {
             this.$matched,
             this.$offset + additionalOffset,
             this.$matchers,
-            this.$subMatches.map(m => m.addOffset(additionalOffset)));
+            this.$subMatches.map(m => m.addOffset(additionalOffset)),
+            context);
     }
 
     public submatches() {

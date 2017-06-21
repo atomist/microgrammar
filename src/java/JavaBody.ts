@@ -2,7 +2,7 @@ import { Concat } from "../Concat";
 import { InputState } from "../InputState";
 import { MatchingLogic, Term } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { DismatchReport, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
+import { DismatchReport, isPatternMatch, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
 
 /**
  * The rest of a Java block, going to a matching depth of +1 curlies.
@@ -27,11 +27,11 @@ class JavaBody implements MatchingLogic {
         }
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         const sm = new JavaContentStateMachine();
         let depth = 1;
         if (is.exhausted()) {
-            return new TerminalPatternMatch(this.$id, "", is.offset, is);
+            return new TerminalPatternMatch(this.$id, "", is.offset, is, context);
         }
 
         let currentIs = is;
@@ -65,11 +65,13 @@ class JavaBody implements MatchingLogic {
             return new TerminalPatternMatch(
                 this.$id,
                 matched,
-                is.offset);
+                is.offset,
+                matched,
+                context);
         }
 
-        const innerMatch = this.inner.matchPrefix(InputState.fromString(matched));
-        if (innerMatch.$isMatch) {
+        const innerMatch = this.inner.matchPrefix(InputState.fromString(matched), context);
+        if (isPatternMatch(innerMatch)) {
             if (this.isTreePatternMatch(innerMatch)) {
                 // console.log("body has parts");
                 // Tree; take its bits
@@ -79,13 +81,16 @@ class JavaBody implements MatchingLogic {
                     matched,
                     is.offset,
                     innerMatch.$matchers,
-                    (innerMatch as TreePatternMatch).$subMatches.map(m => m.addOffset(is.offset)));
+                    (innerMatch as TreePatternMatch).$subMatches.map(m => m.addOffset(is.offset)),
+                    context);
 
             }
             return new TerminalPatternMatch(
                 this.$id,
                 matched,
-                is.offset);
+                is.offset,
+                matched,
+                context);
         } else {
             return new DismatchReport(this.$id, is.offset, innerMatch as DismatchReport);
         }
@@ -140,7 +145,9 @@ export function stripComments(source: string) {
         sm.consume(s);
         switch (sm.state) {
             case "inCComment":
-            case "inLineComment": case "seen*InCComment": case "seen/":
+            case "inLineComment":
+            case "seen*InCComment":
+            case "seen/":
                 break;
             case "outsideString":
                 if (previousState !== "seen*InCComment") {

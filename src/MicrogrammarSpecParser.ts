@@ -2,11 +2,16 @@ import { Concat } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { Term } from "./Matchers";
+import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
+import { isPatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
 import { Rep } from "./Rep";
 import { Break } from "./snobol/Snobol";
 
+/**
+ * Parses microgrammars expressed as strings.
+ */
 export class MicrogrammarSpecParser {
 
     private anonFieldCount = 0;
@@ -29,12 +34,13 @@ export class MicrogrammarSpecParser {
             trailing: new Break("this will not appear"), // replace with matchEverything after merge
         } as Term);
 
-        const match: any = specGrammar.matchPrefix(InputState.fromString(spec));
-        if (!match.$isMatch) {
+        const mpr: MatchPrefixResult = specGrammar.matchPrefix(InputState.fromString(spec), {});
+        if (!isPatternMatch(mpr)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
         }
-        // console.log(`Found ${match.these.length} components`);
 
+        // We need to get at its other properties
+        const match = mpr as any;
         const definitions = { $id: spec };
         match.these.forEach(t => {
             //    console.log(`Processing literal [${t}]`);

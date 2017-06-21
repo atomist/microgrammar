@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { Concat } from "../src/Concat";
 import { InputState } from "../src/InputState";
 import { AnonymousDefinition, Term } from "../src/Matchers";
-import { PatternMatch } from "../src/PatternMatch";
+import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
 import { RepSep } from "../src/Rep";
 
@@ -14,8 +14,8 @@ describe("ConcatTest", () => {
             name: "foo",
         });
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as any;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal("foo");
         expect(result.name).to.equal("foo");
     });
@@ -27,8 +27,8 @@ describe("ConcatTest", () => {
             num: /^[1-9][0-9]*/,
         } as Term);
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as any;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(result)).to.equal(true);
         // expect(result.$matched).to.equal(content);
         expect(result.$matchers.length).to.equal(1);
         // expect(result.$matchers[0].$value).to.equal(2);
@@ -43,8 +43,8 @@ describe("ConcatTest", () => {
             ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as any;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(result)).to.equal(true);
         // expect(result.$matched).to.equal(content);
         // expect(result.$matchers.length).to.equal(1);
         // console.log(JSON.stringify(result.$matchers[0]))
@@ -60,8 +60,8 @@ describe("ConcatTest", () => {
             ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as any;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal(content);
         expect(result.num).to.equal(24);
     });
@@ -75,8 +75,8 @@ describe("ConcatTest", () => {
             ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as any;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal(content);
         expect(result.hours).to.equal(24);
         expect(result.days).to.equal(7);
@@ -88,11 +88,10 @@ describe("ConcatTest", () => {
             name: /[A-Z][a-z]+/,
             delim: ":",
             hobbies: new RepSep(/[a-z]+/, ","),
-            ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
-        const result = mg.matchPrefix(is) as PatternMatch;
-        expect(result.$isMatch).to.equal(true);
+        const result = mg.matchPrefix(is, {}) as PatternMatch;
+        expect(isPatternMatch(result)).to.equal(true);
         const r = result as any;
         expect(r.name).to.equal("Donald");
         expect(r.delim).to.equal(":");

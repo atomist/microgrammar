@@ -1,6 +1,6 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
-import { PatternMatch } from "./PatternMatch";
+import { isPatternMatch, PatternMatch } from "./PatternMatch";
 import { Regex } from "./Primitives";
 
 /**
@@ -18,10 +18,9 @@ export function consumeWhitespace(is: InputState): [string, InputState] {
  * @returns {any}
  */
 export function discard(is: InputState, m: MatchingLogic): [string, InputState] {
-    const eaten = m.matchPrefix(is);
-    if (eaten.$isMatch) {
-        const pm = eaten as PatternMatch;
-        return [pm.$matched, is.consume(pm.$matched)];
+    const eaten = m.matchPrefix(is, context);
+    if (isPatternMatch(eaten)) {
+        return [eaten.$matched, is.consume(eaten.$matched)];
     } else {
         return ["", is];
     }

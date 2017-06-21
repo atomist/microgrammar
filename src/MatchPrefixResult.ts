@@ -8,8 +8,8 @@ export interface MatchPrefixResult {
 
     readonly $offset: number;
 
-    readonly $isMatch: boolean;
-
     readonly $matcherId: string;
+
+    readonly $context: {};
 
 }

@@ -4,7 +4,7 @@ import { InputState } from "./InputState";
 import { InputStream } from "./InputStream";
 import { MatchingLogic } from "./Matchers";
 import { Microgrammar } from "./Microgrammar";
-import { PatternMatch } from "./PatternMatch";
+import { isPatternMatch, PatternMatch } from "./PatternMatch";
 import { StringInputStream } from "./StringInputStream";
 import { consumeWhitespace } from "./Whitespace";
 
@@ -46,8 +46,8 @@ export abstract class MatchingMachine {
                 currentInputState = consumeWhitespace(currentInputState)[1];
             }
             const previousIs = currentInputState;
-            const tryMatch = currentMatcher.matchPrefix(currentInputState) as PatternMatch;
-            if (tryMatch.$isMatch) {
+            const tryMatch = currentMatcher.matchPrefix(currentInputState, {}) as PatternMatch;
+            if (isPatternMatch(tryMatch)) {
                 // Enrich with the name
                 (tryMatch as any).$name = tryMatch.$matcherId;
                 currentMatcher = extractMatcher(this.onMatch(tryMatch));
@@ -58,16 +58,16 @@ export abstract class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (tryMatch.$isMatch) {
+                if (isPatternMatch(tryMatch)) {
                     // TODO will this spoil offsets? Might want to create an input state
                     const matches = omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
                         currentMatcher = extractMatcher(this.observeMatch(m));
                     }
                 } else {
-                    const observerMatch = this.observer.matchPrefix(previousIs);
-                    if (observerMatch.$isMatch) {
-                        currentMatcher = extractMatcher(this.observeMatch(observerMatch as PatternMatch));
+                    const observerMatch = this.observer.matchPrefix(previousIs, {});
+                    if (isPatternMatch(observerMatch)) {
+                        currentMatcher = extractMatcher(this.observeMatch(observerMatch));
                     }
                 }
             }

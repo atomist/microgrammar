@@ -21,8 +21,9 @@ resource "aws_instance" "web" {
 
   connection {
     user = "root"
+  }
 }
-}`;
+`;
 
 describe("Parsing HCL", () => {
 

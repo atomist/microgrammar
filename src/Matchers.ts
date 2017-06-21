@@ -20,7 +20,7 @@ export const AnonymousDefinition: Term = {
  */
 export interface MatchingLogic extends Term {
 
-    matchPrefix(is: InputState): MatchPrefixResult;
+    matchPrefix(is: InputState, context: {}): MatchPrefixResult;
 }
 
 /**

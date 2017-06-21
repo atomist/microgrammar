@@ -3,7 +3,7 @@ import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+import { DismatchReport, isPatternMatch, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 import { consumeWhitespace } from "./Whitespace";
 
 /**
@@ -40,7 +40,7 @@ export class Repetition implements MatchingLogic, Configurable {
         return this;
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         let currentIs = is;
         const matches: PatternMatch[] = [];
         let matched = "";
@@ -50,21 +50,21 @@ export class Repetition implements MatchingLogic, Configurable {
                 matched += eaten[0];
                 currentIs = eaten[1];
             }
-            const match = this.matcher.matchPrefix(currentIs);
-            if (!match.$isMatch) {
+            const match = this.matcher.matchPrefix(currentIs, context);
+            if (!isPatternMatch(match)) {
                 break;
+            } else {
+                currentIs = currentIs.consume(match.$matched);
+                matches.push(match);
+                matched += match.$matched;
             }
-            const pm = match as PatternMatch;
-            currentIs = currentIs.consume(pm.$matched);
-            matches.push(pm);
-            matched += pm.$matched;
 
             if (this.sepMatcher) {
                 const eaten = consumeWhitespace(currentIs);
                 matched += eaten[0];
                 currentIs = eaten[1];
-                const sepMatch = this.sepMatcher.matchPrefix(currentIs) as PatternMatch;
-                if (sepMatch.$isMatch) {
+                const sepMatch = this.sepMatcher.matchPrefix(currentIs, context);
+                if (isPatternMatch(sepMatch)) {
                     currentIs = currentIs.consume(sepMatch.$matched);
                     matched += (sepMatch as PatternMatch).$matched;
                 } else {
@@ -76,8 +76,9 @@ export class Repetition implements MatchingLogic, Configurable {
             new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
-                matches.map(m => m.$value)) :
-            new DismatchReport(this.$id, is.offset);
+                matches.map(m => m.$value),
+                context) :
+            new DismatchReport(this.$id, is.offset, context);
     }
 }
 

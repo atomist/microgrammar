@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import { canonicalize, stripComments, stripWhitespace } from "../../src/java/JavaBody";
+import { canonicalize } from "../../src/java/JavaBody";
 
 describe("Canonicalize", () => {
 

@@ -2,7 +2,7 @@ import { toMatchingLogic } from "./Concat";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
+import { DismatchReport, isPatternMatch, MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
 
 export function optional(o: any, pullUp?: string): MatchingLogic {
     return new Opt(o, pullUp);
@@ -24,24 +24,23 @@ export class Opt implements MatchingLogic {
         this.matcher = toMatchingLogic(o);
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
             return new UndefinedPatternMatch(this.$id, is.offset);
         }
 
-        const maybe = this.matcher.matchPrefix(is);
+        const maybe = this.matcher.matchPrefix(is, context);
         // console.log(`Result of trying Opt on [${is.remainder()}]=${JSON.stringify(maybe)}`);
 
-        if (maybe.$isMatch) {
+        if (isPatternMatch(maybe)) {
             if (this.pullUp) {
-                const maybem = maybe as any;
                 const f = this.pullUp + MATCH_INFO_SUFFIX;
-                const field = maybem.$value[f];
+                const field = maybe.$value[f];
                 if (!field) {
                     throw new Error(`Cannot pull up field ${f} in ${maybe}`);
                 }
-                maybem.$value = field.$value;
+                maybe.$value = field.$value;
             }
             return maybe;
         }
@@ -65,21 +64,21 @@ export class Alt implements MatchingLogic {
         this.matcherB = toMatchingLogic(b);
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new DismatchReport(this.$id, is.offset);
+            return new DismatchReport(this.$id, is.offset, {});
         }
 
-        const aMatch = this.matcherA.matchPrefix(is);
+        const aMatch = this.matcherA.matchPrefix(is, context);
         // console.log(`Result of trying Opt on [${is.remainder()}]=${JSON.stringify(maybe)}`);
-        if (aMatch.$isMatch) {
+        if (isPatternMatch(aMatch)) {
             return aMatch;
         }
         // Otherwise, try b
-        const bMatch = this.matcherB.matchPrefix(is);
-        return (bMatch.$isMatch) ?
+        const bMatch = this.matcherB.matchPrefix(is, context);
+        return (isPatternMatch(bMatch)) ?
             bMatch :
-            new DismatchReport(this.$id, is.offset);
+            new DismatchReport(this.$id, is.offset, {});
     }
 }
 
@@ -101,11 +100,11 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
         }
     }
 
-    function conditionalMatch(is: InputState): MatchPrefixResult {
-        const match = matcher.matchPrefix(is);
-        return (match.$isMatch && matchTest(match)) ?
+    function conditionalMatch(is: InputState, context: {}): MatchPrefixResult {
+        const match = matcher.matchPrefix(is, context);
+        return (isPatternMatch(match) && matchTest(match)) ?
             match :
-            new DismatchReport(this.$id, is.offset);
+            new DismatchReport(this.$id, is.offset, context);
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;

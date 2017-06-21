@@ -15,8 +15,8 @@ export class Literal implements MatchingLogic {
 
     public matchPrefix(is: InputState): MatchPrefixResult {
         return (is.peek(this.literal.length) === this.literal) ?
-            new TerminalPatternMatch(this.$id, this.literal, is.offset) :
-            new DismatchReport(this.$id, is.offset);
+            new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
+            new DismatchReport(this.$id, is.offset, context);
     }
 }
 
@@ -50,9 +50,10 @@ export abstract class AbstractRegex implements MatchingLogic {
                 this.$id,
                 matched,
                 is.offset,
-                this.toValue(actualMatch));
+                this.toValue(actualMatch),
+                context);
         } else {
-            return new DismatchReport(this.$id, is.offset);
+            return new DismatchReport(this.$id, is.offset, context);
         }
     }
 
@@ -94,7 +95,8 @@ export const matchEverything: MatchingLogic = {
             this.$id,
             everything,
             is.offset,
-            is.consume(everything));
+            is.consume(everything),
+            context);
     },
 };
 
@@ -135,7 +137,7 @@ export const Float = new MatchFloat();
 export class MatchLowercaseBoolean extends AbstractRegex {
 
     constructor() {
-        super(/^[false|true]/);
+        super(/^false|true/);
     }
 
     protected toValue(s: string): boolean {
