@@ -1,6 +1,6 @@
 {
   "name": "@atomist/microgrammar",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Atomist",
   "license": "GPL-3.0",
   "repository": {
@@ -15,9 +15,7 @@
   "bugs": {
     "url": "https://github.com/atomist/microgrammar/issues"
   },
-  "dependencies": {
-    "lodash": "^4.17.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^3.5.0",
     "@types/lodash": "^4.14.66",

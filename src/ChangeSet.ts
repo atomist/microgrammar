@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import { PatternMatch } from "./PatternMatch";
 
 function replaceFirstAfter(content: string, offset: number, old: string, replacement: string) {
@@ -15,13 +14,13 @@ export class ChangeSet {
     public change(match: PatternMatch, to: string) {
         const change = new Change(match, to);
         // Don't add twice: update
-        const found = _.find(this.changes, c => c.match === match);
-        if (!found) {
+        const found = this.changes.filter(c => c.match === match);
+        if (found.length === 0) {
             this.changes.push(change);
             // Keep sorted with latest first
             this.changes.sort((pm1, pm2) => pm2.match.$offset - pm1.match.$offset);
         } else {
-            const idx = _.indexOf<any>(this.changes, found);
+            const idx = this.changes.indexOf(found[0]);
             this.changes[idx] = change;
         }
     }
