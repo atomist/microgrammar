@@ -49,19 +49,20 @@ export class Opt implements MatchingLogic {
 }
 
 /**
- * Matches either A or B but not neither
+ * Matches first match of 2 or more matchers.
  */
 export class Alt implements MatchingLogic {
 
-    private matcherA: MatchingLogic;
-    private matcherB: MatchingLogic;
+    private matchers: MatchingLogic[];
+
+    constructor(a: any, b: any, ...matchers: any[]) {
+        const matchObjects = [a, b].concat(matchers);
+        this.matchers = matchObjects.map(m => toMatchingLogic(m));
+    }
 
     // tslint:disable-next-line:member-ordering
-    public $id = `Alt(${this.matcherA},${this.matcherB})`;
-
-    constructor(a: any, b: any) {
-        this.matcherA = toMatchingLogic(a);
-        this.matcherB = toMatchingLogic(b);
+    get $id() {
+        return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
@@ -69,16 +70,13 @@ export class Alt implements MatchingLogic {
             return new DismatchReport(this.$id, is.offset, {});
         }
 
-        const aMatch = this.matcherA.matchPrefix(is, context);
-        // console.log(`Result of trying Opt on [${is.remainder()}]=${JSON.stringify(maybe)}`);
-        if (isPatternMatch(aMatch)) {
-            return aMatch;
+        for (const matcher of this.matchers) {
+            const m = matcher.matchPrefix(is, context);
+            if (isPatternMatch(m)) {
+                return m;
+            }
         }
-        // Otherwise, try b
-        const bMatch = this.matcherB.matchPrefix(is, context);
-        return (isPatternMatch(bMatch)) ?
-            bMatch :
-            new DismatchReport(this.$id, is.offset, {});
+        return new DismatchReport(this.$id, is.offset, {});
     }
 }
 
