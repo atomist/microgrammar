@@ -1,9 +1,9 @@
 import assert = require("power-assert");
+import { fail } from "power-assert";
 
 import { InputState } from "../src/InputState";
 import { Alt } from "../src/Ops";
 import { isPatternMatch } from "../src/PatternMatch";
-import { fail } from "power-assert";
 
 describe("Alt", () => {
 
