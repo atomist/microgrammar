@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { InputState } from "../src/InputState";
-import { isPatternMatch } from "../src/PatternMatch";
-import { Span } from "../src/snobol/Snobol";
+import { InputState } from "../../src/InputState";
+import { isPatternMatch } from "../../src/PatternMatch";
+import { Span } from "../../src/snobol/Snobol";
 
 describe("SpanTest", () => {
 

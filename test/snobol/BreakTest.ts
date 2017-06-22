@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { Concat } from "../src/Concat";
-import { InputState } from "../src/InputState";
-import { AnonymousDefinition, Term } from "../src/Matchers";
-import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
-import { Regex } from "../src/Primitives";
-import { Break, Span } from "../src/snobol/Snobol";
+import { Concat } from "../../src/Concat";
+import { InputState } from "../../src/InputState";
+import { Term } from "../../src/Matchers";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { Regex } from "../../src/Primitives";
+import { Break, Span } from "../../src/snobol/Snobol";
 
 describe("BreakTest", () => {
 
@@ -40,6 +40,15 @@ describe("BreakTest", () => {
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("friday ");
+    });
+
+    it("break matches and consumes", () => {
+        const b = new Break("14", true);
+        const is = InputState.fromString("friday 14");
+        const m = b.matchPrefix(is, {}) as any;
+        expect(isPatternMatch(m)).to.equal(true);
+        expect(m.$matched).to.equal("friday 14");
+        expect(m.$value).to.equal("14");
     });
 
     it("break matches nothing as it comes immediately", () => {

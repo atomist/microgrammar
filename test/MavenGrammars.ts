@@ -116,7 +116,7 @@ export interface XmlTag {
     value: string;
 }
 
-const GAV_CONCAT = when(new Concat({
+export const GAV_CONCAT = when(new Concat({
     tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
     ...AnonymousDefinition,
 }), pm => pm.tags.filter(t => t.name === "groupId").length > 0 &&
@@ -126,10 +126,6 @@ const GAV_CONCAT = when(new Concat({
 // We should be using this elsewhere
 export const GAV_GRAMMAR =
     new Microgrammar(GAV_CONCAT);
-
-export interface Tags {
-    tags: XmlTag[];
-}
 
 export class GAV {
 

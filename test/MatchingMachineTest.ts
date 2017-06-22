@@ -241,7 +241,7 @@ class Sun:
     }
 });
 
-const POM_WITHOUT_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
+export const POM_WITHOUT_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -294,9 +294,9 @@ const POM_WITHOUT_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?
 </project>
 `;
 
-const REPLACE_ME = "<!-- -->";
+export const REPLACE_ME = "<!-- -->";
 
-const POM_WITH_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
+export const POM_WITH_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
