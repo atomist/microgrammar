@@ -2,15 +2,11 @@ import assert = require("power-assert");
 import { expect } from "chai";
 
 import { MatchingLogic } from "../src/Matchers";
-import { MatchingMachine } from "../src/MatchingMachine";
-import { Microgrammar } from "../src/Microgrammar";
-import { Opt, optional } from "../src/Ops";
+import { MatchingMachine } from "../src/Microgrammar";
+import { optional } from "../src/Ops";
 import { PatternMatch } from "../src/PatternMatch";
 import { takeUntil } from "../src/snobol/Snobol";
-import {
-    ALL_DEPENDENCY_GRAMMAR, asVersionedArtifact, GAV, LEGAL_VALUE, VersionedArtifact,
-    XML_TAG_WITH_SIMPLE_VALUE, XmlTag,
-} from "./MavenGrammars";
+import { GAV, LEGAL_VALUE, VersionedArtifact, XML_TAG_WITH_SIMPLE_VALUE, XmlTag } from "./MavenGrammars";
 
 describe("MatchingMachine", () => {
 

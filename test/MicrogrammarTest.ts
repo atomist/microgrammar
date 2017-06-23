@@ -1,8 +1,7 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { AnonymousDefinition, MatchingLogic, Term } from "../src/Matchers";
-import { MatchingMachine } from "../src/MatchingMachine";
-import { Microgrammar } from "../src/Microgrammar";
+import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
 import { PatternMatch } from "../src/PatternMatch";
 import { Rep1Sep, RepSep } from "../src/Rep";
