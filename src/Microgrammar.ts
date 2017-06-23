@@ -48,21 +48,7 @@ export class Microgrammar<T> implements Term {
     public findMatches(
         input: string | InputStream | InputState,
         stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
-
-        class LazyMatcher extends MatchingMachine {
-
-            public matches: PatternMatch[] = [];
-
-            constructor(private ml: MatchingLogic) {
-                super(ml);
-            }
-
-            protected onMatch(pm: PatternMatch): MatchingLogic {
-                this.matches.push(pm);
-                return stopAfterMatch(pm) ? undefined : this.ml;
-            }
-        }
-        const lm = new LazyMatcher(this.matcher).withConfig(this.config);
+        const lm = new LazyMatcher(this.matcher, stopAfterMatch).withConfig(this.config);
         lm.consume(input);
         return lm.matches as Array<T & PatternMatch>;
     }
@@ -79,3 +65,18 @@ export class Microgrammar<T> implements Term {
     }
 
 }
+
+class LazyMatcher extends MatchingMachine {
+
+    public matches: PatternMatch[] = [];
+
+    constructor(private ml: MatchingLogic, private stopAfterMatch: (PatternMatch) => boolean = pm => false) {
+        super(ml);
+    }
+
+    protected onMatch(pm: PatternMatch): MatchingLogic {
+        this.matches.push(pm);
+        return this.stopAfterMatch(pm) ? undefined : this.ml;
+    }
+}
+
