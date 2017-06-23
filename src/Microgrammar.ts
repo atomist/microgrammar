@@ -53,9 +53,8 @@ export class Microgrammar<T> implements Term {
 
             public matches: PatternMatch[] = [];
 
-            constructor(private ml: MatchingLogic, config: Config) {
+            constructor(private ml: MatchingLogic) {
                 super(ml);
-                this.withConfig(config);
             }
 
             protected onMatch(pm: PatternMatch): MatchingLogic {
@@ -63,7 +62,7 @@ export class Microgrammar<T> implements Term {
                 return stopAfterMatch(pm) ? undefined : this.ml;
             }
         }
-        const lm = new LazyMatcher(this.matcher, this.config);
+        const lm = new LazyMatcher(this.matcher).withConfig(this.config);
         lm.consume(input);
         return lm.matches as Array<T & PatternMatch>;
     }
