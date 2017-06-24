@@ -27,9 +27,13 @@ resource "aws_instance" "web" {
 
 describe("Parsing HCL", () => {
 
-    const hclString = Microgrammar.fromString(`"\${stuffUntilNextQuote}"`, {
-        stuffUntilNextQuote: new Break('"'),
-    });
+    // Function so as not to trigger eager loading, which can fail tests
+    function hclString() {
+        return Microgrammar.fromString(`"\${stuffUntilNextQuote}"`, {
+            stuffUntilNextQuote: new Break('"'),
+        });
+    }
+
     const hclNumber = Integer;
 
     it("should find key/value pairs from string", () => {
