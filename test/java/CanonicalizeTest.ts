@@ -124,4 +124,18 @@ describe("Canonicalize", () => {
         assert(stripped === expected);
     });
 
+    it("don't strip whitespace inside strings", () => {
+        const src =
+            `public class Foo { private String = "xxx    \t x"; }`;
+        const stripped = canonicalize(src);
+        assert(stripped === src);
+    });
+
+    it("don't be fooled by apparent comments within strings", () => {
+        const src =
+            `public class Foo { private String = "xxx       \n\n  // \teiwuiurwieuriwuer /* */   \t x"; }`;
+        const stripped = canonicalize(src);
+        assert(stripped === src);
+    });
+
 });
