@@ -11,6 +11,8 @@ import {
     VersionedArtifact,
 } from "./MavenGrammars";
 
+import { fail } from "power-assert";
+
 describe("MicrogrammarTest", () => {
 
     it("literal", () => {
@@ -22,6 +24,36 @@ describe("MicrogrammarTest", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         expect(result[0].$matched).to.equal("foo");
+    });
+
+    function makeMg() {
+        return Microgrammar.fromDefinitions({
+            name: "foo",
+        });
+    }
+
+    it("allows valid call to function", () => {
+        const content = "foo ";
+        const validMg = Microgrammar.fromDefinitions({
+            content: makeMg(),
+        });
+        const result = validMg.findMatches(content);
+        // console.log("Result is " + JSON.stringify(result));
+        expect(result.length).to.equal(1);
+        expect(result[0].$matched).to.equal("foo");
+    });
+
+    it("prevents invalid call to function", () => {
+        const content = "foo ";
+        // This is invalid as we are not invoking the function
+        try {
+            Microgrammar.fromDefinitions({
+                content: makeMg,
+            });
+            fail("Should not permit invalid function step");
+        } catch (e) {
+            assert(e.toString().lastIndexOf("content") !== -1);
+        }
     });
 
     it("can JSON stringify", () => {
@@ -134,8 +166,8 @@ describe("MicrogrammarTest", () => {
             rx: ">",
             notxml: "notxml",
         } as Term, {
-                consumeWhiteSpaceBetweenTokens: true,
-            });
+            consumeWhiteSpaceBetweenTokens: true,
+        });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
     });
@@ -149,8 +181,8 @@ describe("MicrogrammarTest", () => {
             rx: ">",
             notxml: "notxml",
         } as Term, {
-                consumeWhiteSpaceBetweenTokens: false,
-            });
+            consumeWhiteSpaceBetweenTokens: false,
+        });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
     });
@@ -220,7 +252,7 @@ describe("MicrogrammarTest", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert (result.length === 1);
+        assert(result.length === 1);
         const r0 = result[0] as any;
         assert(result[0].$matched === content);
         assert(r0.first.name === "first");
@@ -228,7 +260,7 @@ describe("MicrogrammarTest", () => {
         assert(r0.second.name === "second");
         // Now access match for the name
         const nameMatch = r0.second.name$match as PatternMatch;
-        assert (nameMatch.$value === "second");
+        assert(nameMatch.$value === "second");
         assert(nameMatch.$matched === nameMatch.$value);
         assert(nameMatch.$offset === "<first><".length);
     });
@@ -412,7 +444,7 @@ describe("MicrogrammarTest", () => {
         const names = new Rep1Sep(/^[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
-         });
+        });
 
         const mg = Microgrammar.fromDefinitions<CatsDogsAndPigs>({
             dogs: new Opt(names),

@@ -9,8 +9,8 @@ function XmlElement() {
 }
 function XmlGrammar() {
     return Microgrammar.fromString("${first}${second}", {
-        first: XmlElement,
-        second: XmlElement,
+        first: XmlElement(),
+        second: XmlElement(),
     });
 }
 

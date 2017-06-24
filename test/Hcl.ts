@@ -39,7 +39,7 @@ describe("Parsing HCL", () => {
     it("should find key/value pairs from string", () => {
         const mg = Microgrammar.fromString("${key} = ${value}", {
             key: /[a-z_]+/,
-            value: new Alt(new Alt(LowercaseBoolean, hclString), hclNumber),
+            value: new Alt(new Alt(LowercaseBoolean, hclString()), hclNumber),
         });
 
         const matches = mg.findMatches(sample);
@@ -51,7 +51,7 @@ describe("Parsing HCL", () => {
     it("should find number key/value pairs from definitions", () => {
         const mg = Microgrammar.fromString("${key} = ${value}", {
             key: /[a-z_]+/,
-            value: new Alt(new Alt(LowercaseBoolean, hclString), hclNumber),
+            value: new Alt(new Alt(LowercaseBoolean, hclString()), hclNumber),
         });
 
         const mg2 = Microgrammar.fromDefinitions({

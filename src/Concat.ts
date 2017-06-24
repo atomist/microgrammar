@@ -3,7 +3,7 @@ import { InputState } from "./InputState";
 import { Matcher, MatchingLogic, Term } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
-import { DismatchReport, isPatternMatch, PatternMatch, TerminalPatternMatch, TreePatternMatch } from "./PatternMatch";
+import { DismatchReport, isPatternMatch, PatternMatch, TreePatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
 import { consumeWhitespace } from "./Whitespace";
 
@@ -27,20 +27,24 @@ export class Concat implements MatchingLogic {
     public readonly matchSteps: MatchStep[] = [];
 
     constructor(public definitions: any, public config: Config = DefaultConfig) {
-        for (const matcherName in definitions) {
-            if (matcherName !== "$id" && matcherName !== "matchPrefix") {
-                const def = definitions[matcherName];
+        for (const stepName in definitions) {
+            if (stepName !== "$id" && stepName !== "matchPrefix") {
+                const def = definitions[stepName];
                 if (Array.isArray(def) && def.length === 2) {
                     // It's a transformation of a matched return
                     const ml = def[0];
-                    const named = withName(toMatchingLogic(ml), matcherName);
+                    const named = withName(toMatchingLogic(ml), stepName);
                     this.matchSteps.push(new TransformingMatcher(named, def[1]));
                 } else if (typeof def === "function") {
                     // It's a calculation function
-                    this.matchSteps.push({ $id: matcherName, f: def });
+                    if (def.length === 0) {
+                        // A no arg function is invalid
+                        throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
+                    }
+                    this.matchSteps.push({ $id: stepName, f: def });
                 } else {
                     // It's a normal matcher
-                    const named = withName(toMatchingLogic(def), matcherName);
+                    const named = withName(toMatchingLogic(def), stepName);
                     this.matchSteps.push(named);
                 }
             }
@@ -149,7 +153,6 @@ class MatcherWrapper implements Matcher {
         if (isPatternMatch(mpr)) {
             context[this.name] = mpr.$value;
         }
-        // (mpr as any).name = this.name;
         return mpr;
     }
 }
