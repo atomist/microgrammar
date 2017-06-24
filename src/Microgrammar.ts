@@ -70,7 +70,13 @@ export class Microgrammar<T> implements Term {
 }
 
 /**
- * Single use, potentially stateful, class for matching input
+ * Single use, usually stateful, class for matching input.
+ * Offers the ability to observe a match, as well as match one,
+ * and to change the matcher in use depending on obervation and matching.
+ * E.g. it's possible to choose to start matching pattern B after finding pattern A,
+ * or after *seeing* pattern A, even if starting off matching something else.
+ * This enables us, for example, to parse XML, with the observer watching element
+ * open and close to maintain the current path, while the matcher matches anything we want.
  */
 export abstract class MatchingMachine {
 
@@ -80,8 +86,13 @@ export abstract class MatchingMachine {
 
     protected observer: MatchingLogic;
 
-    constructor(m: any, o?: any) {
-        this.matcher = extractMatcher(m);
+    /**
+     * Create a new stateful matching machine
+     * @param initialMatcher matcher to start using. This can be changed by the callback methods in this class
+     * @param o optional observer
+     */
+    constructor(initialMatcher: any, o?: any) {
+        this.matcher = extractMatcher(initialMatcher);
         if (o) {
             this.observer = extractMatcher(o);
         }
@@ -97,7 +108,6 @@ export abstract class MatchingMachine {
      * @param input
      */
     public consume(input: string | InputStream | InputState): void {
-
         const omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
 
         let currentMatcher: MatchingLogic = this.matcher;
@@ -135,10 +145,19 @@ export abstract class MatchingMachine {
         }
     }
 
+    /**
+     * Observe a match. The return can change the matcher in use, or return the current matcher.
+     * @param pm pattern to observe
+     * @returns {MatchingLogic}
+     */
     protected observeMatch(pm): any {
         return this.matcher;
     }
 
+    /**
+     * React to a match. The return can change the matcher, or return the current matcher.
+     * @param pm matcher
+     */
     protected abstract onMatch(pm: PatternMatch): any;
 
 }

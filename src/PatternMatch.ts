@@ -62,11 +62,6 @@ export class TerminalPatternMatch extends PatternMatch {
     }
 
     public addOffset(additionalOffset: number) {
-        // at this point the $resultingInputState isn't really valid
-        // anymore. Which leads to the question: does it make sense to
-        // save that? I understand returning it from the initial match,
-        // but saving it beyond that seems like a bad idea. We might want
-        // to separate that out. -- to rod from jess
         return new TerminalPatternMatch(
             this.$matcherId,
             this.$matched,
@@ -155,11 +150,6 @@ export class TreePatternMatch extends PatternMatch {
     }
 
     public addOffset(additionalOffset: number) {
-        // at this point the $resultingInputState isn't really valid
-        // anymore. Which leads to the question: does it make sense to
-        // save that? I understand returning it from the initial match,
-        // but saving it beyond that seems like a bad idea. We might want
-        // to separate that out. -- to rod from jess
         return new TreePatternMatch(
             this.$matcherId,
             this.$matched,

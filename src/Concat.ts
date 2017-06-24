@@ -65,11 +65,17 @@ export class Concat implements MatchingLogic {
             }
 
             if (isMatcher(step)) {
-                const report = step.matchPrefix(currentInputState, context);
+                // If it's a concat, give it a fresh matcher
+                const contextToUse = isConcat(step) ? {} : context;
+                const report = step.matchPrefix(currentInputState, contextToUse);
                 if (isPatternMatch(report)) {
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
+                    if (isConcat(step)) {
+                        // Bind the nested context if necessary
+                        context[step.$id] = contextToUse;
+                    }
                 } else {
                     return new DismatchReport(this.$id, initialInputState.offset, context);
                 }
@@ -96,6 +102,10 @@ export class Concat implements MatchingLogic {
             context);
     }
 
+}
+
+function isConcat(m: MatchingLogic): boolean {
+    return m && !!((m as Concat).matchSteps || isConcat((m as MatcherWrapper).ml));
 }
 
 function isMatcher(s: MatchStep): s is Matcher {
@@ -130,7 +140,7 @@ class MatcherWrapper implements Matcher {
 
     public $id = this.name;
 
-    constructor(public name: string, private ml: MatchingLogic) {
+    constructor(public name: string, public ml: MatchingLogic) {
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {

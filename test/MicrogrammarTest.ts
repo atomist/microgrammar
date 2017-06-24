@@ -221,17 +221,17 @@ describe("MicrogrammarTest", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
+        assert (result.length === 1);
         const r0 = result[0] as any;
-        expect(result[0].$matched).to.equal(content);
-        expect(r0.first.name).to.equal("first");
-        expect(r0.first.$match.$matched).to.equal("<first>");
-        expect(r0.second.name).to.equal("second");
+        assert(result[0].$matched === content);
+        assert(r0.first.name === "first");
+        assert(r0.first.$match.$matched === "<first>");
+        assert(r0.second.name === "second");
         // Now access match for the name
         const nameMatch = r0.second.name$match as PatternMatch;
-        expect(nameMatch.$value).to.equal("second");
-        expect(nameMatch.$matched).to.equal(nameMatch.$value);
-        expect(nameMatch.$offset).to.equal("<first><".length);
+        assert (nameMatch.$value === "second");
+        assert(nameMatch.$matched === nameMatch.$value);
+        assert(nameMatch.$offset === "<first><".length);
     });
 
     it("1 XML elements via nested microgrammar with optional not present", () => {
@@ -250,9 +250,9 @@ describe("MicrogrammarTest", () => {
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
         // expect(r0.$name).to.equal("element");
-        expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
-        expect(r0.second).to.equal(undefined);
+        assert(r0.$matched === content);
+        assert(r0.first.$match.$matched === "<first>");
+        assert(r0.second === undefined);
     });
 
     it("2 XML elements via nested microgrammar with whitespace", () => {
@@ -290,7 +290,7 @@ describe("MicrogrammarTest", () => {
     });
 
     it("parse dependencies in ill formed POM", () => {
-        const matches = DEPENDENCY_GRAMMAR.findMatches("<this is a load of bollocks") as any as VersionedArtifact[];
+        const matches = DEPENDENCY_GRAMMAR.findMatches("<this is a load of nonsense") as any as VersionedArtifact[];
         expect(matches.length).to.equal(0);
     });
 
@@ -372,7 +372,6 @@ describe("MicrogrammarTest", () => {
         const names = new Rep1Sep(/[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
-            ...AnonymousDefinition,
         });
 
         const mg = Microgrammar.fromDefinitions({
@@ -381,10 +380,9 @@ describe("MicrogrammarTest", () => {
             cats: names,
             _separator2: "****",
             pigs: nested,
-            ...AnonymousDefinition,
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****Porker") as any[];
-        expect(matches.length).to.equal(1);
+        assert(matches.length === 1);
         const m = matches[0] as any;
         expect(m.cats).to.have.members(["Felix", "Oscar"]);
         expect(m.pigs.pigs).to.have.members(["Porker"]);
@@ -417,8 +415,7 @@ describe("MicrogrammarTest", () => {
         const names = new Rep1Sep(/^[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
-            ...AnonymousDefinition,
-        });
+         });
 
         const mg = Microgrammar.fromDefinitions<CatsDogsAndPigs>({
             dogs: new Opt(names),
@@ -427,7 +424,6 @@ describe("MicrogrammarTest", () => {
             _separator2: "****",
             // Bring in the definitions from the given grammar
             ...nested.definitions,
-            ...AnonymousDefinition,
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****Porker");
         expect(matches.length).to.equal(1);

@@ -1,6 +1,7 @@
-import assert = require("power-assert");
+import * as assert from "power-assert";
 import { Concat } from "../src/Concat";
 import { InputState } from "../src/InputState";
+import { Microgrammar } from "../src/Microgrammar";
 import { isPatternMatch } from "../src/PatternMatch";
 import { Integer, LowercaseBoolean } from "../src/Primitives";
 
@@ -91,6 +92,51 @@ describe("ContextTest", () => {
         assert((matched.$context as any).promoted === "gary");
     });
 
-    it("handles nested matches with correct nested context scope");
+    it("handles multiple bound matches in microgrammar", () => {
+        const cc = Microgrammar.fromDefinitions({
+            nested: {
+                name: /^[a-z]+/,
+            },
+            promoted: ctx => ctx.nested.name,
+            b: Integer,
+            c: Integer,
+        });
+        const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+        assert(matches.length === 2);
+        assert(matches[0].promoted === "gary");
+        assert(matches[1].promoted === "elizabeth");
+    });
+
+    it("doesn't pollute parent context in microgrammar", () => {
+        const cc = Microgrammar.fromDefinitions({
+            nested: {
+                name: /^[a-z]+/,
+                shouty: ctx => ctx.name.toLocaleUpperCase(),
+            },
+            b: Integer,
+            c: Integer,
+        });
+        const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+        assert(matches.length === 2);
+        assert(matches[0].shouty === undefined);
+        assert(matches[1].shouty === undefined);
+    });
+
+    // TODO this is broken because context binding isn't working properly
+    it("handles nested bound matches in microgrammar");
+    //     , () => {
+    //     const cc = Microgrammar.fromDefinitions({
+    //         nested: {
+    //             name: /^[a-z]+/,
+    //             shouty: ctx => ctx.name.toLocaleUpperCase(),
+    //         },
+    //         b: Integer,
+    //         c: Integer,
+    //     });
+    //     const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+    //     assert(matches.length === 2);
+    //     assert(matches[0].nested.shouty === "GARY");
+    //     assert(matches[1].nested.shouty === "ELIZABETH");
+    // });
 
 });
