@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { InputState } from "../../src/InputState";
 import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
-import { AnonymousDefinition } from "../../src/Matchers";
 import { Microgrammar } from "../../src/Microgrammar";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { matchEverything, Regex } from "../../src/Primitives";
@@ -62,7 +61,6 @@ describe("JavaBlockTest", () => {
             equals: "=",
             right: "y",
             _whatever: matchEverything,
-            ...AnonymousDefinition,
         });
         const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);

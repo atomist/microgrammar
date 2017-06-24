@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { ChangeSet } from "../src/ChangeSet";
-import { AnonymousDefinition } from "../src/Matchers";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
 
@@ -15,7 +14,6 @@ describe("MicrogrammarUpdateTest", () => {
         return Microgrammar.fromDefinitions({
             first: element,
             second: new Opt(element),
-            ...AnonymousDefinition,
         });
     }
 

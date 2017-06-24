@@ -1,5 +1,5 @@
 import { Concat } from "../src/Concat";
-import { AnonymousDefinition, Term } from "../src/Matchers";
+import { Term } from "../src/Matchers";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt, when } from "../src/Ops";
 import { Rep, Rep1 } from "../src/Rep";
@@ -16,7 +16,6 @@ const VERSION = {
     lx2: "<version>",
     version: LEGAL_VALUE,
     rx2: "</version>",
-    ...AnonymousDefinition,
 };
 
 export const DEPENDENCY_GRAMMAR = Microgrammar.fromDefinitions<VersionedArtifact>({
@@ -44,7 +43,6 @@ export const ALL_DEPENDENCY_GRAMMAR =
         artifact: LEGAL_VALUE,
         rx: "</artifactId>",
         version: new Opt(VERSION, "version"),
-        ...AnonymousDefinition,
     });
 
 export const PLUGIN_GRAMMAR = Microgrammar.fromDefinitions<VersionedArtifact>({
@@ -56,7 +54,6 @@ export const PLUGIN_GRAMMAR = Microgrammar.fromDefinitions<VersionedArtifact>({
     artifact: LEGAL_VALUE,
     rx: "</artifactId>",
     ...VERSION,
-    ...AnonymousDefinition,
 });
 
 /**
@@ -73,7 +70,6 @@ export const ALL_PLUGIN_GRAMMAR =
         artifact: LEGAL_VALUE,
         rx: "</artifactId>",
         version: new Opt(VERSION, "version"),
-        ...AnonymousDefinition,
     });
 
 const property = {
@@ -90,7 +86,6 @@ export const PROPERTIES_GRAMMAR = Microgrammar.fromDefinitions<PropertiesBlock>(
     _po: "<properties>",
     properties: new Rep(property),
     // _pe: "</properties>"
-    ...AnonymousDefinition,
 });
 
 /**
@@ -118,7 +113,6 @@ export interface XmlTag {
 
 export const GAV_CONCAT = when(new Concat({
     tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
-    ...AnonymousDefinition,
 }), pm => pm.tags.filter(t => t.name === "groupId").length > 0 &&
     pm.tags.filter(t => t.name === "artifactId").length > 0);
 
@@ -155,13 +149,11 @@ export const PARENT_STANZA = Microgrammar.fromDefinitions({
 export const FIRST_DEPENDENCY = Microgrammar.fromDefinitions({
     _deps: "<dependencies>",
     dependency: ALL_DEPENDENCY_GRAMMAR,
-    ...AnonymousDefinition,
 });
 
 export const FIRST_PLUGIN = Microgrammar.fromDefinitions({
     _plugins: "<plugins>",
     plugin: ALL_PLUGIN_GRAMMAR,
-    ...AnonymousDefinition,
 });
 
 export const ARTIFACT_VERSION_GRAMMAR = Microgrammar.fromDefinitions({
@@ -169,5 +161,4 @@ export const ARTIFACT_VERSION_GRAMMAR = Microgrammar.fromDefinitions({
     lx2: "<version>",
     version: LEGAL_VALUE,
     rx2: "</version>",
-    ...AnonymousDefinition,
 });

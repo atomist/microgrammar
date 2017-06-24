@@ -10,11 +10,6 @@ export interface Term {
     readonly $id?: string;
 }
 
-export const AnonymousDefinition: Term = {
-
-    $id: "AnonymousDefinition",
-};
-
 /**
  * Anonymous matcher
  */

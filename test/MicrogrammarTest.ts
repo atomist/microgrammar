@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
-import { AnonymousDefinition, MatchingLogic, Term } from "../src/Matchers";
+import { MatchingLogic, Term } from "../src/Matchers";
 import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
 import { PatternMatch } from "../src/PatternMatch";
@@ -17,7 +17,6 @@ describe("MicrogrammarTest", () => {
         const content = "foo ";
         const mg = Microgrammar.fromDefinitions({
             name: "foo",
-            ...AnonymousDefinition,
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
@@ -251,6 +250,7 @@ describe("MicrogrammarTest", () => {
         const r0 = result[0] as any;
         // expect(r0.$name).to.equal("element");
         assert(r0.$matched === content);
+        assert(r0.first.$match);
         assert(r0.first.$match.$matched === "<first>");
         assert(r0.second === undefined);
     });
@@ -362,7 +362,6 @@ describe("MicrogrammarTest", () => {
             cats: names,
             _separator2: "****",
             pigs: nested,
-            ...AnonymousDefinition,
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****_Porker");
         expect(matches.length).to.equal(0);
@@ -392,7 +391,6 @@ describe("MicrogrammarTest", () => {
         const names = new Rep1Sep(/[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
-            ...AnonymousDefinition,
         });
 
         const mg = Microgrammar.fromDefinitions<CatsDogsAndPigs>({
@@ -402,7 +400,6 @@ describe("MicrogrammarTest", () => {
             _separator2: "****",
             // Bring in the definitions from the given grammar
             ...nested.definitions,
-            ...AnonymousDefinition,
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****Porker");
         expect(matches.length).to.equal(1);

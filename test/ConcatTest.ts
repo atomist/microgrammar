@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Concat } from "../src/Concat";
 import { InputState } from "../src/InputState";
-import { AnonymousDefinition, Term } from "../src/Matchers";
+import { Term } from "../src/Matchers";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
 import { RepSep } from "../src/Rep";
@@ -40,7 +40,6 @@ describe("ConcatTest", () => {
         const content = "2";
         const mg = new Concat({
             num: Integer,
-            ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
         const result = mg.matchPrefix(is, {}) as any;
@@ -57,7 +56,6 @@ describe("ConcatTest", () => {
         const content = "24";
         const mg = new Concat({
             num: Integer,
-            ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
         const result = mg.matchPrefix(is, {}) as any;
@@ -72,7 +70,6 @@ describe("ConcatTest", () => {
             hours: Integer,
             _x: "x",
             days: Integer,
-            ...AnonymousDefinition,
         });
         const is = InputState.fromString(content);
         const result = mg.matchPrefix(is, {}) as any;
