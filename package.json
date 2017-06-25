@@ -36,6 +36,6 @@
     "autotest": "supervisor -q -n exit -e ts -x npm -- run test",
     "lint": "tslint '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
-    "test": "mocha --compilers ts:espower-typescript/guess 'test/**/*.ts'"
+    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\""
   }
 }
