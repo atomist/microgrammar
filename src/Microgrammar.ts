@@ -4,12 +4,33 @@ import { InputState } from "./InputState";
 import { InputStream } from "./InputStream";
 import { isPatternMatch } from "./PatternMatch";
 
+import { ChangeSet } from "./ChangeSet";
 import { MatchingLogic, Term } from "./Matchers";
 import { MicrogrammarSpecParser } from "./MicrogrammarSpecParser";
 import { MatchUpdater, MicrogrammarUpdates } from "./MicrogrammarUpdates";
 import { PatternMatch } from "./PatternMatch";
 import { StringInputStream } from "./StringInputStream";
 import { consumeWhitespace } from "./Whitespace";
+
+/**
+ * Holds a set of updatable matches
+ */
+export class Updatable<T> {
+
+    public readonly matches: T[];
+
+    private cs: ChangeSet;
+
+    constructor(hits: Array<T & PatternMatch>, content: string) {
+        const mut = new MicrogrammarUpdates();
+        this.cs = new ChangeSet(content);
+        this.matches = hits.map(m => mut.updatableMatch(m, this.cs));
+    }
+
+    public updated(): string {
+        return this.cs.updated();
+    }
+}
 
 /**
  * Represents a microgrammar that we can use to match input
@@ -19,8 +40,13 @@ import { consumeWhitespace } from "./Whitespace";
  */
 export class Microgrammar<T> implements Term {
 
-    public static updateableMatch<T>(match: T & PatternMatch, content: string): T & MatchUpdater {
-        return new MicrogrammarUpdates().updateableMatch(match, content);
+    public static updatableMatch<T>(match: T & PatternMatch, content: string): T & MatchUpdater {
+        return new MicrogrammarUpdates().updatableMatch(match, content);
+    }
+
+    public static updatable<T>(matches: Array<T & PatternMatch>,
+                               content: string): Updatable<T> {
+        return new Updatable<T>(matches, content);
     }
 
     public static fromDefinitions<T>(definitions: {}, config: Config = DefaultConfig): Microgrammar<T> {
@@ -31,7 +57,6 @@ export class Microgrammar<T> implements Term {
         spec: string,
         components: object = {},
         config: Config = DefaultConfig): Microgrammar<T> {
-
         return new MicrogrammarSpecParser().fromString<T>(spec, components, config);
     }
 

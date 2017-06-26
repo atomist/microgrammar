@@ -97,8 +97,8 @@ describe("MicrogrammarFromStringTest", () => {
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
             namex: /[a-zA-Z0-9]+/,
         }, {
-                consumeWhiteSpaceBetweenTokens: true,
-            });
+            consumeWhiteSpaceBetweenTokens: true,
+        });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
         expect(result[0].namex).to.equal("first");
@@ -109,8 +109,8 @@ describe("MicrogrammarFromStringTest", () => {
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
             namex: /[a-zA-Z0-9]+/,
         }, {
-                consumeWhiteSpaceBetweenTokens: false,
-            });
+            consumeWhiteSpaceBetweenTokens: false,
+        });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
     });
@@ -207,18 +207,20 @@ describe("MicrogrammarFromStringTest", () => {
         version: LEGAL_VALUE,
     };
 
-    const DEPENDENCY_GRAMMAR = Microgrammar.fromString<VersionedArtifact>(
-        `<dependency>
+    function dependencyGrammar() {
+        return Microgrammar.fromString<VersionedArtifact>(
+            `<dependency>
        <groupId> \${group} </groupId>
        <artifactId> \${artifact} </artifactId>
       ${versionString} `, {
-            group: LEGAL_VALUE,
-            artifact: LEGAL_VALUE,
-            ...VERSION,
-        });
+                group: LEGAL_VALUE,
+                artifact: LEGAL_VALUE,
+                ...VERSION,
+            });
+    }
 
     it("parse dependencies in real world POM", () => {
-        const matches = DEPENDENCY_GRAMMAR.findMatches(RealWorldPom) as any as VersionedArtifact[];
+        const matches = dependencyGrammar().findMatches(RealWorldPom) as any as VersionedArtifact[];
         if (matches.length === 0) {
             throw new Error("Expected matches");
         }
@@ -229,7 +231,7 @@ describe("MicrogrammarFromStringTest", () => {
 
     it("parse dependencies in ill formed POM", () => {
         const matches =
-            DEPENDENCY_GRAMMAR.findMatches("<this is a load of bollocks") as any as VersionedArtifact[];
+            dependencyGrammar().findMatches("<this is a load of bollocks") as any as VersionedArtifact[];
         expect(matches.length).to.equal(0);
     });
 

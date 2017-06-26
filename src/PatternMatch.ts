@@ -6,11 +6,10 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
  */
 export class DismatchReport implements MatchPrefixResult {
 
-    public constructor(
-        public readonly $matcherId: string,
-        public $offset: number,
-        public $context: {},
-        private cause?: DismatchReport) {
+    public constructor(public readonly $matcherId: string,
+                       public $offset: number,
+                       public $context: {},
+                       private cause?: DismatchReport) {
     }
 
 }
@@ -25,20 +24,30 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
     /**
      * Represents a match
+     * @param $matcherId id of the matcher that matched
      * @param $matched the actual string content
      * @param $offset
-     * @param $resultingInputState
+     * @param $context context bound during the match
      */
-    constructor(
-        public readonly $matcherId: string,
-        public readonly $matched: string,
-        public readonly $offset: number,
-        public readonly $context: {}) {
+    constructor(public readonly $matcherId: string,
+                public readonly $matched: string,
+                public readonly $offset: number,
+                public readonly $context: {}) {
+        // Copy top level context properties
+        // tslint:disable-next-line:forin
+        for (const p in $context) {
+            const val = $context[p];
+            if (typeof val !== "function") {
+                this[p] = val;
+                if (this.$value && typeof this.$value === "object") {
+                    this.$value[p] = val;
+                }
+            }
+        }
     }
 
     public abstract addOffset(additionalOffset: number): PatternMatch;
 
-    // how do I specify, an object whose properties are of type PatternMatch?
     public submatches() {
         return {};
     }
@@ -46,18 +55,16 @@ export abstract class PatternMatch implements MatchPrefixResult {
 }
 
 export function isPatternMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
-    return (mpr as PatternMatch).$matched !== undefined;
+    return mpr != null && (mpr as PatternMatch).$matched !== undefined;
 }
 
 export class TerminalPatternMatch extends PatternMatch {
 
-    constructor(
-        matcherId: string,
-        matched: string,
-        offset: number,
-        public readonly $value: any,
-        context: {}) {
-
+    constructor(matcherId: string,
+                matched: string,
+                offset: number,
+                public readonly $value: any,
+                context: {}) {
         super(matcherId, matched, offset, context);
     }
 
@@ -79,9 +86,8 @@ export class UndefinedPatternMatch extends PatternMatch {
 
     public $value = undefined;
 
-    constructor(
-        matcherId: string,
-        offset: number) {
+    constructor(matcherId: string,
+                offset: number) {
 
         super(matcherId, "", offset, {});
     }
@@ -118,32 +124,29 @@ export class TreePatternMatch extends PatternMatch {
 
     public readonly $value;
 
-    constructor(
-        $matcherId: string,
-        $matched: string,
-        $offset: number,
-        public $matchers: Matcher[],
-        public $subMatches: PatternMatch[],
-        context: {}) {
+    constructor($matcherId: string,
+                $matched: string,
+                $offset: number,
+                public $matchers: Matcher[],
+                public $subMatches: PatternMatch[],
+                context: {}) {
 
         super($matcherId, $matched, $offset, context);
         this.$value = {};
-        // Copy top level context properties
-        // tslint:disable-next-line:forin
-        for (const p in context) {
-            this[p] = context[p];
-        }
 
-        // TODO address code duplication with prepare method
         for (let i = 0; i < $subMatches.length; i++) {
-            this.prepareMatch($matchers[i].name, $subMatches[i]);
             const value = $subMatches[i].$value;
-            (this as any)[$matchers[i].name] = value;
             this.$value[$matchers[i].name] = value;
             if (typeof value === "object") {
+                if (!(this as any)[$matchers[i].name]) {
+                    (this as any)[$matchers[i].name] = value;
+                }
                 const mn = this.$value[$matchers[i].name] as MatchInfo;
                 mn.$match = $subMatches[i];
+                (this as any)[$matchers[i].name].$match = $subMatches[i];
             } else {
+                // We've got nowhere to put the matching information on a simple value,
+                // so create a parallel property on the parent with an out of band name
                 this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
             }
         }
@@ -167,27 +170,8 @@ export class TreePatternMatch extends PatternMatch {
         return output;
     }
 
-    private prepareMatch(name: string, pm: PatternMatch) {
-        const pma = pm as any;
-        (pm as any)[name] = pm.$matched;
-        if (pma.subMatchers) {
-            for (let i = 0; i < pma.subMatches.length; i++) {
-                this.prepareMatch(pma.matchers[i].name, pma.subMatches[i]);
-                (this as any)[pma.matchers[i].name] = pma.subMatches[i].$value;
-                if (typeof pma.subMatches[i].$value !== "string") {
-                    (this as any)[pma.matchers[i].name].$match = pma.subMatches[i];
-                }
-                const value = pma.subMatches[i].$value;
-                this.$value[pma.matchers[i].name] = value;
-                if (typeof value === "object") {
-                    const mn = value as MatchInfo;
-                    mn.$match = pma.subMatches[i].$matched;
-                } else {
-                    this.$value[pma.matchers[i].name + MATCH_INFO_SUFFIX] = pma.subMatches[i];
-                }
-            }
-        }
-        return pm;
-    }
+}
 
+export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
+    return mpr != null && (mpr as TreePatternMatch).$matchers !== undefined;
 }

@@ -1,16 +1,20 @@
 import { ChangeSet } from "./ChangeSet";
-import { PatternMatch } from "./PatternMatch";
+import { isTreePatternMatch, PatternMatch } from "./PatternMatch";
 
 export interface MatchUpdater {
     newContent(): string;
     replaceAll(newValue: string): void;
 }
 
+/**
+ * Handle low level updating using get/set properties
+ */
 export class MicrogrammarUpdates {
 
-    public updateableMatch<T>(match: T & PatternMatch, content: string): T & MatchUpdater {
-        const thinger: any = {
-            $changeSet: new ChangeSet(content),
+    public updatableMatch<T>(match: T & PatternMatch, cs: ChangeSet | string): T & MatchUpdater {
+        const changeSet = (typeof cs === "string") ? new ChangeSet(cs) : cs;
+        const updating: any = {
+            $changeSet: changeSet,
             newContent() {
                 return this.$changeSet.updated();
             },
@@ -18,8 +22,8 @@ export class MicrogrammarUpdates {
                 this.$changeSet.change(match, newValue);
             },
         };
-        this.addMatchesAsProperties(thinger, thinger.$changeSet, match);
-        return thinger as (T & MatchUpdater);
+        this.addMatchesAsProperties(updating, updating.$changeSet, match);
+        return updating as (T & MatchUpdater);
     }
 
     /**
@@ -48,11 +52,22 @@ export class MicrogrammarUpdates {
             target[privateProperty] = initialValue;
             Object.defineProperty(target, key, {
                 get() {
-                    return this[privateProperty];
+                    return ((target as any).$invalidated) ?
+                        undefined :
+                        this[privateProperty];
                 },
                 set(newValue) {
-                    // console.log("The setter got called");
+                    if ((target as any).$invalidated) {
+                        throw new Error(`Cannot set [${key}] on [${target}]: invalidated by parent change`);
+                    }
                     cs.change(submatch, newValue);
+                    if (isTreePatternMatch(submatch) && submatch.$subMatches.length > 0) {
+                        // The caller has set the value of an entire property block.
+                        // Invalidate the properties under it
+                        for (const prop of Object.getOwnPropertyNames(target)) {
+                            target[prop].$invalidated = true;
+                        }
+                    }
                 },
                 enumerable: true,
                 configurable: true,

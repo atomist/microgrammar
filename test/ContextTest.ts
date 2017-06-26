@@ -122,21 +122,19 @@ describe("ContextTest", () => {
         assert(matches[1].shouty === undefined);
     });
 
-    // TODO this is broken because context binding isn't working properly
-    it("handles nested bound matches in microgrammar");
-    //     , () => {
-    //     const cc = Microgrammar.fromDefinitions({
-    //         nested: {
-    //             name: /^[a-z]+/,
-    //             shouty: ctx => ctx.name.toLocaleUpperCase(),
-    //         },
-    //         b: Integer,
-    //         c: Integer,
-    //     });
-    //     const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-    //     assert(matches.length === 2);
-    //     assert(matches[0].nested.shouty === "GARY");
-    //     assert(matches[1].nested.shouty === "ELIZABETH");
-    // });
+    it("handles nested bound matches in microgrammar", () => {
+        const cc = Microgrammar.fromDefinitions({
+            nested: {
+                name: /^[a-z]+/,
+                shouty: ctx => ctx.name.toLocaleUpperCase(),
+            },
+            b: Integer,
+            c: Integer,
+        });
+        const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+        assert(matches.length === 2);
+        assert(matches[0].nested.shouty === "GARY");
+        assert(matches[1].nested.shouty === "ELIZABETH");
+    });
 
 });

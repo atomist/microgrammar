@@ -47,5 +47,9 @@ export class ChangeSet {
 
 class Change {
 
-    constructor(public match: PatternMatch, public to: string) { }
+    constructor(public match: PatternMatch, public to: string) {
+        if (match.$offset === undefined) {
+            throw new Error(`No offset on match with id [${match.$matcherId}]: matched=[${match.$matched}]`);
+        }
+    }
 }

@@ -76,9 +76,11 @@ export class Concat implements MatchingLogic {
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
-                    if (isConcat(step)) {
+                    if (contextToUse !== context) {
                         // Bind the nested context if necessary
                         context[step.$id] = contextToUse;
+                    } else {
+                        context[step.$id] = report.$value;
                     }
                 } else {
                     return new DismatchReport(this.$id, initialInputState.offset, context);
@@ -148,12 +150,7 @@ class MatcherWrapper implements Matcher {
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        // Remember to copy extra properties
-        const mpr = this.ml.matchPrefix(is, context) as PatternMatch;
-        if (isPatternMatch(mpr)) {
-            context[this.name] = mpr.$value;
-        }
-        return mpr;
+        return this.ml.matchPrefix(is, context) as PatternMatch;
     }
 }
 
@@ -169,11 +166,8 @@ class TransformingMatcher implements Matcher {
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         const mpr = this.m.matchPrefix(is, context) as PatternMatch;
-        // (mpr as any).name = this.name;
         if (isPatternMatch(mpr)) {
             const computed = this.f(mpr.$value, context);
-            // tslint:disable-next-line:max-line-length
-            // console.log(`Setting context.${this.name} from ${mpr.$value} to ${computed} via ${this.f} using context ${context}`)
             context[this.name] = mpr[this.name] = computed;
         }
         return mpr;
