@@ -1,4 +1,4 @@
-import { toMatchingLogic } from "./Concat";
+import { isConcat, toMatchingLogic  } from "./Concat";
 import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
@@ -50,7 +50,10 @@ export class Repetition implements MatchingLogic, Configurable {
                 matched += eaten[0];
                 currentIs = eaten[1];
             }
-            const match = this.matcher.matchPrefix(currentIs, context);
+
+            const contextToUse = isConcat(this.matcher) ? {} : context;
+
+            const match = this.matcher.matchPrefix(currentIs, contextToUse);
             if (!isPatternMatch(match)) {
                 break;
             } else {
