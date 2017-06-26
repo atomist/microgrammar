@@ -75,11 +75,18 @@ export class Repetition implements MatchingLogic, Configurable {
                 }
             }
         }
+
+        const values = matches.map(m =>
+            (typeof m.$value === "object") ?
+                m.$context :
+                m.$value,
+        );
+
         return (matches.length >= this.min) ?
             new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
-                matches.map(m => m.$value),
+                values,
                 context) :
             new DismatchReport(this.$id, is.offset, context);
     }
