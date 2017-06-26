@@ -3,7 +3,7 @@ import { InputState } from "../src/InputState";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 
-describe("RegexTest", () => {
+describe("Regex", () => {
 
     it("match word letters", () => {
         const regexp = new Regex(/^[a-z]+/);
