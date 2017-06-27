@@ -6,37 +6,30 @@ describe("Whitespace stripping", () => {
 
     it("shouldn't change when no whitespace", () => {
         const src =
-            `public class Foo { }`;
+            `public class Foo{}`;
         const stripped = stripWhitespace(src);
         assert(stripped === src);
     });
 
-    it("should replace leading newline with single space", () => {
+    it("should strip leading newline", () => {
         const src =
-            `public class Foo { }`;
+            `public class Foo{}`;
         const stripped = stripWhitespace("\n" + src);
-        assert(stripped === " " + src);
+        assert(stripped === src);
     });
 
-    it("should replace leading newlines with single space", () => {
+    it("should strip leading tabs and drop trailing newline", () => {
         const src =
-            `public class Foo { }`;
-        const stripped = stripWhitespace("\n\n" + src);
-        assert(stripped === " " + src);
-    });
-
-    it("should replace leading tabs with single space", () => {
-        const src =
-            `public class Foo { }`;
+            `public class Foo{}`;
         const stripped = stripWhitespace("\t\t" + src + "\n");
-        assert(stripped === " " + src + " ");
+        assert(stripped === src);
     });
 
-    it("should replace 3 spaces with single space", () => {
+    it("should replace 3 unecessary spaces with none", () => {
         const src =
             `public class Foo {    }`;
         const stripped = stripWhitespace(src);
-        assert(stripped === "public class Foo { }");
+        assert(stripped === "public class Foo{}");
     });
 
 });

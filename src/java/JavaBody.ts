@@ -227,6 +227,7 @@ class JavaContentStateMachine {
 
 /**
  * Strip whitespace down to a single space, except in strings
+ * Remove whitespaces that aren't syntactically necessary altogether.
  * @param source
  * @returns {string}
  */
@@ -259,7 +260,12 @@ export function stripWhitespace(source: string): string {
 }
 
 function strip(src: string): string {
-    return src.replace(/[\s]+/g, " ");
+    let stripped = src.replace(/[\s]+/g, " ");
+    // Get rid of syntactically unnecessary whitespace
+    stripped = stripped.replace(/([{}.@;])\s/g, "$1");
+    stripped = stripped.replace(/\s([{}.@;])/g, "$1");
+    stripped = stripped.trim();
+    return stripped;
 }
 
 /**

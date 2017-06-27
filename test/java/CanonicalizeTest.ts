@@ -2,13 +2,20 @@ import assert = require("power-assert");
 
 import { canonicalize } from "../../src/java/JavaBody";
 
-describe("Canonicalize", () => {
+describe("canonicalize", () => {
 
     it("shouldn't change when no comments or whitespace", () => {
         const src =
-            `public class Foo { }`;
+            `public class Foo{}`;
         const stripped = canonicalize(src);
         assert(stripped === src);
+    });
+
+    it("should strip out syntactically unnecessary whitespace: space in {}", () => {
+        const src =
+            `public class Foo { }`;
+        const stripped = canonicalize(src);
+        assert(stripped === `public class Foo{}`);
     });
 
     it("should strip out comments and whitespace", () => {
@@ -21,7 +28,7 @@ describe("Canonicalize", () => {
             Foo { }
             `;
         const expected =
-            ` public class Foo { } `;
+            `public class Foo{}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
@@ -39,7 +46,7 @@ describe("Canonicalize", () => {
             Foo { }
             `;
         const expected =
-            ` public class Foo { } `;
+            `public class Foo{}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
@@ -59,7 +66,7 @@ describe("Canonicalize", () => {
             }
             `;
         const expected =
-            ` public class Foo { int i; } `;
+            `public class Foo{int i;}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
@@ -79,7 +86,7 @@ describe("Canonicalize", () => {
             }
             `;
         const expected =
-            ` public class Foo { int i; } `;
+            `public class Foo{int i;}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
@@ -99,7 +106,7 @@ describe("Canonicalize", () => {
             }
             `;
         const expected =
-            ` public class Foo { int i; } `;
+            `public class Foo{int i;}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
@@ -119,21 +126,21 @@ describe("Canonicalize", () => {
             }
             `;
         const expected =
-            ` public class Foo { int i; } `;
+            `public class Foo{int i;}`;
         const stripped = canonicalize(src);
         assert(stripped === expected);
     });
 
     it("don't strip whitespace inside strings", () => {
         const src =
-            `public class Foo { private String = "xxx    \t x"; }`;
+            `public class Foo{private String="xxx    \t x";}`;
         const stripped = canonicalize(src);
         assert(stripped === src);
     });
 
-    it("don't be fooled by apparent comments within strings", () => {
+    it("isn't fooled by apparent comments within strings", () => {
         const src =
-            `public class Foo { private String = "xxx       \n\n  // \teiwuiurwieuriwuer /* */   \t x"; }`;
+            `public class Foo{private String="xxx       \n\n  // \teiwuiurwieuriwuer /* */   \t x";}`;
         const stripped = canonicalize(src);
         assert(stripped === src);
     });
