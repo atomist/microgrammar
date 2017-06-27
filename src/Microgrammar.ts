@@ -142,8 +142,11 @@ export abstract class MatchingMachine {
                 currentInputState = consumeWhitespace(currentInputState)[1];
             }
             const previousIs = currentInputState;
-            const tryMatch = currentMatcher.matchPrefix(currentInputState, {}) as PatternMatch;
-            if (isPatternMatch(tryMatch)) {
+            const tryMatch = currentMatcher.matchPrefix(currentInputState, {});
+
+            // We can't accept empty matches as genuine at this level:
+            // For example, if the matcher is just a Rep or Alt
+            if (isPatternMatch(tryMatch) && tryMatch.$matched !== "") {
                 // Enrich with the name
                 (tryMatch as any).$name = tryMatch.$matcherId;
                 currentMatcher = extractMatcher(this.onMatch(tryMatch));
