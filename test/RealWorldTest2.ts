@@ -72,7 +72,6 @@ export const AnyAnnotation = Microgrammar.fromDefinitions<RawAnnotation>({
     _content: new Opt(JavaParenthesizedExpression),
     content: ctx => {
         const cont = ctx._content ? ctx._content.block : "";
-        console.log("********* Found content " + ctx._content + " for " + ctx.name + ", setting to " + cont);
         return cont;
     },
 });
