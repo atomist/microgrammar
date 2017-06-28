@@ -1,8 +1,8 @@
 
-import { Microgrammar } from "../src/Microgrammar";
-import { Alt, Opt } from "../src/Ops";
-import { RepSep } from "../src/Rep";
-import { Break } from "../src/snobol/Snobol";
+import { Microgrammar } from "../../src/Microgrammar";
+import { Alt, Opt } from "../../src/Ops";
+import { RepSep } from "../../src/Rep";
+import { Break } from "../../src/snobol/Snobol";
 
 import * as assert from "power-assert";
 

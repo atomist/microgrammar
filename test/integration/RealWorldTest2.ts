@@ -1,13 +1,13 @@
 
-import { InputState } from "../src/InputState";
-import { JavaBlock, JavaParenthesizedExpression } from "../src/java/JavaBody";
-import { Microgrammar } from "../src/Microgrammar";
-import { Opt } from "../src/Ops";
+import { InputState } from "../../src/InputState";
+import { JavaBlock, JavaParenthesizedExpression } from "../../src/java/JavaBody";
+import { Microgrammar } from "../../src/Microgrammar";
+import { Opt } from "../../src/Ops";
 
 import * as assert from "power-assert";
-import { Rep } from "../src/Rep";
+import { Rep } from "../../src/Rep";
 
-import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 
 describe("AnyAnnotationGrammar", () => {
 
@@ -72,7 +72,6 @@ export const AnyAnnotation = Microgrammar.fromDefinitions<RawAnnotation>({
     _content: new Opt(JavaParenthesizedExpression),
     content: ctx => {
         const cont = ctx._content ? ctx._content.block : "";
-        console.log("********* Found content " + ctx._content + " for " + ctx.name + ", setting to " + cont);
         return cont;
     },
 });
