@@ -1,16 +1,15 @@
 import { Concat } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
-import { InputState } from "./InputState";
+import { InputState, InputStateManager } from "./InputState";
 import { InputStream } from "./InputStream";
-import { isPatternMatch } from "./PatternMatch";
+import { isPatternMatch, PatternMatch } from "./PatternMatch";
 
 import { ChangeSet } from "./ChangeSet";
 import { MatchingLogic, Term } from "./Matchers";
 import { MicrogrammarSpecParser } from "./MicrogrammarSpecParser";
 import { MatchUpdater, MicrogrammarUpdates } from "./MicrogrammarUpdates";
-import { PatternMatch } from "./PatternMatch";
 import { StringInputStream } from "./StringInputStream";
-import { consumeWhitespace } from "./Whitespace";
+import {readyToMatch } from "./Whitespace";
 
 /**
  * Holds a set of updatable matches
@@ -53,10 +52,9 @@ export class Microgrammar<T> implements Term {
         return new Microgrammar<T>(new Concat(definitions, config), config);
     }
 
-    public static fromString<T>(
-        spec: string,
-        components: object = {},
-        config: Config = DefaultConfig): Microgrammar<T> {
+    public static fromString<T>(spec: string,
+                                components: object = {},
+                                config: Config = DefaultConfig): Microgrammar<T> {
         return new MicrogrammarSpecParser().fromString<T>(spec, components, config);
     }
 
@@ -64,7 +62,8 @@ export class Microgrammar<T> implements Term {
 
     public definitions = this.matcher.definitions;
 
-    constructor(public matcher: Concat, private config: Config = DefaultConfig) { }
+    constructor(public matcher: Concat, private config: Config = DefaultConfig) {
+    }
 
     /**
      * Convenience method to find matches without the ability to update them
@@ -73,9 +72,8 @@ export class Microgrammar<T> implements Term {
      * Often used to stop after one.
      * @return {PatternMatch[]}
      */
-    public findMatches(
-        input: string | InputStream | InputState,
-        stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
+    public findMatches(input: string | InputStream,
+                       stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch).withConfig(this.config);
         lm.consume(input);
         return lm.matches as Array<T & PatternMatch>;
@@ -87,7 +85,7 @@ export class Microgrammar<T> implements Term {
      * @param input
      * @returns {PatternMatch[]}
      */
-    public firstMatch(input: string | InputStream | InputState): PatternMatch & T {
+    public firstMatch(input: string | InputStream): PatternMatch & T {
         const found = this.findMatches(input, pm => true);
         return found.length > 0 ? found[0] : null;
     }
@@ -132,17 +130,22 @@ export abstract class MatchingMachine {
      * Stream-oriented matching. The observer can match in parallel with the main matcher.
      * @param input
      */
-    public consume(input: string | InputStream | InputState): void {
+    public consume(input: string | InputStream): void {
         const omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
 
         let currentMatcher: MatchingLogic = this.matcher;
-        let currentInputState: InputState = toInputState(input);
+        const stream = toInputStream(input);
+        const stateManager = new InputStateManager(stream);
+
+        let currentInputState: InputState = new InputState(stateManager);
         while (currentMatcher && !currentInputState.exhausted()) {
-            if (this.config.consumeWhiteSpaceBetweenTokens) {
-                currentInputState = consumeWhitespace(currentInputState)[1];
-            }
+            currentInputState = readyToMatch(currentInputState,
+                this.config,
+                this.observer ? undefined : currentMatcher)[1];
+
             const previousIs = currentInputState;
-            const tryMatch = currentMatcher.matchPrefix(currentInputState, {});
+            const tryMatch =
+                currentMatcher.matchPrefix(currentInputState, {});
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
@@ -153,7 +156,9 @@ export abstract class MatchingMachine {
                 currentInputState = currentInputState.consume(tryMatch.$matched);
             } else {
                 // We didn't match. Discard the current input character and try again
-                currentInputState = currentInputState.advance();
+                if (!currentInputState.exhausted()) {
+                    currentInputState = currentInputState.advance();
+                }
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
@@ -170,7 +175,10 @@ export abstract class MatchingMachine {
                     }
                 }
             }
-        }
+
+            // We can advance the window
+            stateManager.dropLeft(currentInputState.offset);
+        }   // while
     }
 
     /**
@@ -203,14 +211,10 @@ function extractMatcher(matcher: any): MatchingLogic {
     return new Concat(matcher);
 }
 
-function toInputState(input: string | InputStream | InputState): InputState {
-    if ((input as any).stream) {
-        return input as InputState;
-    }
-    const is = (typeof input === "string") ?
+function toInputStream(input: string | InputStream): InputStream {
+    return (typeof input === "string") ?
         new StringInputStream(input) :
         input;
-    return InputState.fromInputStream(is as InputStream);
 }
 
 class LazyMatcher extends MatchingMachine {

@@ -1,84 +1,146 @@
 import { InputStream } from "./InputStream";
 import { StringInputStream } from "./StringInputStream";
 
-const DEFAULT_BUFFER_SIZE = 1000;
-
 /**
  * InputState abstraction, backed by a buffer or stream
  * which is managed transparently.
  */
 export class InputState {
 
-    public static fromString(s: string, bufferSize: number = DEFAULT_BUFFER_SIZE) {
-        return new InputState(s, 0, "", bufferSize, undefined);
+    public static fromString(s: string) {
+        return new InputState(new InputStateManager(new StringInputStream(s)), 0);
     }
 
-    public static fromInputStream(is: InputStream, bufferSize: number = DEFAULT_BUFFER_SIZE) {
-        return new InputState(is, 0, "", bufferSize, undefined);
-    }
-
-    private stream: InputStream;
-
-    private constructor(
-        input: string | InputStream,
-        public readonly offset: number,
-        private lookaheadBuf: string,
-        private bufferSize,
-        private parent: InputState) {
-
-        this.stream =
-            (typeof input === "string") ?
-                new StringInputStream(input) :
-                input;
-    }
-
-    public exhausted() {
-        return this.lookaheadBuf.length === 0 && this.stream.exhausted();
-    }
-
-    public consume(s: string): InputState {
-        this.ensureAvailable(s.length);
-        if (this.lookaheadBuf.indexOf(s) !== 0) {
-            throw new Error(`Illegal call to InputState.consume: Cannot consume [${s}] from [${this.lookaheadBuf}]`);
-        }
-        return new InputState(this.stream, this.offset + s.length,
-            this.lookaheadBuf.substr(s.length), this.bufferSize, this);
-    }
-
-    public advance(): InputState {
-        this.ensureAvailable(1);
-        return new InputState(this.stream, this.offset + 1,
-            this.lookaheadBuf.substr(1), this.bufferSize,
-            this);
-    }
-
-    public peek(n: number): string {
-        this.ensureAvailable(n);
-        return this.exhausted() ?
-            "" :
-            this.lookaheadBuf.substr(0, n);
+    public constructor(private readonly ism: InputStateManager,
+                       public readonly offset: number = 0) {
     }
 
     /**
-     * Read ahead if necessary, populating our lookahead buffer
-     * @param needed number of characters we may need
-     * @return the string content actually additionally read
+     * Skip to before this pattern. Exhaust input if necessary.
+     * @param what what to skip to
+     * @return {InputState}
      */
-    private ensureAvailable(needed: number): void {
-        if (this.lookaheadBuf.length < needed && !this.stream.exhausted()) {
-            if (this.parent) {
-                const offsetOffset = this.offset - this.parent.offset;
-                this.parent.ensureAvailable(needed + offsetOffset);
-                // console.log(`ReadByParent=[${readByParent}]`);
-                const read = this.parent.peek(needed + offsetOffset)
-                    .substr(offsetOffset + this.lookaheadBuf.length);
-                this.lookaheadBuf += read;
-            } else {
-                const read = this.stream.read(Math.max(this.bufferSize, needed));
-                this.lookaheadBuf += read;
-            }
-            // console.log(`Added to buffer [${read}] bufsize=${this.bufferSize}: now=[${this.lookaheadBuf}]`);
+    public skipTo(what: string): InputState {
+        return this.skipWhile(s => s !== what, what.length);
+    }
+
+    /**
+     * Skip input while it matches the given function
+     * @param skip skip till
+     * @param n number of characters to look at
+     * @return {InputState}
+     */
+    public skipWhile(skip: (char: string) => boolean, n: number = 1): InputState {
+        let offset = this.offset;
+        while (this.ism.canSatisfy(offset) && skip(this.ism.get(offset, n))) {
+            ++offset;
         }
+        return new InputState(this.ism, offset);
+    }
+
+    /**
+     * What substring has been read since the given state
+     * @param l previous input state
+     * @return {string}
+     */
+    public seenSince(l: InputState): string {
+        if (l.ism !== this.ism) {
+            throw new Error("Can't seenSince: Different input streams");
+        }
+        return this.ism.get(l.offset, this.offset - l.offset);
+    }
+
+    /**
+     * Is the input exhausted?
+     * @return {boolean}
+     */
+    public exhausted() {
+        return !this.ism.canSatisfy(this.offset);
+    }
+
+    /**
+     * Consume the given string if our input begins with it. Otherwise fail
+     * @param s string that we must find
+     * @return {InputState}
+     */
+    public consume(s: string): InputState {
+        if (this.ism.get(this.offset, s.length) !== s) {
+            throw new Error(`Illegal call to InputState.consume: Cannot consume [${s}] from XXXX`);
+        }
+        return new InputState(this.ism, this.offset + s.length);
+    }
+
+    /**
+     * Advance one character in the input
+     * @return {InputState}
+     */
+    public advance(): InputState {
+        if (this.exhausted()) {
+            throw new Error(`Illegal call to InputState.advance: Stream is exhausted`);
+        }
+        return new InputState(this.ism, this.offset + 1);
+    }
+
+    /**
+     * Look ahead in the input without consuming characters
+     * @param n number of characters to look ahead
+     * @return {string}
+     */
+    public peek(n: number): string {
+        return this.exhausted() ?
+            "" :
+            this.ism.get(this.offset, n);
+    }
+
+}
+
+const DEFAULT_BUFFER_SIZE = 1000;
+
+/**
+ * Window over input. Enables us to use a very simple InputStream
+ * abstraction that does not need to support backtracking.
+ */
+export class InputStateManager {
+
+    private left = 0;
+
+    private window: string = "";
+
+    constructor(private stream: InputStream, private bufsize: number = DEFAULT_BUFFER_SIZE) {
+    }
+
+    public get(offset: number, n: number): string {
+        this.canSatisfy(offset + n);
+        return this.window.substr(offset - this.left, n);
+    }
+
+    public canSatisfy(offset: number): boolean {
+        if (offset < this.left) {
+            throw new Error(`Cannot rewind to offset ${offset}: already at ${this.left}`);
+        }
+        if (offset > this.right()) {
+            this.window += this.stream.read(Math.max(this.bufsize, offset - this.right()));
+        }
+        return this.right() >= offset;
+    }
+
+    /**
+     * Drop characters left of the offset from window
+     * @param offset leftmost offset we'll need
+     */
+    public dropLeft(offset: number): void {
+        if (offset > this.left && offset <= this.right()) {
+            this.window = this.window.substr(offset - this.left);
+            this.left = offset;
+        }
+    }
+
+    public exhausted() {
+        return this.stream.exhausted() && this.window === "";
+    }
+
+    private right() {
+        return this.left + this.window.length;
     }
 
 }

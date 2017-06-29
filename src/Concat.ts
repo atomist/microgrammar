@@ -5,7 +5,7 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
 import { DismatchReport, isPatternMatch, PatternMatch, TreePatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
-import { consumeWhitespace } from "./Whitespace";
+import { readyToMatch } from "./Whitespace";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -26,14 +26,18 @@ export class Concat implements MatchingLogic {
 
     public readonly matchSteps: MatchStep[] = [];
 
+    // Used to check first matcher
+    private readonly firstMatcher: Matcher;
+
     constructor(public definitions: any, public config: Config = DefaultConfig) {
         for (const stepName in definitions) {
-            if (stepName !== "$id" && stepName !== "matchPrefix") {
+            if ([ "$id", "matchPrefix", "canStartWith", "requiredPrefix"].indexOf(stepName) === -1) {
                 const def = definitions[stepName];
                 if (Array.isArray(def) && def.length === 2) {
                     // It's a transformation of a matched return
                     const ml = def[0];
-                    const named = withName(toMatchingLogic(ml), stepName);
+                    const m = toMatchingLogic(ml);
+                    const named = withName(m, stepName);
                     this.matchSteps.push(new TransformingMatcher(named, def[1]));
                 } else if (typeof def === "function") {
                     // It's a calculation function
@@ -41,7 +45,7 @@ export class Concat implements MatchingLogic {
                         // A no arg function is invalid
                         throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
                     }
-                    this.matchSteps.push({ $id: stepName, f: def });
+                    this.matchSteps.push({$id: stepName, f: def});
                 } else {
                     // It's a normal matcher
                     const named = withName(toMatchingLogic(def), stepName);
@@ -49,6 +53,7 @@ export class Concat implements MatchingLogic {
                 }
             }
         }
+        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
     }
 
     get $id() {
@@ -57,19 +62,25 @@ export class Concat implements MatchingLogic {
             "Concat{" + this.matchSteps.map(m => m.$id).join(",") + "}";
     }
 
+    public canStartWith(char: string): boolean {
+        return !this.firstMatcher.canStartWith || this.firstMatcher.canStartWith(char);
+    }
+
+    get requiredPrefix(): string {
+        return this.firstMatcher.requiredPrefix;
+    }
+
     public matchPrefix(initialInputState: InputState, context: {}): MatchPrefixResult {
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
         let matched = "";
         for (const step of this.matchSteps) {
-            if (this.config.consumeWhiteSpaceBetweenTokens) {
-                const eaten = consumeWhitespace(currentInputState);
-                matched += eaten[0];
-                currentInputState = eaten[1];
-            }
-
             if (isMatcher(step)) {
-                // If it's a concat, give it a fresh matcher
+                const eat = readyToMatch(currentInputState, this.config);
+                currentInputState = eat[1];
+                matched += eat[0];
+
+                // If it's a concat, give it a fresh context
                 const contextToUse = isConcat(step) ? {} : context;
                 const report = step.matchPrefix(currentInputState, contextToUse);
                 if (isPatternMatch(report)) {
@@ -152,6 +163,14 @@ class MatcherWrapper implements Matcher {
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         return this.ml.matchPrefix(is, context) as PatternMatch;
     }
+
+    public canStartWith(char: string): boolean {
+        return !this.ml.canStartWith || this.ml.canStartWith(char);
+    }
+
+    get requiredPrefix(): string {
+        return this.ml.requiredPrefix;
+    }
 }
 
 /**
@@ -171,5 +190,13 @@ class TransformingMatcher implements Matcher {
             context[this.name] = mpr[this.name] = computed;
         }
         return mpr;
+    }
+
+    public canStartWith(char: string): boolean {
+        return !this.m.canStartWith || this.m.canStartWith(char);
+    }
+
+    get requiredPrefix(): string {
+        return this.m.requiredPrefix;
     }
 }

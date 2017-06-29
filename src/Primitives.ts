@@ -18,6 +18,14 @@ export class Literal implements MatchingLogic {
             new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
             new DismatchReport(this.$id, is.offset, context);
     }
+
+    public canStartWith(char: string): boolean {
+        return this.literal[0] === char;
+    }
+
+    get requiredPrefix(): string {
+        return this.literal;
+    }
 }
 
 /**
@@ -34,6 +42,10 @@ export abstract class AbstractRegex implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
+        if (is.exhausted()) {
+            return new DismatchReport(this.$id, is.offset, context);
+        }
+
         // TODO this is fragile as it only takes the top content
         const remainder = is.peek(2000);
         const results: RegExpExecArray = this.regex.exec(remainder);
@@ -86,24 +98,14 @@ export class Regex extends AbstractRegex {
     }
 }
 
-export const matchEverything: MatchingLogic = {
-    $id: "matchEverything",
-
-    matchPrefix(is: InputState): MatchPrefixResult {
-        const everything = is.peek(100000); // cheating!
-        return new TerminalPatternMatch(
-            this.$id,
-            everything,
-            is.offset,
-            is.consume(everything),
-            context);
-    },
-};
-
 export class MatchInteger extends AbstractRegex {
 
     constructor() {
         super(/^[1-9][0-9]*/);
+    }
+
+    public canStartWith(c: string): boolean {
+        return !isNaN(+c);
     }
 
     protected toValue(s: string) {

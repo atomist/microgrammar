@@ -1,10 +1,10 @@
-import { isConcat, toMatchingLogic  } from "./Concat";
+import { isConcat, toMatchingLogic } from "./Concat";
 import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
-import { MatchingLogic } from "./Matchers";
+import { MatchingLogic} from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { DismatchReport, isPatternMatch, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
-import { consumeWhitespace } from "./Whitespace";
+import { readyToMatch } from "./Whitespace";
 
 /**
  * Handle repetition, with or without a separator.
@@ -40,35 +40,45 @@ export class Repetition implements MatchingLogic, Configurable {
         return this;
     }
 
+    public canStartWith(char: string): boolean {
+        return (this.min === 0) ?
+            true :
+            !this.matcher.canStartWith || this.matcher.canStartWith(char);
+    }
+
+    get requiredPrefix(): string {
+        return (this.min === 0) ?
+            undefined :
+            this.matcher.requiredPrefix;
+    }
+
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        let currentIs = is;
+        let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
-        while (!currentIs.exhausted()) {
-            if (this.config.consumeWhiteSpaceBetweenTokens) {
-                const eaten = consumeWhitespace(currentIs);
-                matched += eaten[0];
-                currentIs = eaten[1];
-            }
+        while (!currentInputState.exhausted()) {
+            const eat = readyToMatch(currentInputState, this.config);
+            currentInputState = eat[1];
+            matched += eat[0];
 
             const contextToUse = isConcat(this.matcher) ? {} : context;
 
-            const match = this.matcher.matchPrefix(currentIs, contextToUse);
+            const match = this.matcher.matchPrefix(currentInputState, contextToUse);
             if (!isPatternMatch(match)) {
                 break;
             } else {
-                currentIs = currentIs.consume(match.$matched);
+                currentInputState = currentInputState.consume(match.$matched);
                 matches.push(match);
                 matched += match.$matched;
             }
 
             if (this.sepMatcher) {
-                const eaten = consumeWhitespace(currentIs);
+                const eaten = readyToMatch(currentInputState, this.config);
+                currentInputState = eaten[1];
                 matched += eaten[0];
-                currentIs = eaten[1];
-                const sepMatch = this.sepMatcher.matchPrefix(currentIs, context);
+                const sepMatch = this.sepMatcher.matchPrefix(currentInputState, context);
                 if (isPatternMatch(sepMatch)) {
-                    currentIs = currentIs.consume(sepMatch.$matched);
+                    currentInputState = currentInputState.consume(sepMatch.$matched);
                     matched += (sepMatch as PatternMatch).$matched;
                 } else {
                     break;

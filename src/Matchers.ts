@@ -11,11 +11,26 @@ export interface Term {
 }
 
 /**
- * Anonymous matcher
+ * Anonymous matcher. Only the matchPrefix method must be implemented
+ * to implement a matcher. Optional properties and functions
+ * can help make matching more efficient.
  */
 export interface MatchingLogic extends Term {
 
+    /**
+     * Prefix that's required for this to match.
+     * Return undefined if we don't know
+     */
+    requiredPrefix?: string;
+
     matchPrefix(is: InputState, context: {}): MatchPrefixResult;
+
+    /**
+     * Can a match start with this character?
+     * @param char character to test for
+     */
+    canStartWith?(char: string): boolean;
+
 }
 
 /**

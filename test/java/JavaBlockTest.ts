@@ -1,9 +1,11 @@
 import { expect } from "chai";
+
 import { InputState } from "../../src/InputState";
 import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
 import { Microgrammar } from "../../src/Microgrammar";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
-import { matchEverything, Regex } from "../../src/Primitives";
+import { Regex } from "../../src/Primitives";
+import { Break } from "../../src/snobol/Snobol";
 
 describe("JavaBlockTest", () => {
 
@@ -60,7 +62,7 @@ describe("JavaBlockTest", () => {
             left: new Regex(/^[a-z]+/),
             equals: "=",
             right: "y",
-            _whatever: matchEverything,
+            _whatever: new Break("//////"),
         });
         const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);

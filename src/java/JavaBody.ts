@@ -27,6 +27,18 @@ class JavaBody implements MatchingLogic {
         }
     }
 
+    public canStartWith(char: string): boolean {
+        return this.kind === "block" ?
+            char === "{" :
+            char === "(";
+    }
+
+    get requiredPrefix(): string {
+        return this.kind === "block" ?
+            "{" :
+            "(";
+    }
+
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         const sm = new JavaContentStateMachine();
         let depth = 1;

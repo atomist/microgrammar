@@ -4,7 +4,7 @@
 set -o pipefail
 
 declare Pkg=travis-build-node
-declare Version=0.2.0
+declare Version=0.3.0
 
 function msg() {
     echo "$Pkg: $*"
@@ -23,7 +23,7 @@ function main () {
     fi
 
     msg "compiling typescript"
-    if ! tsc -p .; then
+    if ! npm run compile; then
         err "typescript compilation failed"
         return 1
     fi

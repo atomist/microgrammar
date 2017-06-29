@@ -55,8 +55,7 @@ describe("OptTest", () => {
         } as Term,
         );
 
-        const is = InputState.fromString(content);
-        const result = mg.firstMatch(is) as any;
+        const result = mg.firstMatch(content) as any;
         expect(result.x.x).to.equal("x");
     });
 
@@ -73,8 +72,7 @@ describe("OptTest", () => {
         } as Term,
         );
 
-        const is = InputState.fromString(content);
-        const result = mg.firstMatch(is) as any;
+        const result = mg.firstMatch(content) as any;
         expect(result.x).to.equal("x");
     });
 

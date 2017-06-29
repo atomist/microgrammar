@@ -5,7 +5,7 @@ import { InputStream } from "./InputStream";
 
 export class StringInputStream implements InputStream {
 
-    private offset = 0;
+    public offset = 0;
 
     constructor(public readonly content: string) {
         if (content === undefined) {
@@ -18,8 +18,9 @@ export class StringInputStream implements InputStream {
     }
 
     public read(n: number): string {
-        const s = this.content.substr(this.offset);
+        const s = this.content.substr(this.offset, n);
         this.offset += s.length;
+        // console.log(`read(${n}) returned [${s}], offset now=${this.offset}`);
         return s;
     }
 

@@ -18,7 +18,6 @@
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^3.5.0",
-    "@types/lodash": "^4.14.66",
     "@types/mocha": "^2.2.41",
     "@types/power-assert": "^1.4.29",
     "chai": "^4.0.2",
@@ -34,6 +33,8 @@
   },
   "scripts": {
     "autotest": "supervisor -q -n exit -e ts -x npm -- run test",
+    "clean": "rm -rf build ; find src test -type f -name '*.js' -print0 | xargs -0 rm -f",
+    "compile": "tsc -p .",
     "lint": "tslint '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "test": "mocha --compilers ts:espower-typescript/guess 'test/**/*.ts'"

@@ -1,26 +1,42 @@
-import { expect } from "chai";
 import { InputState } from "../src/InputState";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
 
-describe("IntegerTest", () => {
+import * as assert from "power-assert";
+
+describe("Integer", () => {
+
+    it("should recognize valid prefixes", () => {
+        for (let i = 0; i <= 10; i++) {
+            assert(Integer.canStartWith("" + i));
+        }
+    });
+
+    it("should recognize invalid prefixes", () => {
+        for (const c of [ "-", "$", "a", "n", "*" ]) {
+            assert(!Integer.canStartWith(c));
+        }
+    });
+});
+
+describe("Integer matching", () => {
 
     it("test one digit", () => {
         const is = InputState.fromString("1");
         const m = Integer.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        assert(isPatternMatch(m));
         const match = m as PatternMatch;
-        expect(match.$matched).to.equal("1");
-        expect(match.$value).to.equal(1);
+        assert(match.$matched === "1");
+        assert(match.$value === 1);
     });
 
     it("test multiple digits", () => {
         const is = InputState.fromString("105x");
         const m = Integer.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        assert(isPatternMatch(m));
         const match = m as PatternMatch;
-        expect(match.$matched).to.equal("105");
-        expect(match.$value).to.equal(105);
+        assert(match.$matched === "105");
+        assert(match.$value === 105);
     });
 
 });
