@@ -162,80 +162,80 @@ class Sun:
     };
 
     function parsePomWithTracker(pom: string) {
-        class XmlTracker extends MatchingMachine {
-
-            public dependencies: VersionedArtifact[] = [];
-
-            public elementStack: string[] = [];
-
-            private group: string;
-            private artifact: string;
-            private version: string;
-
-            constructor() {
-                super(XML_TAG_WITH_SIMPLE_VALUE, {
-                    _l: "<",
-                    slash: optional("/"),
-                    name: LEGAL_VALUE,
-                    _r: ">",
-                });
-            }
-
-            protected underOneOf(...elts: string[]) {
-                return elts.filter(elt => this.elementStack.indexOf(elt) > -1).length > 0;
-            }
-
-            protected path() {
-                return this.elementStack.join("/");
-            }
-
-            protected onMatch(pm: PatternMatch & XmlTag) {
-                // console.log(pm.name + " [" + this.elementStack.join("/") + "]");
-                if (this.elementStack.indexOf("dependencies") > -1 &&
-                    !this.underOneOf("dependencyManagement", "plugin", "pluginManagement", "exclusions")) {
-                    // We're building a dependency
-
-                    // console.log(`**** found ${pm.name} under [${this.path()}]`)
-
-                    switch (pm.name) {
-                        case "groupId":
-                            this.group = pm.value;
-                            break;
-                        case "artifactId":
-                            this.artifact = pm.value;
-                            break;
-                        case "version":
-                            this.version = pm.value;
-                            break;
-                        default:
-                    }
-                }
-                return this.matcher;
-            }
-
-            protected observeMatch(pm: { name: string, slash }) {
-                if (pm.slash) {
-                    this.elementStack.pop();
-                    if (pm.name === "dependency") {
-                        if (this.group && this.artifact) {
-                            const va = new GAV(this.group, this.artifact, this.version);
-                            this.dependencies.push(va);
-                            this.group = this.artifact = this.version = undefined;
-                        }
-                    }
-                } else {
-                    this.elementStack.push(pm.name);
-                }
-                return this.matcher;
-            }
-        }
-
         const xt = new XmlTracker();
         xt.consume(pom);
         assert(xt.dependencies.length === 1);
         assert(xt.dependencies[0].group === "com.foo.bar");
     }
 });
+
+export class XmlTracker extends MatchingMachine {
+
+    public dependencies: VersionedArtifact[] = [];
+
+    public elementStack: string[] = [];
+
+    private group: string;
+    private artifact: string;
+    private version: string;
+
+    constructor() {
+        super(XML_TAG_WITH_SIMPLE_VALUE, {
+            _l: "<",
+            slash: optional("/"),
+            name: LEGAL_VALUE,
+            _r: ">",
+        });
+    }
+
+    protected underOneOf(...elts: string[]) {
+        return elts.filter(elt => this.elementStack.indexOf(elt) > -1).length > 0;
+    }
+
+    protected path() {
+        return this.elementStack.join("/");
+    }
+
+    protected onMatch(pm: PatternMatch & XmlTag) {
+        // console.log(pm.name + " [" + this.elementStack.join("/") + "]");
+        if (this.elementStack.indexOf("dependencies") > -1 &&
+            !this.underOneOf("dependencyManagement", "plugin", "pluginManagement", "exclusions")) {
+            // We're building a dependency
+
+            // console.log(`**** found ${pm.name} under [${this.path()}]`)
+
+            switch (pm.name) {
+                case "groupId":
+                    this.group = pm.value;
+                    break;
+                case "artifactId":
+                    this.artifact = pm.value;
+                    break;
+                case "version":
+                    this.version = pm.value;
+                    break;
+                default:
+            }
+        }
+        return this.matcher;
+    }
+
+    protected observeMatch(pm: { name: string, slash }) {
+        if (pm.slash) {
+            this.elementStack.pop();
+            if (pm.name === "dependency") {
+                if (this.group && this.artifact) {
+                    const va = new GAV(this.group, this.artifact, this.version);
+                    this.dependencies.push(va);
+                    this.group = this.artifact = this.version = undefined;
+                }
+            }
+        } else {
+            this.elementStack.push(pm.name);
+        }
+        return this.matcher;
+    }
+}
 
 export const POM_WITHOUT_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -292,6 +292,8 @@ export const POM_WITHOUT_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="
 
 export const REPLACE_ME = "<!-- -->";
 
+export const ADD_DEPENDENCY = "<!-- dep -->";
+
 export const POM_WITH_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -337,6 +339,8 @@ export const POM_WITH_DEPENDENCY_MANAGEMENT = `<?xml version="1.0" encoding="UTF
 			<version>1.0.0</version>
 			${REPLACE_ME}
 		</dependency>
+
+        ${ADD_DEPENDENCY}
 
 	</dependencies>
 
