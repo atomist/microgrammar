@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
+
+## [0.3.11] - 2017-06-29
+
+[0.3.11]: https://github.com/atomist/microgrammar/compare/0.3.10...0.3.11
+
+Performance release
+
+### Changed
+
+-   Various performance improvements
 
 ## [0.2.0] - 2017-06-21
 
