@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import { stripWhitespace } from "../../src/java/JavaBody";
+import { stripWhitespace } from "../../src/java/JavaUtils";
 
 describe("Whitespace stripping", () => {
 
