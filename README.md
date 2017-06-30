@@ -121,3 +121,17 @@ the [Atomist microgrammar documentation][mg-doc].  You can also take a
 look at the tests in this repository.
 
 [mg-doc]: http://docs.atomist.com/user-guide/rug/microgrammars/ (Atomist Documentation - Microgrammars)
+
+## Development
+
+See the [contribution guidelines](CONTRIBUTING.md).
+
+### Running tests
+
+Run all the tests in mocha:
+
+`npm test`
+
+Run one test file:
+
+`TEST=MyTestFile.ts npm test`
