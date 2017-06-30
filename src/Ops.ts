@@ -106,5 +106,7 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;
+    conditionalMatcher.requiredPrefix = matcher.requiredPrefix;
+    conditionalMatcher.canStartWith = matcher.canStartWith;
     return conditionalMatcher;
 }

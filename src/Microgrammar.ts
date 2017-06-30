@@ -141,7 +141,8 @@ export abstract class MatchingMachine {
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
                 this.config,
-                this.observer ? undefined : currentMatcher)[1];
+                currentMatcher,
+                this.observer)[1];
 
             const previousIs = currentInputState;
             const tryMatch =

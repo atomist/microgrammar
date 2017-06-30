@@ -8,7 +8,7 @@ describe("XML Benchmark", () => {
 
     const addedDependencies = 10;
 
-    const comments = 10;
+    const comments = 5;
 
     it("parses POM", () => {
 
@@ -45,7 +45,7 @@ function addedDependency(group: string, artifact: string, version: string) {
 
 function addedComment(n: number) {
     return `<!--
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+${n} Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Nunc condimentum quis dui et convallis. Fusce a commodo dui, a euismod tellus.
 In tellus mi, rhoncus in rhoncus id, interdum ac nisl.
 Proin sit amet sem vitae nibh dictum venenatis eget nec purus.
