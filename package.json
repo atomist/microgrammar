@@ -37,6 +37,6 @@
     "compile": "tsc -p .",
     "lint": "tslint '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
-    "test": "mocha --compilers ts:espower-typescript/guess 'test/**/*.ts'"
+    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\""
   }
 }
