@@ -33,46 +33,47 @@ export class MicrogrammarUpdates {
      * @param match
      */
     private addMatchesAsProperties(target: object, cs: ChangeSet, match: PatternMatch): void {
-        const submatches = match.submatches();
-        // tslint:disable-next-line:forin
-        for (const key in submatches) {
-            const submatch = submatches[key] as PatternMatch;
-            let initialValue;
-            if (submatch.submatches() === {}) {
-                initialValue = submatch.$matched; // or $value ? they should both be the string value.
-                // this could also be derived from content + offset, which reduces memory consumption
-            } else {
-                initialValue = {};
-                this.addMatchesAsProperties(initialValue, cs, submatch);
-            }
+        if (isTreePatternMatch(match)) {
+            const submatches = match.submatches();
+            // tslint:disable-next-line:forin
+            for (const key in submatches) {
+                const submatch = submatches[key] as PatternMatch;
+                let initialValue;
+                if (isTreePatternMatch(submatch) && submatch.submatches() === {}) {
+                    initialValue = submatch.$matched; // or $value ? they should both be the string value.
+                    // this could also be derived from content + offset, which reduces memory consumption
+                } else {
+                    initialValue = {};
+                    this.addMatchesAsProperties(initialValue, cs, submatch);
+                }
 
-            const privateProperty = "_" + key;
+                const privateProperty = "_" + key;
 
-            // https://stackoverflow.com/questions/12827266/get-and-set-in-typescript
-            target[privateProperty] = initialValue;
-            Object.defineProperty(target, key, {
-                get() {
-                    return ((target as any).$invalidated) ?
-                        undefined :
-                        this[privateProperty];
-                },
-                set(newValue) {
-                    if ((target as any).$invalidated) {
-                        throw new Error(`Cannot set [${key}] on [${target}]: invalidated by parent change`);
-                    }
-                    cs.change(submatch, newValue);
-                    if (isTreePatternMatch(submatch) && submatch.$subMatches.length > 0) {
-                        // The caller has set the value of an entire property block.
-                        // Invalidate the properties under it
-                        for (const prop of Object.getOwnPropertyNames(target)) {
-                            target[prop].$invalidated = true;
+                // https://stackoverflow.com/questions/12827266/get-and-set-in-typescript
+                target[privateProperty] = initialValue;
+                Object.defineProperty(target, key, {
+                    get() {
+                        return ((target as any).$invalidated) ?
+                            undefined :
+                            this[privateProperty];
+                    },
+                    set(newValue) {
+                        if ((target as any).$invalidated) {
+                            throw new Error(`Cannot set [${key}] on [${target}]: invalidated by parent change`);
                         }
-                    }
-                },
-                enumerable: true,
-                configurable: true,
-            });
+                        cs.change(submatch, newValue);
+                        if (isTreePatternMatch(submatch) && submatch.$subMatches.length > 0) {
+                            // The caller has set the value of an entire property block.
+                            // Invalidate the properties under it
+                            for (const prop of Object.getOwnPropertyNames(target)) {
+                                target[prop].$invalidated = true;
+                            }
+                        }
+                    },
+                    enumerable: true,
+                    configurable: true,
+                });
+            }
         }
-
     }
 }

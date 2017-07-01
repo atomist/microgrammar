@@ -11,22 +11,31 @@ export interface Term {
 }
 
 /**
- * Anonymous matcher. Only the matchPrefix method must be implemented
+ * Core matching logic interface. Only the matchPrefix method must be implemented
  * to implement a matcher. Optional properties and functions
  * can help make matching more efficient.
  */
 export interface MatchingLogic extends Term {
 
     /**
-     * Prefix that's required for this to match.
-     * Return undefined if we don't know
+     * Optimization property. Prefix that's required for this to match.
+     * Return undefined if we don't know. If we can provide this information,
+     * it can make matching much more efficient if this is the first
+     * matcher in a Microgrammar.
      */
-    requiredPrefix?: string;
+    readonly requiredPrefix?: string;
 
+    /**
+     * Core matching method. Can we match at the present point in the
+     * given InputState
+     * @param is input state
+     * @param context context: What's already bound by other matchers,
+     * and what this matcher should bind to if it wishes
+     */
     matchPrefix(is: InputState, context: {}): MatchPrefixResult;
 
     /**
-     * Can a match start with this character?
+     * Optimization method. Can a match start with this character?
      * @param char character to test for
      */
     canStartWith?(char: string): boolean;

@@ -7,18 +7,23 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
 export class DismatchReport implements MatchPrefixResult {
 
     public constructor(public readonly $matcherId: string,
-                       public $offset: number,
-                       public $context: {},
-                       private cause?: DismatchReport) {
+                       public readonly $offset: number,
+                       public readonly $context: {},
+                       private readonly cause?: DismatchReport) {
     }
 
 }
 
+/**
+ * Represents a successful match.
+ */
 export abstract class PatternMatch implements MatchPrefixResult {
 
     /**
+     * Value extracted from matcher.
      * @return the $value that is extracted from this matcher. May be a
-     * scalar or an array, or a nested structure
+     * scalar or an array, or a nested structure. May or not be the
+     * same as $matched property.
      */
     public $value: any;
 
@@ -26,7 +31,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
      * Represents a match
      * @param $matcherId id of the matcher that matched
      * @param $matched the actual string content
-     * @param $offset
+     * @param $offset offset from 0 in input
      * @param $context context bound during the match
      */
     constructor(public readonly $matcherId: string,
@@ -36,11 +41,13 @@ export abstract class PatternMatch implements MatchPrefixResult {
         // Copy top level context properties
         // tslint:disable-next-line:forin
         for (const p in $context) {
-            const val = $context[p];
-            if (typeof val !== "function") {
-                this[p] = val;
-                if (this.$value && typeof this.$value === "object") {
-                    this.$value[p] = val;
+            if (!isSpecialMember(p)) {
+                const val = $context[p];
+                if (typeof val !== "function") {
+                    this[p] = val;
+                    if (this.$value && typeof this.$value === "object") {
+                        this.$value[p] = val;
+                    }
                 }
             }
         }
@@ -48,16 +55,15 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
     public abstract addOffset(additionalOffset: number): PatternMatch;
 
-    public submatches() {
-        return {};
-    }
-
 }
 
 export function isPatternMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
     return mpr != null && (mpr as PatternMatch).$matched !== undefined;
 }
 
+/**
+ * Simple pattern pattern. No submatches.
+ */
 export class TerminalPatternMatch extends PatternMatch {
 
     constructor(matcherId: string,
@@ -96,7 +102,6 @@ export class UndefinedPatternMatch extends PatternMatch {
         return new UndefinedPatternMatch(
             this.$matcherId, this.$offset + additionalOffset);
     }
-
 }
 
 /**
@@ -174,4 +179,15 @@ export class TreePatternMatch extends PatternMatch {
 
 export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
     return mpr != null && (mpr as TreePatternMatch).$matchers !== undefined;
+}
+
+/**
+ * Return true if the member has a special meaning,
+ * rather than being bound to the context. For example,
+ * is a veto function or a private property.
+ * @param name member name to test
+ * @return {boolean}
+ */
+export function isSpecialMember(name: string) {
+    return name.indexOf("_") === 0;
 }

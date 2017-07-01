@@ -95,16 +95,16 @@ export interface PropertiesBlock {
     properties: Array<{ name: string, value: string }>;
 }
 
-export const XML_TAG_WITH_SIMPLE_VALUE =
-    when(new Concat({
-        _l: "<",
-        name: LEGAL_VALUE,
-        _r: ">",
-        value: LEGAL_VALUE,
-        _l2: "</",
-        _close: LEGAL_VALUE,
-        _r2: ">",
-    }), pm => pm._close === pm.name);
+export const XML_TAG_WITH_SIMPLE_VALUE = new Concat({
+    _l: "<",
+    name: LEGAL_VALUE,
+    _r: ">",
+    value: LEGAL_VALUE,
+    _l2: "</",
+    _close: LEGAL_VALUE,
+    _ok: ctx => ctx._close === ctx.name,
+    _r2: ">",
+});
 
 export interface XmlTag {
     name: string;
@@ -114,7 +114,7 @@ export interface XmlTag {
 export const GAV_CONCAT = when(new Concat({
     tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
 }), pm => pm.tags.filter(t => t.name === "groupId").length > 0 &&
-    pm.tags.filter(t => t.name === "artifactId").length > 0);
+pm.tags.filter(t => t.name === "artifactId").length > 0);
 
 // This correctly handles ordering, which is free
 // We should be using this elsewhere

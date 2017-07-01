@@ -3,7 +3,7 @@ import { InputState } from "./InputState";
 import { Matcher, MatchingLogic, Term } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
-import { DismatchReport, isPatternMatch, PatternMatch, TreePatternMatch } from "./PatternMatch";
+import { DismatchReport, isPatternMatch, isSpecialMember, PatternMatch, TreePatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
 import { readyToMatch } from "./Whitespace";
 
@@ -20,24 +20,26 @@ export type MatchStep = Matcher | { $id: string, f: ((ctx: {}) => void | boolean
 
 /**
  * Represents a concatenation of multiple matchers. This is the normal
- * way we compose matches, although this class needn't be used explicitly.
+ * way we compose matches, although this class needn't be used explicitly,
+ * as Microgrammars use it.
  */
 export class Concat implements MatchingLogic {
 
     public readonly matchSteps: MatchStep[] = [];
 
-    // Used to check first matcher
+    // Used to check first matcher. We want to do that to check
+    // for required prefix etc.
     private readonly firstMatcher: Matcher;
 
     constructor(public definitions: any, public config: Config = DefaultConfig) {
         for (const stepName in definitions) {
-            if ([ "$id", "matchPrefix", "canStartWith", "requiredPrefix"].indexOf(stepName) === -1) {
+            if (["$id", "matchPrefix", "canStartWith", "requiredPrefix"].indexOf(stepName) === -1) {
                 const def = definitions[stepName];
                 if (Array.isArray(def) && def.length === 2) {
                     // It's a transformation of a matched return
                     const ml = def[0];
                     const m = toMatchingLogic(ml);
-                    const named = withName(m, stepName);
+                    const named = new NamedMatcher(stepName, m);
                     this.matchSteps.push(new TransformingMatcher(named, def[1]));
                 } else if (typeof def === "function") {
                     // It's a calculation function
@@ -48,7 +50,7 @@ export class Concat implements MatchingLogic {
                     this.matchSteps.push({$id: stepName, f: def});
                 } else {
                     // It's a normal matcher
-                    const named = withName(toMatchingLogic(def), stepName);
+                    const named = new NamedMatcher(stepName, toMatchingLogic(def));
                     this.matchSteps.push(named);
                 }
             }
@@ -101,7 +103,7 @@ export class Concat implements MatchingLogic {
                 // Bind its result to the context and see if
                 // we should stop matching.
                 const r = step.f(context);
-                if (step.$id.indexOf("_") === 0) {
+                if (isSpecialMember(step.$id)) {
                     if (r === false) {
                         return new DismatchReport(this.$id, initialInputState.offset, context);
                     }
@@ -122,7 +124,7 @@ export class Concat implements MatchingLogic {
 }
 
 export function isConcat(m: MatchingLogic): boolean {
-    return m && !!((m as Concat).matchSteps || isConcat((m as MatcherWrapper).ml));
+    return m && !!((m as Concat).matchSteps || isConcat((m as NamedMatcher).ml));
 }
 
 function isMatcher(s: MatchStep): s is Matcher {
@@ -130,12 +132,16 @@ function isMatcher(s: MatchStep): s is Matcher {
 }
 
 /**
- * Turns a JSON element such as name: "literal" into a matcher
+ * Turns a JSON element such as name: "literal" into a matcher.
+ * Return undefined if the object is undefined or null
  * @param name of the created matcher
- * @param o
+ * @param o object to attempt to make into a matcher
  * @returns {any}
  */
 export function toMatchingLogic(o: TermDef): MatchingLogic {
+    if (!o) {
+        return undefined;
+    }
     if (typeof o === "string") {
         return new Literal(o as string);
     } else if ((o as RegExp).exec) {
@@ -149,11 +155,10 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
     }
 }
 
-function withName(ml: MatchingLogic, name: string): Matcher {
-    return new MatcherWrapper(name, ml);
-}
-
-class MatcherWrapper implements Matcher {
+/**
+ * Give an existing matcher a name
+ */
+class NamedMatcher implements Matcher {
 
     public $id = this.name;
 
@@ -178,7 +183,7 @@ class MatcherWrapper implements Matcher {
  */
 class TransformingMatcher implements Matcher {
 
-    public name = this.m.name;
+    public readonly name = this.m.name;
 
     constructor(public m: Matcher, private f: (val, ctx) => any) {
     }

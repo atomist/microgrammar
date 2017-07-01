@@ -367,9 +367,9 @@ describe("MicrogrammarTest", () => {
         if (matches.length !== 1) {
             throw new Error(`Expected 1 matches, not ${matches.length}`);
         }
-        expect(matches[0]._separator).to.equal("****");
-        expect(matches[0].dogs.length).to.equal(0);
-        expect(matches[0].cats.length).to.equal(0);
+        assert(matches[0]._separator === undefined, "_ properties don't get bound");
+        assert(matches[0].dogs.length === 0);
+        assert(matches[0].cats.length === 0);
     });
 
     it("extract non-empty rep structure", () => {
@@ -377,7 +377,7 @@ describe("MicrogrammarTest", () => {
         if (matches.length !== 1) {
             throw new Error(`Expected 1 matches, not ${matches.length}`);
         }
-        expect(matches[0]._separator).to.equal("****");
+        assert(matches[0]._separator === undefined);
         expect(matches[0].dogs).to.have.members(["Fido"]);
         expect(matches[0].cats).to.have.members(["Felix", "Oscar"]);
     });

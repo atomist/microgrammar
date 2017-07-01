@@ -1,4 +1,4 @@
-import { Concat } from "./Concat";
+import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
 import { InputState, InputStateManager } from "./InputState";
 import { InputStream } from "./InputStream";
@@ -39,10 +39,22 @@ export class Updatable<T> {
  */
 export class Microgrammar<T> implements Term {
 
+    /**
+     * Make this match transparently updatable using property mutation
+     * @param match match to make updatable
+     * @param content the match is within
+     * @return {T&MatchUpdater}
+     */
     public static updatableMatch<T>(match: T & PatternMatch, content: string): T & MatchUpdater {
         return new MicrogrammarUpdates().updatableMatch(match, content);
     }
 
+    /**
+     * Make these matches transparently updatable using property mutation
+     * @param matches matches
+     * @param content content the matches are within
+     * @return {Updatable<T>}
+     */
     public static updatable<T>(matches: Array<T & PatternMatch>,
                                content: string): Updatable<T> {
         return new Updatable<T>(matches, content);
@@ -115,9 +127,9 @@ export abstract class MatchingMachine {
      * @param o optional observer
      */
     constructor(initialMatcher: any, o?: any) {
-        this.matcher = extractMatcher(initialMatcher);
+        this.matcher = toMatchingLogic(initialMatcher);
         if (o) {
-            this.observer = extractMatcher(o);
+            this.observer = toMatchingLogic(o);
         }
     }
 
@@ -153,7 +165,7 @@ export abstract class MatchingMachine {
             if (isPatternMatch(tryMatch) && tryMatch.$matched !== "") {
                 // Enrich with the name
                 (tryMatch as any).$name = tryMatch.$matcherId;
-                currentMatcher = extractMatcher(this.onMatch(tryMatch));
+                currentMatcher = toMatchingLogic(this.onMatch(tryMatch));
                 currentInputState = currentInputState.consume(tryMatch.$matched);
             } else {
                 // We didn't match. Discard the current input character and try again
@@ -167,12 +179,12 @@ export abstract class MatchingMachine {
                     // TODO will this spoil offsets? Might want to create an input state
                     const matches = omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
-                        currentMatcher = extractMatcher(this.observeMatch(m));
+                        currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }
                 } else {
                     const observerMatch = this.observer.matchPrefix(previousIs, {});
                     if (isPatternMatch(observerMatch)) {
-                        currentMatcher = extractMatcher(this.observeMatch(observerMatch));
+                        currentMatcher = toMatchingLogic(this.observeMatch(observerMatch));
                     }
                 }
             }
@@ -197,19 +209,6 @@ export abstract class MatchingMachine {
      */
     protected abstract onMatch(pm: PatternMatch): any;
 
-}
-
-function extractMatcher(matcher: any): MatchingLogic {
-    if (!matcher) {
-        return matcher;
-    }
-    if ((matcher as MatchingLogic).matchPrefix) {
-        return matcher as MatchingLogic;
-    }
-    if (matcher.matcher) {
-        return matcher.matcher as MatchingLogic;
-    }
-    return new Concat(matcher);
 }
 
 function toInputStream(input: string | InputStream): InputStream {

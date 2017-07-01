@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+### Changed
+
+- **Breaking** Matcher properties with names starting with `_` are no longer bound to the
+pattern match
+
 ## [0.3.11] - 2017-06-29
 
 [0.3.11]: https://github.com/atomist/microgrammar/compare/0.3.10...0.3.11
