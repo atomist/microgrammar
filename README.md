@@ -90,7 +90,7 @@ Some notes:
 -   Properties that match are bound to the result.
 -   Certain out of band values, beginning with `$`, are added to the
     results, showing the exact text that matched, the offset etc.
--   Microgrammar returns can be strongly typed. In this case we've
+-   When using TypeScript, microgrammar returns can be strongly typed. In this case we've
     used an anonymous type, but we could also use an interface. We
     could also use untyped, JavaScript style.
 -   Matching skips junk such as `greg*^ tom:::`. In this case, `greg`
@@ -121,6 +121,11 @@ the [Atomist microgrammar documentation][mg-doc].  You can also take a
 look at the tests in this repository.
 
 [mg-doc]: http://docs.atomist.com/user-guide/rug/microgrammars/ (Atomist Documentation - Microgrammars)
+
+## Performance considerations
+See [Writing efficient microgrammars][efficiency].
+
+[efficiency]: performance.md (Writing efficient microgrammars)
 
 ## Development
 
