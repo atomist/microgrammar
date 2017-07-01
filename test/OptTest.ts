@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { InputState } from "../src/InputState";
+import { InputState, inputStateFromString } from "../src/InputState";
 import { Term } from "../src/Matchers";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
@@ -10,7 +10,7 @@ describe("OptTest", () => {
 
     it("should match when matcher doesn't match", () => {
         const alt = new Opt("A");
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = alt.matchPrefix(is, {}) as PatternMatch;
         expect(isPatternMatch(m)).to.equal(true);
         expect(m.$value).to.equal(undefined);
@@ -18,7 +18,7 @@ describe("OptTest", () => {
 
     it("should match when matcher matches", () => {
         const alt = new Opt("A");
-        const is = InputState.fromString("AB");
+        const is = inputStateFromString("AB");
         const m = alt.matchPrefix(is, {}) as PatternMatch;
         expect(isPatternMatch(m)).to.equal(true);
         expect(m.$value).to.equal("A");
@@ -27,7 +27,7 @@ describe("OptTest", () => {
     it("test raw opt missing", () => {
         const content = "";
         const mg = new Opt(new Literal("x"));
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
         expect(result.$matched).to.equal("");
@@ -36,7 +36,7 @@ describe("OptTest", () => {
     it("test raw opt present", () => {
         const content = "x";
         const mg = new Opt(new Literal("x"));
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
         expect(result.$matched).to.equal("x");

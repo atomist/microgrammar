@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { InputState, InputStateManager } from "../src/InputState";
+import { InputState, InputStateManager, inputStateFromString, InputStateImpl } from "../src/InputState";
 import { InputStream } from "../src/InputStream";
 import { DEPENDENCY_GRAMMAR } from "./MavenGrammars";
 
@@ -8,30 +8,30 @@ import * as assert from "power-assert";
 describe("InputStateTest", () => {
 
     it("cannot consume", () => {
-        const is = InputState.fromString("foo bar");
+        const is = inputStateFromString("foo bar");
         assert.throws(
             () => is.consume("xxxx"),
         );
     });
 
     it("remainder is all", () => {
-        const is = InputState.fromString("foo bar");
+        const is = inputStateFromString("foo bar");
         expect(is.peek(10)).equals("foo bar");
     });
 
     it("remainder is correct after advance", () => {
-        const is = InputState.fromString("foo bar").advance();
+        const is = inputStateFromString("foo bar").advance();
         // expect(is.content).equals("foo bar");
         expect(is.peek(1000)).equals("oo bar");
     });
 
     it("remainder is correct after attempt advance past end", () => {
-        const is = InputState.fromString("f").advance();
+        const is = inputStateFromString("f").advance();
         expect(is.peek(10)).equals("");
     });
 
     it("peek is correct after read", () => {
-        const is = InputState.fromString("0123456789");
+        const is = inputStateFromString("0123456789");
         assert(is.peek(1) === "0");
         const at3 = is.consume("012");
         assert(is.peek(1) === "0");
@@ -71,7 +71,7 @@ describe("InputStateTest", () => {
         withBuffer(300));
 
     function withBuffer(bufSize: number, extraContent: string = "") {
-        let is = InputState.fromString("0123456789" + extraContent);
+        let is = inputStateFromString("0123456789" + extraContent);
         assert(is.peek(7) === "0123456");
         is = is.consume("01");
         assert(is.peek(3) === "234");
@@ -83,7 +83,7 @@ describe("InputStateTest", () => {
         const stream = new ReleasingStringInputStream("the quick brown fox jumps over the lazy dog");
         expect(stream.offset).to.equal(0);
 
-        const state0 = new InputState(new InputStateManager(stream));
+        const state0 = new InputStateImpl(new InputStateManager(stream));
 
         const state1 = state0.advance();
         expect(state1.offset).to.equal(1);

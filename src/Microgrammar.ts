@@ -1,6 +1,6 @@
 import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
-import { InputState, InputStateManager } from "./InputState";
+import { InputState, InputStateImpl, InputStateManager } from "./InputState";
 import { InputStream } from "./InputStream";
 import { isPatternMatch, PatternMatch } from "./PatternMatch";
 
@@ -149,7 +149,7 @@ export abstract class MatchingMachine {
         const stream = toInputStream(input);
         const stateManager = new InputStateManager(stream);
 
-        let currentInputState: InputState = new InputState(stateManager);
+        let currentInputState: InputState = new InputStateImpl(stateManager);
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
                 this.config,

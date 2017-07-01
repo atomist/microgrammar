@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { InputState } from "../src/InputState";
+import { InputState, inputStateFromString } from "../src/InputState";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 
@@ -7,7 +7,7 @@ describe("Regex", () => {
 
     it("match word letters", () => {
         const regexp = new Regex(/^[a-z]+/);
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;
@@ -17,14 +17,14 @@ describe("Regex", () => {
 
     it("failed match", () => {
         const regexp = new Regex(/^[a-z]+/);
-        const is = InputState.fromString("14 friday");
+        const is = inputStateFromString("14 friday");
         const m = regexp.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(false);
     });
 
     it("without anchors to skip content", () => {
         const regexp = new Regex(/[a-z]+/);
-        const is = InputState.fromString("**friday 14");
+        const is = inputStateFromString("**friday 14");
         const m = regexp.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;

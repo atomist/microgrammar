@@ -1,5 +1,5 @@
 import { Concat } from "../Concat";
-import { InputState } from "../InputState";
+import { InputState, inputStateFromString } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
 import { DismatchReport, isPatternMatch, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
@@ -71,7 +71,7 @@ class JavaBody implements MatchingLogic {
                 context);
         }
 
-        const innerMatch = this.inner.matchPrefix(InputState.fromString(matched), context);
+        const innerMatch = this.inner.matchPrefix(inputStateFromString(matched), context);
         if (isPatternMatch(innerMatch)) {
             if (this.isTreePatternMatch(innerMatch)) {
                 // console.log("body has parts");

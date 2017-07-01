@@ -1,6 +1,6 @@
 import { Concat } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
-import { InputState } from "./InputState";
+import { InputState, inputStateFromString } from "./InputState";
 import { Term } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
@@ -34,7 +34,7 @@ export class MicrogrammarSpecParser {
             trailing: new Break("this will not appear"), // replace with matchEverything after merge
         } as Term);
 
-        const mpr: MatchPrefixResult = specGrammar.matchPrefix(InputState.fromString(spec), {});
+        const mpr: MatchPrefixResult = specGrammar.matchPrefix(inputStateFromString(spec), {});
         if (!isPatternMatch(mpr)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
         }

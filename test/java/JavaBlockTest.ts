@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { InputState } from "../../src/InputState";
+import { InputState, inputStateFromString } from "../../src/InputState";
 import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
 import { Microgrammar } from "../../src/Microgrammar";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
@@ -49,7 +49,7 @@ describe("JavaBlockTest", () => {
 
     it("should match till balance", () => {
         const balanced = "{  x = y; { }  2; }";
-        const is = InputState.fromString(balanced + "// this is a comment }");
+        const is = inputStateFromString(balanced + "// this is a comment }");
         const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
         expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal(balanced);
@@ -57,7 +57,7 @@ describe("JavaBlockTest", () => {
 
     it("should match inner structure", () => {
         const balanced = "{ x = y; }";
-        const is = InputState.fromString(balanced);
+        const is = inputStateFromString(balanced);
         const inner = Microgrammar.fromDefinitions({
             left: new Regex(/^[a-z]+/),
             equals: "=",
@@ -74,14 +74,14 @@ describe("JavaBlockTest", () => {
     });
 
     function match(what: string) {
-        const is = InputState.fromString(what);
+        const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
         expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal(what);
     }
 
     function shouldNotMatch(what: string) {
-        const is = InputState.fromString(what);
+        const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(false);
     }

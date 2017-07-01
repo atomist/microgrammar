@@ -1,4 +1,4 @@
-import { InputState } from "../../src/InputState";
+import { InputState, inputStateFromString } from "../../src/InputState";
 import { JavaBlock, JavaParenthesizedExpression } from "../../src/java/JavaBody";
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
@@ -37,7 +37,7 @@ describe("GrammarWithOnlyARep", () => {
     it("can handle rep", () => {
         const rep = new Rep(AnyAnnotation);
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
-        const match = rep.matchPrefix(InputState.fromString(src), {}) as PatternMatch;
+        const match = rep.matchPrefix(inputStateFromString(src), {}) as PatternMatch;
         assert(isPatternMatch(match));
         assert(match.$matched.trim() === `@ChangeControlled @Donkey("24", name = "Eeyore")`);
     });
