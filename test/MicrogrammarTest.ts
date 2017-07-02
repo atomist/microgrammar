@@ -12,8 +12,10 @@ import {
 } from "./MavenGrammars";
 
 import { fail } from "power-assert";
+import { JavaParenthesizedExpression } from "../build/src/java/JavaBody";
+import { JAVA_IDENTIFIER } from "./java/JavaBlockMicrogrammarTest";
 
-describe("MicrogrammarTest", () => {
+describe("Microgrammar", () => {
 
     it("literal", () => {
         const content = "foo ";
@@ -54,6 +56,47 @@ describe("MicrogrammarTest", () => {
         } catch (e) {
             assert(e.toString().lastIndexOf("content") !== -1);
         }
+    });
+
+    it("parse all content: File matches", () => {
+        const content = "public void thing(int i);";
+        const mg = Microgrammar.fromDefinitions<any>({
+            _p: "public",
+            type: JAVA_IDENTIFIER,
+            name: JAVA_IDENTIFIER,
+            params: JavaParenthesizedExpression,
+            _semi: ";",
+        });
+        const result = mg.exactMatch(content);
+        assert(result);
+        assert(result.$matched === content);
+        assert(result.name === "thing");
+    });
+
+    it("parse all content: Fail due to irrelevant content after match", () => {
+        const content = "public void thing(int i); // and this is irrelevant crap";
+        const mg = Microgrammar.fromDefinitions<any>({
+            _p: "public",
+            type: JAVA_IDENTIFIER,
+            name: JAVA_IDENTIFIER,
+            params: JavaParenthesizedExpression,
+            _semi: ";",
+        });
+        const result = mg.exactMatch(content);
+        assert(!result);
+    });
+
+    it("parse all content: Fail due to irrelevant content before match", () => {
+        const content = "// and this is irrelevant crap\npublic void thing(int i);";
+        const mg = Microgrammar.fromDefinitions<any>({
+            _p: "public",
+            type: JAVA_IDENTIFIER,
+            name: JAVA_IDENTIFIER,
+            params: JavaParenthesizedExpression,
+            _semi: ";",
+        });
+        const result = mg.exactMatch(content);
+        assert(!result);
     });
 
     it("can JSON stringify", () => {

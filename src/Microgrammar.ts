@@ -105,6 +105,27 @@ export class Microgrammar<T> implements Term {
         return found.length > 0 ? found[0] : null;
     }
 
+    /**
+     * Return a match if it explains the whole of the input.
+     * This style of usage is more like a traditional parser,
+     * building an AST for a while file.
+     * @param input
+     * @return {PatternMatch&T}
+     */
+    // TODO we should allow InputStream also, although this makes
+    // verifying that we got to the end harder
+    public exactMatch(input: string): PatternMatch & T {
+        const match = this.firstMatch(input);
+        if (match && match.$offset !== 0) {
+            // Not a match because it's not at the beginning
+            return undefined;
+        }
+        if (match && match.$matched !== input) {
+            return undefined;
+        }
+        return match;
+    }
+
 }
 
 /**
