@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Rep, Rep1, Rep1Sep, RepSep } from "../src/Rep";
 import { LEGAL_VALUE } from "./MavenGrammars";
 
-describe("RepTest", () => {
+describe("Rep", () => {
 
     it("rep(0) should match 0 when matcher doesn't match", () => {
         const rep = new Rep("A");

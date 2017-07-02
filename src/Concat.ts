@@ -5,7 +5,8 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
 import { DismatchReport, isPatternMatch, isSpecialMember, PatternMatch, TreePatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
-import { readyToMatch } from "./Whitespace";
+
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Represents something that can be passed into a microgrammar

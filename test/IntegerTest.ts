@@ -1,4 +1,4 @@
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
 

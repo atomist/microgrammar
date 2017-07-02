@@ -1,15 +1,18 @@
 import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
-import { InputState, InputStateImpl, InputStateManager } from "./InputState";
-import { InputStream } from "./InputStream";
+import { InputState } from "./InputState";
+import { MatchingLogic, Term } from "./Matchers";
 import { isPatternMatch, PatternMatch } from "./PatternMatch";
 
-import { ChangeSet } from "./ChangeSet";
-import { MatchingLogic, Term } from "./Matchers";
-import { MicrogrammarSpecParser } from "./MicrogrammarSpecParser";
-import { MatchUpdater, MicrogrammarUpdates } from "./MicrogrammarUpdates";
-import { StringInputStream } from "./StringInputStream";
-import {readyToMatch } from "./Whitespace";
+import { InputStream } from "./spi/InputStream";
+import { StringInputStream } from "./spi/StringInputStream";
+
+import { ChangeSet } from "./internal/ChangeSet";
+import { DefaultInputState } from "./internal/DefaultInputState";
+import { InputStateManager } from "./internal/InputStateManager";
+import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
+import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Holds a set of updatable matches
@@ -149,7 +152,7 @@ export abstract class MatchingMachine {
         const stream = toInputStream(input);
         const stateManager = new InputStateManager(stream);
 
-        let currentInputState: InputState = new InputStateImpl(stateManager);
+        let currentInputState: InputState = new DefaultInputState(stateManager);
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
                 this.config,

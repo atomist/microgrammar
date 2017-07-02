@@ -4,7 +4,8 @@ import { InputState } from "./InputState";
 import { MatchingLogic} from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { DismatchReport, isPatternMatch, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
-import { readyToMatch } from "./Whitespace";
+
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Handle repetition, with or without a separator.

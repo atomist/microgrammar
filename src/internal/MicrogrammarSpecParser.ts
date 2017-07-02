@@ -1,13 +1,14 @@
-import { Concat } from "./Concat";
-import { Config, DefaultConfig } from "./Config";
-import { InputState, inputStateFromString } from "./InputState";
-import { Term } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { Microgrammar } from "./Microgrammar";
-import { isPatternMatch } from "./PatternMatch";
-import { Literal, Regex } from "./Primitives";
-import { Rep } from "./Rep";
-import { Break } from "./snobol/Snobol";
+import { Concat } from "../Concat";
+import { Config, DefaultConfig } from "../Config";
+import { Term } from "../Matchers";
+import { MatchPrefixResult } from "../MatchPrefixResult";
+import { Microgrammar } from "../Microgrammar";
+import { isPatternMatch } from "../PatternMatch";
+import { Literal, Regex } from "../Primitives";
+import { Rep } from "../Rep";
+import { Break } from "../snobol/Snobol";
+
+import { inputStateFromString } from "./InputStateFactory";
 
 /**
  * Parses microgrammars expressed as strings.

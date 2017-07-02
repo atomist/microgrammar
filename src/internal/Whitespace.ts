@@ -1,7 +1,7 @@
-import { InputState } from "./InputState";
-import { MatchingLogic } from "./Matchers";
+import { InputState } from "../InputState";
+import { MatchingLogic } from "../Matchers";
 
-import { Config, DefaultConfig } from "./Config";
+import { Config, DefaultConfig } from "../Config";
 
 /**
  * Prepare to match. Skip whitespace if appropriate. Skip irrelevant content if

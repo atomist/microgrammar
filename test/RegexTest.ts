@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 

@@ -1,12 +1,13 @@
 import { expect } from "chai";
 import { Concat } from "../../src/Concat";
-import { InputState, inputStateFromString } from "../../src/InputState";
 import { Term } from "../../src/Matchers";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { Regex } from "../../src/Primitives";
 import { Break, Span } from "../../src/snobol/Snobol";
 
-describe("BreakTest", () => {
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+
+describe("Break", () => {
 
     it("break matches exhausted", () => {
         const b = new Break("14");

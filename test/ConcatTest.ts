@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Concat } from "../src/Concat";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { Term } from "../src/Matchers";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";

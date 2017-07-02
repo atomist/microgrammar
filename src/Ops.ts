@@ -4,6 +4,13 @@ import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { DismatchReport, isPatternMatch, MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
 
+/**
+ * Optional match on the given matcher
+ * @param o matcher
+ * @param pullUp property from the matcher to pull up to the
+ * parent if specified
+ * @return {Opt}
+ */
 export function optional(o: any, pullUp?: string): MatchingLogic {
     return new Opt(o, pullUp);
 }
@@ -31,8 +38,6 @@ export class Opt implements MatchingLogic {
         }
 
         const maybe = this.matcher.matchPrefix(is, context);
-        // console.log(`Result of trying Opt on [${is.remainder()}]=${JSON.stringify(maybe)}`);
-
         if (isPatternMatch(maybe)) {
             if (this.pullUp) {
                 const f = this.pullUp + MATCH_INFO_SUFFIX;

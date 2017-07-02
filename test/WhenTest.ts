@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { when } from "../src/Ops";
 import { isPatternMatch } from "../src/PatternMatch";
 import { Literal } from "../src/Primitives";
 
-describe("Whentest", () => {
+describe("When", () => {
 
     it("when true should match", () => {
         const primitive = new Literal("foo");

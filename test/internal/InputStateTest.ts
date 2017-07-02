@@ -1,11 +1,12 @@
 import { expect } from "chai";
-import { InputState, InputStateManager, inputStateFromString, InputStateImpl } from "../src/InputState";
-import { InputStream } from "../src/InputStream";
-import { DEPENDENCY_GRAMMAR } from "./MavenGrammars";
+
+import { InputStream } from "../../src/spi/InputStream";
+import { DEPENDENCY_GRAMMAR } from "../MavenGrammars";
 
 import * as assert from "power-assert";
+import { inputStateFromStream, inputStateFromString } from "../../src/internal/InputStateFactory";
 
-describe("InputStateTest", () => {
+describe("InputState", () => {
 
     it("cannot consume", () => {
         const is = inputStateFromString("foo bar");
@@ -82,9 +83,7 @@ describe("InputStateTest", () => {
     it("read ahead does not dirty parent", () => {
         const stream = new ReleasingStringInputStream("the quick brown fox jumps over the lazy dog");
         expect(stream.offset).to.equal(0);
-
-        const state0 = new InputStateImpl(new InputStateManager(stream));
-
+        const state0 = inputStateFromStream(stream);
         const state1 = state0.advance();
         expect(state1.offset).to.equal(1);
         const state2 = state1.advance();

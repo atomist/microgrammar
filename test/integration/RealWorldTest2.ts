@@ -1,12 +1,13 @@
-import { InputState, inputStateFromString } from "../../src/InputState";
 import { JavaBlock, JavaParenthesizedExpression } from "../../src/java/JavaBody";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
 
 import * as assert from "power-assert";
 import { Rep, Rep1 } from "../../src/Rep";
 
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
 
 describe("AnyAnnotationGrammar", () => {
 

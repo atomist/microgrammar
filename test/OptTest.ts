@@ -1,12 +1,12 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { Term } from "../src/Matchers";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Literal } from "../src/Primitives";
 
-describe("OptTest", () => {
+describe("Opt", () => {
 
     it("should match when matcher doesn't match", () => {
         const alt = new Opt("A");

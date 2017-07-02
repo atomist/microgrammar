@@ -1,9 +1,12 @@
 import { Concat } from "../Concat";
-import { InputState, inputStateFromString } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
 import { DismatchReport, isPatternMatch, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
 import { JavaContentStateMachine } from "./JavaContentStateMachine";
+
+import { InputState } from "../InputState";
+
+import { inputStateFromString } from ".././internal/InputStateFactory";
 
 /**
  * The rest of a Java block, going to a matching depth of +1 curlies.

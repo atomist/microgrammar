@@ -1,6 +1,7 @@
 
 /**
- * Stateful stream primitives. Consumption via the read method is irreversible.
+ * Stateful stream primitives. Implement over a string or input stream.
+ * Consumption via the read method is irreversible.
  */
 export interface InputStream {
 

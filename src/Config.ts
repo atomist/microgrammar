@@ -1,4 +1,6 @@
-
+/**
+ * Configuration for a grammar or configurable matcher
+ */
 export interface Config {
 
     consumeWhiteSpaceBetweenTokens: boolean;

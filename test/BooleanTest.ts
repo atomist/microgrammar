@@ -1,5 +1,5 @@
 import assert = require("power-assert");
-import { inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { LowercaseBoolean } from "../src/Primitives";
 

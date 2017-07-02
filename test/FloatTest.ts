@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Float } from "../src/Primitives";
 
-describe("FloatTest", () => {
+describe("Float", () => {
 
     it("test one digit", () => {
         const is = inputStateFromString("1");

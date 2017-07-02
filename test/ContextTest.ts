@@ -1,6 +1,6 @@
 import * as assert from "power-assert";
 import { Concat } from "../src/Concat";
-import { InputState, inputStateFromString } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { Microgrammar } from "../src/Microgrammar";
 import { isPatternMatch } from "../src/PatternMatch";
 import { Integer, LowercaseBoolean } from "../src/Primitives";

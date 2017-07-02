@@ -1,9 +1,11 @@
 import { expect } from "chai";
-import { InputState, inputStateFromString } from "../../src/InputState";
+
 import { isPatternMatch } from "../../src/PatternMatch";
 import { Span } from "../../src/snobol/Snobol";
 
-describe("SpanTest", () => {
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+
+describe("Span", () => {
 
     it("span no match when no single char", () => {
         const span = new Span("abcd");
