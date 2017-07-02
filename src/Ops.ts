@@ -2,7 +2,7 @@ import { toMatchingLogic } from "./Concat";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, isPatternMatch, MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
+import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPatternMatch } from "./PatternMatch";
 
 /**
  * Optional match on the given matcher
@@ -72,7 +72,7 @@ export class Alt implements MatchingLogic {
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new DismatchReport(this.$id, is.offset, {});
+            return new MatchFailureReport(this.$id, is.offset, {});
         }
 
         for (const matcher of this.matchers) {
@@ -81,7 +81,7 @@ export class Alt implements MatchingLogic {
                 return m;
             }
         }
-        return new DismatchReport(this.$id, is.offset, {});
+        return new MatchFailureReport(this.$id, is.offset, {});
     }
 }
 
@@ -107,7 +107,7 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
         const match = matcher.matchPrefix(is, context);
         return (isPatternMatch(match) && matchTest(match)) ?
             match :
-            new DismatchReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context);
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;

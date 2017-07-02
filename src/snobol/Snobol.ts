@@ -6,7 +6,7 @@ import { toMatchingLogic } from "../Concat";
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { DismatchReport, isPatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../PatternMatch";
 
 /**
  * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -29,7 +29,7 @@ export class Span implements MatchingLogic {
         }
         return (currentIs !== is) ?
             new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) :
-            new DismatchReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context);
     }
 }
 
@@ -104,7 +104,7 @@ export class Break implements MatchingLogic {
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isPatternMatch(this.badMatcher.matchPrefix(currentIs, context))) {
-                    return new DismatchReport(this.$id, is.offset, context);
+                    return new MatchFailureReport(this.$id, is.offset, context);
                 }
             }
             matched += currentIs.peek(1);

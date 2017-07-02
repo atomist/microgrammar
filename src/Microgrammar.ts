@@ -2,13 +2,14 @@ import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
-import { isPatternMatch, PatternMatch } from "./PatternMatch";
+import {DismatchReport, isPatternMatch, MatchFailureReport, PatternMatch} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
+import {inputStateFromString} from "./internal/InputStateFactory";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
@@ -114,16 +115,13 @@ export class Microgrammar<T> implements Term {
      */
     // TODO we should allow InputStream also, although this makes
     // verifying that we got to the end harder
-    public exactMatch(input: string): PatternMatch & T {
-        const match = this.firstMatch(input);
-        if (match && match.$offset !== 0) {
-            // Not a match because it's not at the beginning
-            return undefined;
+    public exactMatch(input: string): PatternMatch & T | DismatchReport {
+        const match = this.matcher.matchPrefix(inputStateFromString(input), {});
+
+        if (isPatternMatch(match) && match.$matched !== input) {
+            return { description: "Not all input was consumed." };
         }
-        if (match && match.$matched !== input) {
-            return undefined;
-        }
-        return match;
+        return match as (PatternMatch & T | MatchFailureReport);
     }
 
 }

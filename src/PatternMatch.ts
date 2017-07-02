@@ -4,14 +4,22 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
 /**
  * Returned when we failed to match prefix
  */
-export class DismatchReport implements MatchPrefixResult {
+
+export interface DismatchReport {
+    description: string;
+}
+
+export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport {
 
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
                        public readonly $context: {},
-                       private readonly cause?: DismatchReport) {
+                       private readonly cause?: MatchFailureReport) {
     }
 
+    get description(): string {
+        return `Match failed on ${this.$matcherId}`;
+    }
 }
 
 /**
@@ -57,7 +65,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
 }
 
-export function isPatternMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
+export function isPatternMatch(mpr: MatchPrefixResult | DismatchReport): mpr is PatternMatch {
     return mpr != null && (mpr as PatternMatch).$matched !== undefined;
 }
 

@@ -3,7 +3,7 @@ import * as assert from "power-assert";
 import { MatchingLogic, Term } from "../src/Matchers";
 import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
 import { Opt } from "../src/Ops";
-import { PatternMatch } from "../src/PatternMatch";
+import {isPatternMatch, PatternMatch} from "../src/PatternMatch";
 import { Rep1Sep, RepSep } from "../src/Rep";
 import { RealWorldPom } from "./Fixtures";
 import {
@@ -12,7 +12,7 @@ import {
 } from "./MavenGrammars";
 
 import { fail } from "power-assert";
-import { JavaParenthesizedExpression } from "../build/src/java/JavaBody";
+import { JavaParenthesizedExpression } from "../src/java/JavaBody";
 import { JAVA_IDENTIFIER } from "./java/JavaBlockMicrogrammarTest";
 
 describe("Microgrammar", () => {
@@ -60,7 +60,7 @@ describe("Microgrammar", () => {
 
     it("parse all content: File matches", () => {
         const content = "public void thing(int i);";
-        const mg = Microgrammar.fromDefinitions<any>({
+        const mg = Microgrammar.fromDefinitions<{ name: string }>({
             _p: "public",
             type: JAVA_IDENTIFIER,
             name: JAVA_IDENTIFIER,
@@ -68,9 +68,36 @@ describe("Microgrammar", () => {
             _semi: ";",
         });
         const result = mg.exactMatch(content);
-        assert(result);
-        assert(result.$matched === content);
-        assert(result.name === "thing");
+        if (isPatternMatch(result)) {
+            assert(result);
+            assert(result.$matched === content);
+            assert(result.name === "thing");
+        } else {
+            fail();
+        }
+    });
+
+    it("parse all content: pattern match recognized in output", () => {
+        const content = "public void";
+        const mg = Microgrammar.fromDefinitions<any>({
+            _p: "public",
+            type: JAVA_IDENTIFIER,
+        });
+        const result = mg.exactMatch(content);
+        assert(isPatternMatch(result));
+    });
+
+    it("parse all content: dismatch report recognized in output", () => {
+        const content = "not-matchy void";
+        const mg = Microgrammar.fromDefinitions<{type: string }>({
+            _p: "public",
+            type: JAVA_IDENTIFIER,
+        });
+        const result = mg.exactMatch(content);
+        assert(!isPatternMatch(result));
+        if (!isPatternMatch(result)) {
+            assert(result.description !== undefined);
+        }
     });
 
     it("parse all content: Fail due to irrelevant content after match", () => {
@@ -83,7 +110,7 @@ describe("Microgrammar", () => {
             _semi: ";",
         });
         const result = mg.exactMatch(content);
-        assert(!result);
+        assert(!isPatternMatch(result));
     });
 
     it("parse all content: Fail due to irrelevant content before match", () => {
@@ -96,7 +123,7 @@ describe("Microgrammar", () => {
             _semi: ";",
         });
         const result = mg.exactMatch(content);
-        assert(!result);
+        assert(!isPatternMatch(result));
     });
 
     it("can JSON stringify", () => {

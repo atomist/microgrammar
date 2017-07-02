@@ -1,7 +1,7 @@
 import { Concat } from "../Concat";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { DismatchReport, isPatternMatch, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
+import { isPatternMatch, MatchFailureReport, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
 import { JavaContentStateMachine } from "./JavaContentStateMachine";
 
 import { InputState } from "../InputState";
@@ -96,7 +96,7 @@ class JavaBody implements MatchingLogic {
                 matched,
                 context);
         } else {
-            return new DismatchReport(this.$id, is.offset, innerMatch as DismatchReport);
+            return new MatchFailureReport(this.$id, is.offset, innerMatch as MatchFailureReport);
         }
     }
 
