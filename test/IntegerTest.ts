@@ -1,4 +1,4 @@
-import { InputState } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
 
@@ -22,7 +22,7 @@ describe("Integer", () => {
 describe("Integer matching", () => {
 
     it("test one digit", () => {
-        const is = InputState.fromString("1");
+        const is = inputStateFromString("1");
         const m = Integer.matchPrefix(is);
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
@@ -31,7 +31,7 @@ describe("Integer matching", () => {
     });
 
     it("test multiple digits", () => {
-        const is = InputState.fromString("105x");
+        const is = inputStateFromString("105x");
         const m = Integer.matchPrefix(is);
         assert(isPatternMatch(m));
         const match = m as PatternMatch;

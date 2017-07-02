@@ -1,7 +1,7 @@
-import { InputState } from "./InputState";
-import { MatchingLogic } from "./Matchers";
+import { InputState } from "../InputState";
+import { MatchingLogic } from "../Matchers";
 
-import { Config, DefaultConfig } from "./Config";
+import { Config, DefaultConfig } from "../Config";
 
 /**
  * Prepare to match. Skip whitespace if appropriate. Skip irrelevant content if
@@ -18,12 +18,9 @@ export function readyToMatch(is: InputState, config: Config = DefaultConfig,
                              ...matchers: MatchingLogic[]): [string, InputState] {
     const lookFor = commonPrefix(matchers);
     if (lookFor) {
-        const r = is.skipTo(lookFor);
-        const skipped = r.seenSince(is);
-        return [skipped, r];
+        return is.skipTo(lookFor);
     } else if (config.consumeWhiteSpaceBetweenTokens) {
-        const r = is.skipWhile(c => c.trim() === ""); // || m && m.canStartWith && !m.canStartWith(c));
-        return [r.seenSince(is), r];
+        return is.skipWhile(c => c.trim() === "", 1); // || m && m.canStartWith && !m.canStartWith(c));
     } else {
         return ["", is];
     }

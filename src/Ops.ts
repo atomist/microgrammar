@@ -2,8 +2,15 @@ import { toMatchingLogic } from "./Concat";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, isPatternMatch, MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
+import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPatternMatch } from "./PatternMatch";
 
+/**
+ * Optional match on the given matcher
+ * @param o matcher
+ * @param pullUp property from the matcher to pull up to the
+ * parent if specified
+ * @return {Opt}
+ */
 export function optional(o: any, pullUp?: string): MatchingLogic {
     return new Opt(o, pullUp);
 }
@@ -31,8 +38,6 @@ export class Opt implements MatchingLogic {
         }
 
         const maybe = this.matcher.matchPrefix(is, context);
-        // console.log(`Result of trying Opt on [${is.remainder()}]=${JSON.stringify(maybe)}`);
-
         if (isPatternMatch(maybe)) {
             if (this.pullUp) {
                 const f = this.pullUp + MATCH_INFO_SUFFIX;
@@ -67,7 +72,7 @@ export class Alt implements MatchingLogic {
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new DismatchReport(this.$id, is.offset, {});
+            return new MatchFailureReport(this.$id, is.offset, {});
         }
 
         for (const matcher of this.matchers) {
@@ -76,7 +81,7 @@ export class Alt implements MatchingLogic {
                 return m;
             }
         }
-        return new DismatchReport(this.$id, is.offset, {});
+        return new MatchFailureReport(this.$id, is.offset, {});
     }
 }
 
@@ -102,7 +107,7 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
         const match = matcher.matchPrefix(is, context);
         return (isPatternMatch(match) && matchTest(match)) ?
             match :
-            new DismatchReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context);
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;

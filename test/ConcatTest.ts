@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { Concat } from "../src/Concat";
-import { InputState } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { Term } from "../src/Matchers";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Integer } from "../src/Primitives";
@@ -15,7 +15,7 @@ describe("Concat", () => {
         const mg = new Concat({
             name: "foo",
         });
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal("foo");
@@ -28,7 +28,7 @@ describe("Concat", () => {
             $id: "Foo",
             num: /^[1-9][0-9]*/,
         } as Term);
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         expect(isPatternMatch(result)).to.equal(true);
         // expect(result.$matched).to.equal(content);
@@ -43,7 +43,7 @@ describe("Concat", () => {
         const mg = new Concat({
             num: Integer,
         });
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         expect(isPatternMatch(result)).to.equal(true);
         // expect(result.$matched).to.equal(content);
@@ -59,7 +59,7 @@ describe("Concat", () => {
         const mg = new Concat({
             num: Integer,
         });
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal(content);
@@ -73,7 +73,7 @@ describe("Concat", () => {
             _x: "x",
             days: Integer,
         });
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         expect(isPatternMatch(result)).to.equal(true);
         expect(result.$matched).to.equal(content);
@@ -90,7 +90,7 @@ describe("Concat", () => {
             },
         });
         const content = "Lizzy+Katrina";
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         assert(isPatternMatch(result));
         assert(result.name === "Lizzy");
@@ -106,7 +106,7 @@ describe("Concat", () => {
             },
         });
         const content = "Lizzy+Katrina,Terri";
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         assert(isPatternMatch(result));
         assert(result.names[0], "Lizzy");
@@ -124,7 +124,7 @@ describe("Concat", () => {
             players: nameList,
         });
         const content = "Jardine vs Bradman,Woodfull";
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         assert(isPatternMatch(result));
         assert(result.gentlemen.names[0], "Jardine");
@@ -139,7 +139,7 @@ describe("Concat", () => {
             players: new Rep1Sep(/[A-Za-z]+/, ","),
         });
         const content = "Jardine vs Bradman,Woodfull";
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         assert(isPatternMatch(result));
         assert(result.gentlemen[0], "Jardine");
@@ -162,7 +162,7 @@ describe("Concat", () => {
             players: nameList,
         });
         const content = "Jardine(bat),Wyatt(bat) vs Bradman(bat,bowl),Woodfull(bat,keep)";
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
         assert(isPatternMatch(result));
         assert(result.gentlemen.names[0].name, "Jardine");
@@ -181,7 +181,7 @@ describe("Concat", () => {
             delim: ":",
             hobbies: new RepSep(/[a-z]+/, ","),
         });
-        const is = InputState.fromString(content);
+        const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as PatternMatch;
         expect(isPatternMatch(result)).to.equal(true);
         const r = result as any;

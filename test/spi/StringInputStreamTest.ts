@@ -1,4 +1,4 @@
-import { StringInputStream } from "../src/StringInputStream";
+import { StringInputStream } from "../../src/spi/StringInputStream";
 
 import * as assert from "power-assert";
 

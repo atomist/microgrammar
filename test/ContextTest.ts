@@ -1,6 +1,6 @@
 import * as assert from "power-assert";
 import { Concat } from "../src/Concat";
-import { InputState } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { Microgrammar } from "../src/Microgrammar";
 import { isPatternMatch } from "../src/PatternMatch";
 import { Integer, LowercaseBoolean } from "../src/Primitives";
@@ -13,7 +13,7 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = cc.matchPrefix(InputState.fromString("24 7"), {});
+        const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.$context.sum === 24 + 7);
@@ -26,7 +26,7 @@ describe("ContextTest", () => {
             willBeFalse: ctx => typeof ctx.a === "string",
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = cc.matchPrefix(InputState.fromString("24 7"), {});
+        const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.$context.sum === 24 + 7);
@@ -38,7 +38,7 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = cc.matchPrefix(InputState.fromString("24 7"), {});
+        const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.sum === 24 + 7);
@@ -50,7 +50,7 @@ describe("ContextTest", () => {
             b: /[0-9]+/,
             _rework(ctx) { ctx.b = parseInt(ctx.b, 10); },
         });
-        const matched: any = cc.matchPrefix(InputState.fromString("24 7"), {});
+        const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.$context.b === 7);
     });
@@ -60,7 +60,7 @@ describe("ContextTest", () => {
             a: Integer,
             b: [/[0-9]+/, b => parseInt(b, 10)],
         });
-        const matched: any = cc.matchPrefix(InputState.fromString("24 7"), {});
+        const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.$context.b === 7);
     });
@@ -72,9 +72,9 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = cc.matchPrefix(InputState.fromString("true 7 35"), {});
+        const matched = cc.matchPrefix(inputStateFromString("true 7 35"), {});
         assert(isPatternMatch(matched));
-        const matched2 = cc.matchPrefix(InputState.fromString("false 7 35"), {});
+        const matched2 = cc.matchPrefix(inputStateFromString("false 7 35"), {});
         assert(!isPatternMatch(matched2));
     });
 
@@ -87,7 +87,7 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = cc.matchPrefix(InputState.fromString("gary 7 35"), {});
+        const matched = cc.matchPrefix(inputStateFromString("gary 7 35"), {});
         assert(isPatternMatch(matched));
         assert((matched.$context as any).promoted === "gary");
     });

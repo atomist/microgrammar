@@ -9,8 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+### Added
+
+- `exactMatch` method on `Microgrammar` to insist on
+matching entire input.
+
 ### Changed
 
+- **Breaking** Introduced `spi` and `internal` packages to clearly
+specify user API
 - **Breaking** Matcher properties with names starting with `_` are no longer bound to the
 pattern match
 

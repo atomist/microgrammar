@@ -1,4 +1,4 @@
-import { PatternMatch } from "./PatternMatch";
+import { PatternMatch } from "../PatternMatch";
 
 function replaceFirstAfter(content: string, offset: number, old: string, replacement: string) {
     return content.substring(0, offset) + content.substring(offset).replace(old, replacement);

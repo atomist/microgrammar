@@ -3,9 +3,10 @@ import { InputState } from "./InputState";
 import { Matcher, MatchingLogic, Term } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { Microgrammar } from "./Microgrammar";
-import { DismatchReport, isPatternMatch, isSpecialMember, PatternMatch, TreePatternMatch } from "./PatternMatch";
+import { isPatternMatch, isSpecialMember, MatchFailureReport, PatternMatch, TreePatternMatch } from "./PatternMatch";
 import { Literal, Regex } from "./Primitives";
-import { readyToMatch } from "./Whitespace";
+
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -96,7 +97,7 @@ export class Concat implements MatchingLogic {
                         context[step.$id] = report.$value;
                     }
                 } else {
-                    return new DismatchReport(this.$id, initialInputState.offset, context);
+                    return new MatchFailureReport(this.$id, initialInputState.offset, context);
                 }
             } else {
                 // It's a function taking the context.
@@ -105,7 +106,7 @@ export class Concat implements MatchingLogic {
                 const r = step.f(context);
                 if (isSpecialMember(step.$id)) {
                     if (r === false) {
-                        return new DismatchReport(this.$id, initialInputState.offset, context);
+                        return new MatchFailureReport(this.$id, initialInputState.offset, context);
                     }
                 } else {
                     context[step.$id] = r;

@@ -1,12 +1,12 @@
 import { expect } from "chai";
-import { InputState } from "../src/InputState";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Float } from "../src/Primitives";
 
-describe("FloatTest", () => {
+describe("Float", () => {
 
     it("test one digit", () => {
-        const is = InputState.fromString("1");
+        const is = inputStateFromString("1");
         const m = Float.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;
@@ -15,7 +15,7 @@ describe("FloatTest", () => {
     });
 
     it("test multiple digits", () => {
-        const is = InputState.fromString("105x");
+        const is = inputStateFromString("105x");
         const m = Float.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;
@@ -24,7 +24,7 @@ describe("FloatTest", () => {
     });
 
     it("test with decimal", () => {
-        const is = InputState.fromString("105.25555xxx");
+        const is = inputStateFromString("105.25555xxx");
         const m = Float.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;
@@ -33,7 +33,7 @@ describe("FloatTest", () => {
     });
 
     it("test signed", () => {
-        const is = InputState.fromString("-105.25555xxx");
+        const is = inputStateFromString("-105.25555xxx");
         const m = Float.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;
@@ -42,7 +42,7 @@ describe("FloatTest", () => {
     });
 
     it("test no leading digit", () => {
-        const is = InputState.fromString("-.25555xxx");
+        const is = inputStateFromString("-.25555xxx");
         const m = Float.matchPrefix(is);
         expect(isPatternMatch(m)).to.equal(true);
         const match = m as PatternMatch;

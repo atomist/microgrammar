@@ -1,12 +1,13 @@
-import { InputState } from "../../src/InputState";
 import { JavaBlock, JavaParenthesizedExpression } from "../../src/java/JavaBody";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
 
 import * as assert from "power-assert";
 import { Rep, Rep1 } from "../../src/Rep";
 
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
 
 describe("AnyAnnotationGrammar", () => {
 
@@ -37,7 +38,7 @@ describe("GrammarWithOnlyARep", () => {
     it("can handle rep", () => {
         const rep = new Rep(AnyAnnotation);
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
-        const match = rep.matchPrefix(InputState.fromString(src), {}) as PatternMatch;
+        const match = rep.matchPrefix(inputStateFromString(src), {}) as PatternMatch;
         assert(isPatternMatch(match));
         assert(match.$matched.trim() === `@ChangeControlled @Donkey("24", name = "Eeyore")`);
     });

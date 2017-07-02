@@ -1,15 +1,19 @@
 import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
-import { InputState, InputStateManager } from "./InputState";
-import { InputStream } from "./InputStream";
-import { isPatternMatch, PatternMatch } from "./PatternMatch";
-
-import { ChangeSet } from "./ChangeSet";
+import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
-import { MicrogrammarSpecParser } from "./MicrogrammarSpecParser";
-import { MatchUpdater, MicrogrammarUpdates } from "./MicrogrammarUpdates";
-import { StringInputStream } from "./StringInputStream";
-import {readyToMatch } from "./Whitespace";
+import {DismatchReport, isPatternMatch, MatchFailureReport, PatternMatch} from "./PatternMatch";
+
+import { InputStream } from "./spi/InputStream";
+import { StringInputStream } from "./spi/StringInputStream";
+
+import { ChangeSet } from "./internal/ChangeSet";
+import { DefaultInputState } from "./internal/DefaultInputState";
+import {inputStateFromString} from "./internal/InputStateFactory";
+import { InputStateManager } from "./internal/InputStateManager";
+import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
+import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Holds a set of updatable matches
@@ -102,6 +106,24 @@ export class Microgrammar<T> implements Term {
         return found.length > 0 ? found[0] : null;
     }
 
+    /**
+     * Return a match if it explains the whole of the input.
+     * This style of usage is more like a traditional parser,
+     * building an AST for a while file.
+     * @param input
+     * @return {PatternMatch&T}
+     */
+    // TODO we should allow InputStream also, although this makes
+    // verifying that we got to the end harder
+    public exactMatch(input: string): PatternMatch & T | DismatchReport {
+        const match = this.matcher.matchPrefix(inputStateFromString(input), {});
+
+        if (isPatternMatch(match) && match.$matched !== input) {
+            return { description: "Not all input was consumed." };
+        }
+        return match as (PatternMatch & T | MatchFailureReport);
+    }
+
 }
 
 /**
@@ -149,7 +171,7 @@ export abstract class MatchingMachine {
         const stream = toInputStream(input);
         const stateManager = new InputStateManager(stream);
 
-        let currentInputState: InputState = new InputState(stateManager);
+        let currentInputState: InputState = new DefaultInputState(stateManager);
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
                 this.config,

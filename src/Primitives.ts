@@ -1,7 +1,7 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, TerminalPatternMatch } from "./PatternMatch";
+import { MatchFailureReport, TerminalPatternMatch } from "./PatternMatch";
 
 /**
  * Match a literal string
@@ -16,7 +16,7 @@ export class Literal implements MatchingLogic {
     public matchPrefix(is: InputState): MatchPrefixResult {
         return (is.peek(this.literal.length) === this.literal) ?
             new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
-            new DismatchReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context);
     }
 
     public canStartWith(char: string): boolean {
@@ -43,7 +43,7 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     public matchPrefix(is: InputState): MatchPrefixResult {
         if (is.exhausted()) {
-            return new DismatchReport(this.$id, is.offset, context);
+            return new MatchFailureReport(this.$id, is.offset, context);
         }
 
         // TODO this is fragile as it only takes the top content
@@ -65,7 +65,7 @@ export abstract class AbstractRegex implements MatchingLogic {
                 this.toValue(actualMatch),
                 context);
         } else {
-            return new DismatchReport(this.$id, is.offset, context);
+            return new MatchFailureReport(this.$id, is.offset, context);
         }
     }
 

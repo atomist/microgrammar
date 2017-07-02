@@ -1,9 +1,12 @@
 import { Concat } from "../Concat";
-import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { DismatchReport, isPatternMatch, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
+import { isPatternMatch, MatchFailureReport, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
 import { JavaContentStateMachine } from "./JavaContentStateMachine";
+
+import { InputState } from "../InputState";
+
+import { inputStateFromString } from ".././internal/InputStateFactory";
 
 /**
  * The rest of a Java block, going to a matching depth of +1 curlies.
@@ -71,7 +74,7 @@ class JavaBody implements MatchingLogic {
                 context);
         }
 
-        const innerMatch = this.inner.matchPrefix(InputState.fromString(matched), context);
+        const innerMatch = this.inner.matchPrefix(inputStateFromString(matched), context);
         if (isPatternMatch(innerMatch)) {
             if (this.isTreePatternMatch(innerMatch)) {
                 // console.log("body has parts");
@@ -93,7 +96,7 @@ class JavaBody implements MatchingLogic {
                 matched,
                 context);
         } else {
-            return new DismatchReport(this.$id, is.offset, innerMatch as DismatchReport);
+            return new MatchFailureReport(this.$id, is.offset, innerMatch as MatchFailureReport);
         }
     }
 

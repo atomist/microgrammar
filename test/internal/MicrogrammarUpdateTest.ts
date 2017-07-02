@@ -1,12 +1,12 @@
-import { ChangeSet } from "../src/ChangeSet";
-import { Microgrammar } from "../src/Microgrammar";
-import { Opt } from "../src/Ops";
+import { ChangeSet } from "../../src/internal/ChangeSet";
+import { Microgrammar } from "../../src/Microgrammar";
+import { Opt } from "../../src/Ops";
 
 import * as assert from "power-assert";
 
-import { isPatternMatch } from "../src/PatternMatch";
-import { Integer } from "../src/Primitives";
-import { RepSep } from "../src/Rep";
+import { isPatternMatch } from "../../src/PatternMatch";
+import { Integer } from "../../src/Primitives";
+import { RepSep } from "../../src/Rep";
 
 describe("MicrogrammarUpdateTest", () => {
 

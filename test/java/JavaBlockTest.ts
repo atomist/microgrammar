@@ -1,13 +1,15 @@
-import { expect } from "chai";
 
-import { InputState } from "../../src/InputState";
 import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
 import { Microgrammar } from "../../src/Microgrammar";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { Regex } from "../../src/Primitives";
 import { Break } from "../../src/snobol/Snobol";
 
-describe("JavaBlockTest", () => {
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+
+import * as assert from "power-assert";
+
+describe("JavaBlock", () => {
 
     it("match empty block", () => {
         match("{}");
@@ -49,15 +51,15 @@ describe("JavaBlockTest", () => {
 
     it("should match till balance", () => {
         const balanced = "{  x = y; { }  2; }";
-        const is = InputState.fromString(balanced + "// this is a comment }");
+        const is = inputStateFromString(balanced + "// this is a comment }");
         const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
-        expect(isPatternMatch(m)).to.equal(true);
-        expect(m.$matched).to.equal(balanced);
+        assert(isPatternMatch(m));
+        assert(m.$matched === balanced);
     });
 
     it("should match inner structure", () => {
         const balanced = "{ x = y; }";
-        const is = InputState.fromString(balanced);
+        const is = inputStateFromString(balanced);
         const inner = Microgrammar.fromDefinitions({
             left: new Regex(/^[a-z]+/),
             equals: "=",
@@ -65,25 +67,25 @@ describe("JavaBlockTest", () => {
             _whatever: new Break("//////"),
         });
         const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {});
-        expect(isPatternMatch(m)).to.equal(true);
-        expect(m.$matched).to.equal(balanced);
-        expect(m.block.left).to.equal("x");
-        expect(m.block.left$match.$offset).to.equal(2);
-        expect(m.block.right).to.equal("y");
-        expect(m.block.right$match.$offset).to.equal(6);
+        assert(isPatternMatch(m));
+        assert(m.$matched === balanced);
+        assert(m.block.left === "x");
+        assert(m.block.left$match.$offset === 2);
+        assert(m.block.right === "y");
+        assert(m.block.right$match.$offset === 6);
     });
 
     function match(what: string) {
-        const is = InputState.fromString(what);
+        const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
-        expect(isPatternMatch(m)).to.equal(true);
-        expect(m.$matched).to.equal(what);
+        assert(isPatternMatch(m));
+        assert(m.$matched === what);
     }
 
     function shouldNotMatch(what: string) {
-        const is = InputState.fromString(what);
+        const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefix(is, {});
-        expect(isPatternMatch(m)).to.equal(false);
+        assert(!isPatternMatch(m));
     }
 
 });

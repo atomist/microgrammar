@@ -3,8 +3,9 @@ import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic} from "./Matchers";
 import { MatchPrefixResult } from "./MatchPrefixResult";
-import { DismatchReport, isPatternMatch, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
-import { readyToMatch } from "./Whitespace";
+import { isPatternMatch, MatchFailureReport, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+
+import { readyToMatch } from "./internal/Whitespace";
 
 /**
  * Handle repetition, with or without a separator.
@@ -98,7 +99,7 @@ export class Repetition implements MatchingLogic, Configurable {
                 is.offset,
                 values,
                 context) :
-            new DismatchReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context);
     }
 }
 

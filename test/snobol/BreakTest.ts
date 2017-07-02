@@ -1,16 +1,17 @@
 import { expect } from "chai";
 import { Concat } from "../../src/Concat";
-import { InputState } from "../../src/InputState";
 import { Term } from "../../src/Matchers";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { Regex } from "../../src/Primitives";
 import { Break, Span } from "../../src/snobol/Snobol";
 
-describe("BreakTest", () => {
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+
+describe("Break", () => {
 
     it("break matches exhausted", () => {
         const b = new Break("14");
-        const is = InputState.fromString("");
+        const is = inputStateFromString("");
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("");
@@ -18,7 +19,7 @@ describe("BreakTest", () => {
 
     it("break matches another matcher", () => {
         const b = new Break(new Regex(/^[a-z]/));
-        const is = InputState.fromString("HEY YOU banana");
+        const is = inputStateFromString("HEY YOU banana");
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("HEY YOU ");
@@ -28,7 +29,7 @@ describe("BreakTest", () => {
         const b = new Break(
             new Concat({ $id: "yeah", _start: "${", name: new Regex(/^[a-z]+/), _end: "}" } as Term,
                 { consumeWhiteSpaceBetweenTokens: false }));
-        const is = InputState.fromString("HEY YOU ${thing} and more stuff");
+        const is = inputStateFromString("HEY YOU ${thing} and more stuff");
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("HEY YOU ");
@@ -36,7 +37,7 @@ describe("BreakTest", () => {
 
     it("break matches", () => {
         const b = new Break("14");
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("friday ");
@@ -44,7 +45,7 @@ describe("BreakTest", () => {
 
     it("break matches and consumes", () => {
         const b = new Break("14", true);
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {}) as any;
         expect(isPatternMatch(m)).to.equal(true);
         expect(m.$matched).to.equal("friday 14");
@@ -53,7 +54,7 @@ describe("BreakTest", () => {
 
     it("break matches nothing as it comes immediately", () => {
         const b = new Break("friday");
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("");
@@ -65,7 +66,7 @@ describe("BreakTest", () => {
             prefix: b,
             number: new Span("41"),
         });
-        const is = InputState.fromString("friday 14");
+        const is = inputStateFromString("friday 14");
         const m = c.matchPrefix(is, {});
         expect(isPatternMatch(m)).to.equal(true);
         expect((m as PatternMatch).$matched).to.equal("friday 14");
