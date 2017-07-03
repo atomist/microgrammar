@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+## [0.4.0] - 2017-07-02
+
+[0.4.0]: https://github.com/atomist/microgrammar/compare/0.4.0...0.3.11
+
+API clarification release
+
 ### Added
 
 - `exactMatch` method on `Microgrammar` to insist on
