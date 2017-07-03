@@ -16,10 +16,14 @@ describe("JavaBlock microgrammars", () => {
 
 });
 
+/**
+ * Note that these grammars aren't meant to be realistic
+ */
+
 export const JAVA_IDENTIFIER = /^[A-Za-z][a-zA-Z0-9]+/;
 
 const METHOD_GRAMMAR = Microgrammar.fromDefinitions<ChangeControledMethod>({
-    _visibilityModifier: "public", // TODO make optional
+    _visibilityModifier: "public",
     type: JAVA_IDENTIFIER,
     name: JAVA_IDENTIFIER,
     parameterContent: JavaParenthesizedExpression,
