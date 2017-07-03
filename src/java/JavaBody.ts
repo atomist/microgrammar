@@ -1,15 +1,21 @@
 import { Concat } from "../Concat";
+import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { MatchPrefixResult } from "../MatchPrefixResult";
-import { isPatternMatch, MatchFailureReport, TerminalPatternMatch, TreePatternMatch } from "../PatternMatch";
+import {
+    DismatchReport,
+    isPatternMatch,
+    isTreePatternMatch,
+    TerminalPatternMatch,
+    TreePatternMatch,
+} from "../PatternMatch";
+
+import { inputStateFromString } from "../internal/InputStateFactory";
+
 import { JavaContentStateMachine } from "./JavaContentStateMachine";
 
-import { InputState } from "../InputState";
-
-import { inputStateFromString } from ".././internal/InputStateFactory";
-
 /**
- * The rest of a Java block, going to a matching depth of +1 curlies.
+ * The rest of a Java block, going to a matching depth of +1 curlies or braces.
  * Does not read final curly
  */
 class JavaBody implements MatchingLogic {
@@ -76,7 +82,7 @@ class JavaBody implements MatchingLogic {
 
         const innerMatch = this.inner.matchPrefix(inputStateFromString(matched), context);
         if (isPatternMatch(innerMatch)) {
-            if (this.isTreePatternMatch(innerMatch)) {
+            if (isTreePatternMatch(innerMatch)) {
                 // console.log("body has parts");
                 // Tree; take its bits
                 // TODO: test offsets and then adjust them
@@ -96,12 +102,8 @@ class JavaBody implements MatchingLogic {
                 matched,
                 context);
         } else {
-            return new MatchFailureReport(this.$id, is.offset, innerMatch as MatchFailureReport);
+            return new DismatchReport(this.$id, is.offset, innerMatch as DismatchReport);
         }
-    }
-
-    private isTreePatternMatch(pm: MatchPrefixResult): pm is TreePatternMatch {
-        return (pm as TreePatternMatch).$matchers !== undefined;
     }
 }
 

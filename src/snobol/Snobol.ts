@@ -43,8 +43,8 @@ export function takeUntil(what): MatchingLogic {
 
 /**
  * Return a match for the first thing if it doesn't
- * @param desired terminal match
- * @param match we don't want.
+ * @param a desired match
+ * @param b match we don't want.
  */
 export function yadaYadaThenThisButNotThat(a, b): MatchingLogic {
     return new Break(a, true, b);
@@ -52,7 +52,7 @@ export function yadaYadaThenThisButNotThat(a, b): MatchingLogic {
 
 /**
  * Anything, then the given matcher. Binds the terminal match
- * @param a desired terminal match
+ * @param a desired match
  * @returns {Break}
  */
 export function yadaYadaThen(a): MatchingLogic {

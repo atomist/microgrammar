@@ -6,7 +6,7 @@ import { canonicalize } from "../../src/java/JavaUtils";
 
 describe("Java Benchmark", () => {
 
-    const parseCount = 1000;
+    const parseCount = 50;
 
     const validTargetMethods = 0;
 
@@ -16,7 +16,7 @@ describe("Java Benchmark", () => {
 
     const comments = 0;
 
-    it("annotated methods", () => {
+    it("parses annotated methods", () => {
         let additional = "";
         for (let m = 0; m < validTargetMethods; m++) {
             additional += validMethod(m);
