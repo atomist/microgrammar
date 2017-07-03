@@ -12,8 +12,8 @@ import {
 } from "./MavenGrammars";
 
 import { fail } from "power-assert";
-import { JavaParenthesizedExpression } from "../src/java/JavaBody";
-import { JAVA_IDENTIFIER } from "./java/JavaBlockMicrogrammarTest";
+import { JavaParenthesizedExpression } from "../src/matchers/java/JavaBody";
+import { JAVA_IDENTIFIER } from "./matchers/java/JavaBlockMicrogrammarTest";
 
 describe("Microgrammar", () => {
 

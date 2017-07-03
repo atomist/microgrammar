@@ -6,9 +6,12 @@ import { Microgrammar } from "../Microgrammar";
 import { isPatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
 import { Rep } from "../Rep";
-import { Break } from "../snobol/Snobol";
+
+import { Break } from "../matchers/snobol/Break";
 
 import { inputStateFromString } from "./InputStateFactory";
+
+import { RestOfInput } from "../matchers/skip/Skip";
 
 /**
  * Parses microgrammars expressed as strings.
@@ -32,8 +35,8 @@ export class MicrogrammarSpecParser {
                     literal: new Break(componentReference),
                     component: componentReference,
                 } as Term)),
-            trailing: new Break("this will not appear"), // replace with matchEverything after merge
-        } as Term);
+            trailing: RestOfInput,
+        });
 
         const mpr: MatchPrefixResult = specGrammar.matchPrefix(inputStateFromString(spec), {});
         if (!isPatternMatch(mpr)) {

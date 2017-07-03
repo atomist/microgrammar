@@ -1,16 +1,16 @@
-import { Concat } from "../Concat";
-import { InputState } from "../InputState";
-import { MatchingLogic } from "../Matchers";
-import { MatchPrefixResult } from "../MatchPrefixResult";
+import { Concat } from "../../Concat";
+import { InputState } from "../../InputState";
+import { MatchingLogic } from "../../Matchers";
+import { MatchPrefixResult } from "../../MatchPrefixResult";
 import {
-    DismatchReport,
     isPatternMatch,
     isTreePatternMatch,
+    MatchFailureReport,
     TerminalPatternMatch,
     TreePatternMatch,
-} from "../PatternMatch";
+} from "../../PatternMatch";
 
-import { inputStateFromString } from "../internal/InputStateFactory";
+import { inputStateFromString } from "../../internal/InputStateFactory";
 
 import { JavaContentStateMachine } from "./JavaContentStateMachine";
 
@@ -102,7 +102,7 @@ class JavaBody implements MatchingLogic {
                 matched,
                 context);
         } else {
-            return new DismatchReport(this.$id, is.offset, innerMatch as DismatchReport);
+            return new MatchFailureReport(this.$id, is.offset, innerMatch);
         }
     }
 }

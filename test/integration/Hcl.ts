@@ -2,8 +2,9 @@ import assert = require("power-assert");
 
 import { Term } from "../../src/Matchers";
 import { Microgrammar } from "../../src/Microgrammar";
-import { Integer, LowercaseBoolean, Regex } from "../../src/Primitives";
-import { Break } from "../../src/snobol/Snobol";
+import { Integer, LowercaseBoolean } from "../../src/Primitives";
+
+import { Break } from "../../src/matchers/snobol/Break";
 
 import { Alt } from "../../src/Ops";
 

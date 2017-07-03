@@ -5,7 +5,8 @@ import { MatchingLogic } from "../src/Matchers";
 import { MatchingMachine } from "../src/Microgrammar";
 import { optional } from "../src/Ops";
 import { PatternMatch } from "../src/PatternMatch";
-import { takeUntil } from "../src/snobol/Snobol";
+
+import { takeUntil } from "../src/matchers/skip/Skip";
 import { GAV, LEGAL_VALUE, VersionedArtifact, XML_TAG_WITH_SIMPLE_VALUE, XmlTag } from "./MavenGrammars";
 
 describe("MatchingMachine", () => {

@@ -1,11 +1,12 @@
 
-import { JavaBlock, javaBlockContaining } from "../../src/java/JavaBody";
-import { Microgrammar } from "../../src/Microgrammar";
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
-import { Regex } from "../../src/Primitives";
-import { Break } from "../../src/snobol/Snobol";
+import { JavaBlock, javaBlockContaining } from "../../../src/matchers/java/JavaBody";
+import { Microgrammar } from "../../../src/Microgrammar";
+import { isPatternMatch, PatternMatch } from "../../../src/PatternMatch";
+import { Regex } from "../../../src/Primitives";
 
-import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { Break } from "../../../src/matchers/snobol/Break";
+
+import { inputStateFromString } from "../../../src/internal/InputStateFactory";
 
 import * as assert from "power-assert";
 

@@ -1,10 +1,8 @@
-import { Microgrammar } from "../../src/Microgrammar";
-import { Alt } from "../../src/Ops";
+import { Microgrammar } from "../../../src/Microgrammar";
+import { Alt } from "../../../src/Ops";
 
 import * as assert from "power-assert";
-import { yadaYadaThen, yadaYadaThenThisButNotThat } from "../../src/snobol/Snobol";
-import { POM_WITH_DEPENDENCY_MANAGEMENT } from "../MatchingMachineTest";
-import { asVersionedArtifact, GAV_CONCAT, VersionedArtifact, XmlTag } from "../MavenGrammars";
+import { yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
 
 describe("fluent builder", () => {
 

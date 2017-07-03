@@ -1,11 +1,13 @@
 import { expect } from "chai";
-import { Concat } from "../../src/Concat";
-import { Term } from "../../src/Matchers";
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
-import { Regex } from "../../src/Primitives";
-import { Break, Span } from "../../src/snobol/Snobol";
+import { Concat } from "../../../src/Concat";
+import { Term } from "../../../src/Matchers";
+import { isPatternMatch, PatternMatch } from "../../../src/PatternMatch";
+import { Regex } from "../../../src/Primitives";
 
-import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { Break } from "../../../src/matchers/snobol/Break";
+
+import { inputStateFromString } from "../../../src/internal/InputStateFactory";
+import { Span } from "../../../src/matchers/snobol/Span";
 
 describe("Break", () => {
 

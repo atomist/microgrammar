@@ -9,11 +9,12 @@ import { StringInputStream } from "./spi/StringInputStream";
 
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
-import {inputStateFromString} from "./internal/InputStateFactory";
+import { inputStateFromStream, inputStateFromString } from "./internal/InputStateFactory";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
+import { RestOfInput } from "./matchers/skip/Skip";
 
 /**
  * Holds a set of updatable matches
@@ -109,19 +110,28 @@ export class Microgrammar<T> implements Term {
     /**
      * Return a match if it explains the whole of the input.
      * This style of usage is more like a traditional parser,
-     * building an AST for a while file.
+     * building an AST for a whole file.
      * @param input
      * @return {PatternMatch&T}
      */
-    // TODO we should allow InputStream also, although this makes
-    // verifying that we got to the end harder
-    public exactMatch(input: string): PatternMatch & T | DismatchReport {
-        const match = this.matcher.matchPrefix(inputStateFromString(input), {});
+    public exactMatch(input: string | InputStream): PatternMatch & T | DismatchReport {
+        // Create a matcher that matches our matcher,
+        // plus any trailing content
+        const matcher = new Concat({
+            desired: this.matcher,
+            trailingJunk: RestOfInput,
+        });
+        const match = matcher.matchPrefix(inputStateFromStream(toInputStream(input)), {});
 
-        if (isPatternMatch(match) && match.$matched !== input) {
-            return { description: "Not all input was consumed." };
+        if (isPatternMatch(match)) {
+            const detyped = match as any;
+            if (detyped.trailingJunk !== "") {
+                return {description: `Not all input was consumed: Left over [${detyped.trailingJunk.$matched}]`};
+            } else {
+                return detyped.desired.$match as (PatternMatch & T);
+            }
         }
-        return match as (PatternMatch & T | MatchFailureReport);
+        return match as MatchFailureReport;
     }
 
 }

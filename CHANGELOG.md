@@ -16,6 +16,8 @@ matching entire input.
 
 ### Changed
 
+- **Breaking** Introduced `matchers` package. Broke `skip` and `snobol`
+functionality into own packages under it. Moved `java` under it.
 - **Breaking** Introduced `spi` and `internal` packages to clearly
 specify user API
 - **Breaking** Matcher properties with names starting with `_` are no longer bound to the

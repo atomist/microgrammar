@@ -1,63 +1,9 @@
-/**
- * SNOBOL-inspired primitives
- */
 
-import { toMatchingLogic } from "../Concat";
-import { InputState } from "../InputState";
-import { MatchingLogic } from "../Matchers";
-import { MatchPrefixResult } from "../MatchPrefixResult";
-import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../PatternMatch";
-
-/**
- * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
- * SPAN(S) matches one or more subject characters from the set in S.
- * SPAN must match at least one subject character, and will match the LONGEST subject string possible.
- */
-export class Span implements MatchingLogic {
-
-    public $id = `Span[${this.characters}]`;
-
-    constructor(public characters: string) {
-    }
-
-    public matchPrefix(is: InputState): MatchPrefixResult {
-        let currentIs = is;
-        let matched = "";
-        while (!currentIs.exhausted() && this.characters.indexOf(currentIs.peek(1)) > -1) {
-            matched += currentIs.peek(1);
-            currentIs = currentIs.advance();
-        }
-        return (currentIs !== is) ?
-            new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) :
-            new MatchFailureReport(this.$id, is.offset, context);
-    }
-}
-
-/**
- * Match a string until the given logic. Wraps Break.
- * Binds the content until the break.
- */
-export function takeUntil(what): MatchingLogic {
-    return new Break(what);
-}
-
-/**
- * Return a match for the first thing if it doesn't
- * @param a desired match
- * @param b match we don't want.
- */
-export function yadaYadaThenThisButNotThat(a, b): MatchingLogic {
-    return new Break(a, true, b);
-}
-
-/**
- * Anything, then the given matcher. Binds the terminal match
- * @param a desired match
- * @returns {Break}
- */
-export function yadaYadaThen(a): MatchingLogic {
-    return new Break(a, true);
-}
+import { toMatchingLogic } from "../../Concat";
+import { InputState } from "../../InputState";
+import { MatchingLogic } from "../../Matchers";
+import { MatchPrefixResult } from "../../MatchPrefixResult";
+import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../../PatternMatch";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm

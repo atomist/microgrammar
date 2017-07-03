@@ -2,7 +2,7 @@ import "mocha";
 import * as assert from "power-assert";
 import { ChangeControlledMethodGrammar } from "../integration/RealWorldTest2";
 
-import { canonicalize } from "../../src/java/JavaUtils";
+import { canonicalize } from "../../src/matchers/java/JavaUtils";
 
 describe("Java Benchmark", () => {
 

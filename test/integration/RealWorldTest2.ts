@@ -1,4 +1,4 @@
-import { JavaBlock, JavaParenthesizedExpression } from "../../src/java/JavaBody";
+import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/java/JavaBody";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 
 import { Microgrammar } from "../../src/Microgrammar";

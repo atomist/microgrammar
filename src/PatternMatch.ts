@@ -6,6 +6,7 @@ import { MatchPrefixResult } from "./MatchPrefixResult";
  */
 
 export interface DismatchReport {
+
     description: string;
 }
 

@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import { stripComments, stripWhitespace } from "../../src/java/JavaUtils";
+import { stripComments, stripWhitespace } from "../../../src/matchers/java/JavaUtils";
 
 describe("Comment stripping", () => {
 

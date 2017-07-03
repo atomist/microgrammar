@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import { canonicalize } from "../../src/java/JavaUtils";
+import { canonicalize } from "../../../src/matchers/java/JavaUtils";
 
 describe("canonicalize", () => {
 
