@@ -1,17 +1,13 @@
-import { Concat } from "../Concat";
-import { Config, DefaultConfig } from "../Config";
-import { Term } from "../Matchers";
-import { MatchPrefixResult } from "../MatchPrefixResult";
-import { Microgrammar } from "../Microgrammar";
-import { isPatternMatch } from "../PatternMatch";
-import { Literal, Regex } from "../Primitives";
-import { Rep } from "../Rep";
+import {Concat, toMatchingLogic} from "../Concat";
+import {Config, DefaultConfig} from "../Config";
+import {MatchingLogic} from "../Matchers";
+import {isPatternMatch} from "../PatternMatch";
+import {Literal} from "../Primitives";
+import * as MatcherPrinter from "./MatcherPrinter";
 
-import { Break } from "../matchers/snobol/Break";
-
-import { inputStateFromString } from "./InputStateFactory";
-
-import { RestOfInput } from "../matchers/skip/Skip";
+import {Break} from "../matchers/snobol/Break";
+import {exactMatch} from "./ExactMatch";
+import {MicrogrammarSpec, specGrammar} from "./SpecGrammar";
 
 /**
  * Parses microgrammars expressed as strings.
@@ -20,60 +16,165 @@ export class MicrogrammarSpecParser {
 
     private anonFieldCount = 0;
 
-    public fromString<T>(spec: string, components: object = {}, config: Config = DefaultConfig) {
-        const componentReference = new Concat({
-            $id: "component",
-            _start: new Literal("${"),
-            componentName: new Regex(/^[a-zA-Z0-9_]+/),
-            _end: new Literal("}"),
-        } as Term);
-        const specGrammar = new Concat({
-            $id: "spec",
-            these: new Rep(
-                new Concat({
-                    $id: "literal, then component",
-                    literal: new Break(componentReference),
-                    component: componentReference,
-                } as Term)),
-            trailing: RestOfInput,
-        });
+    public fromString(spec: string, elements: object = {}, config: Config = DefaultConfig): Concat {
 
-        const mpr: MatchPrefixResult = specGrammar.matchPrefix(inputStateFromString(spec), {});
+        const mpr = exactMatch<MicrogrammarSpec>(specGrammar, spec);
         if (!isPatternMatch(mpr)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
         }
+        const match = mpr as MicrogrammarSpec;
 
-        // We need to get at its other properties
-        const match = mpr as any;
-        const definitions = { $id: spec };
-        match.these.forEach(t => {
-            //    console.log(`Processing literal [${t}]`);
-            this.addLiteralDefinitions(definitions, t.literal);
-            const reference = t.component.componentName;
-            if (components[reference] === undefined) {
-                throw new Error(`No definition found for ${reference}`); // consider defaulting to non-greedy-any?
-            }
-            definitions[reference] = components[reference];
-        });
-        this.addLiteralDefinitions(definitions, match.trailing);
+        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match, config);
 
-        const concat = new Concat(definitions, config);
+        const matcherSequence2 = this.populateSpecifiedElements(elements, matcherSequence1);
 
-        // console.log("Parsed matcher: " + concat.$id);
-        return new Microgrammar<T>(concat, config);
+        const matcherSequence3 = this.inferUnspecifiedElements(matcherSequence2);
+
+        const definitions = this.definitionsFromSpecs(spec, matcherSequence3);
+
+        return new Concat(definitions, config);
     }
 
-    private addLiteralDefinitions(definitions: any, literal: string) {
-        // TODO why, if we don't put this in, does it fail at runtime in Nashorn?
-        // it gets TypeError: literal.split is not a function
-        if (typeof literal === "string") {
-            literal.split(/\s/).forEach(token => {
-                if (token.length > 0) {
-                    const arbName = `_${this.anonFieldCount++}`;
-                    definitions[arbName] = new Literal(token);
+    private definitionSpecsFromMicrogrammarSpec(match: MicrogrammarSpec, config: Config): DefinitionSpec[] {
+        // flatMap would work better here
+        const matcherSequence1: DefinitionSpec[] = [];
+        match.these.forEach(
+            t => {
+                if (t.literal.length > 0) {
+                    matcherSequence1.push({anonymous: this.matcherForLiteral(t.literal, config)});
+                }
+                matcherSequence1.push({reference: t.element.elementName});
+            });
+        matcherSequence1.push({anonymous: this.matcherForLiteral(match.trailing, config)});
+        return matcherSequence1;
+    }
+
+    private populateSpecifiedElements(elements: any, definitionSpecs: DefinitionSpec[]): DefinitionSpec[] {
+        return definitionSpecs.map(t => {
+                if (isReference(t) && elements[t.reference]) {
+                    return {
+                        named: {
+                            name: t.reference,
+                            matcher: toMatchingLogic(elements[t.reference]),
+                        },
+                    };
+                } else {
+                    return t;
                 }
             });
+    }
+
+    private inferUnspecifiedElements(definitionSpecs: DefinitionSpec[]): SatisfiedDefinitionSpec[] {
+        return definitionSpecs.map((s, i) => {
+            if (isReference(s)) {
+                const next = definitionSpecs[i + 1];
+                if (!next) {
+                    throw new Error("I expect to have some sort of trailing matcher");
+                }
+                if (isReference(next)) {
+                    throw new Error(
+                        "There are two elements in a row without something more specific in between them");
+                }
+                const untilTheNextThing = new Break(matcherFrom(next));
+                return {
+                    named: {
+                        name: s.reference,
+                        matcher: untilTheNextThing,
+                    },
+                };
+            } else {
+                return s;
+            }
+        });
+    }
+
+    private definitionsFromSpecs(id: string, definitionSpecs: SatisfiedDefinitionSpec[]): object {
+        const definitions = {$id: id};
+        definitionSpecs.forEach( t  => {
+            if (isAnonymous(t)) {
+                this.addAnonymousToDefinitions(definitions, t.anonymous);
+            }
+            if (isNamed(t)) {
+                definitions[t.named.name] = t.named.matcher;
+            }
+        });
+        return definitions;
+    }
+
+    private matcherForLiteral(literal: string, config: Config) {
+        if (!config.consumeWhiteSpaceBetweenTokens) {
+            return new Literal(literal);
+        }
+        // TODO why, if we don't put this in, does it fail?
+        // it gets TypeError: literal.split is not a function
+        if (typeof literal === "string") {
+            const whiteSpaceSeparated = literal.split(/\s/);
+            if (whiteSpaceSeparated.length === 1) {
+                return new Literal(literal);
+            } else {
+                const definitions = {};
+                whiteSpaceSeparated.forEach(token => {
+                    if (token.length > 0) {
+                        this.addAnonymousToDefinitions(definitions, new Literal(token));
+                    }
+                });
+                return new Concat(definitions);
+            }
         }
     }
 
+    private addAnonymousToDefinitions(definitions: any, matcher: MatchingLogic) {
+        const arbName = `_${this.anonFieldCount++}`;
+        definitions[arbName] = matcher;
+    }
+
+}
+
+interface Anonymous {
+    anonymous: MatchingLogic;
+}
+
+interface Reference {
+    reference: string;
+}
+
+interface Named {
+    named: {
+        name: string,
+        matcher: MatchingLogic,
+    };
+}
+
+type DefinitionSpec = Anonymous | Reference | Named;
+type SatisfiedDefinitionSpec = Anonymous | Named;
+
+// Dogfooding idea:
+// I wonder if I could make a Rug to generate these.
+// It could choose any property unique to each alternative.
+// Then I could put my learnings in the Rug. For instance, this !! strategy will
+// return false if the scrutinized property contains empty string >:-(
+// Then, the trick is, can I also make it configure a reviewer
+// that will flag an error if, say, I ever added the "named:" property
+// to one of the other alternatives? (If the property used to distinguish
+// ever became not unique)
+// ... that reviewer could check for this structure
+// and could run on TS files generally. Can it make a comment on a PR?
+function isAnonymous(thing: DefinitionSpec): thing is Anonymous {
+    return !!(thing as Anonymous).anonymous;
+}
+
+function isReference(thing: DefinitionSpec): thing is Reference {
+    return !!(thing as Reference).reference;
+}
+
+function isNamed(thing: DefinitionSpec): thing is Named {
+    return !!(thing as Named).named;
+}
+
+function matcherFrom(definitionSpec: SatisfiedDefinitionSpec) {
+    if (isAnonymous(definitionSpec)) {
+        return definitionSpec.anonymous;
+    } else {
+        return definitionSpec.named.matcher;
+    }
 }

@@ -1,13 +1,13 @@
 import { expect } from "chai";
-import { Microgrammar } from "../src/Microgrammar";
-import { Opt } from "../src/Ops";
-import { PatternMatch } from "../src/PatternMatch";
-import { RepSep } from "../src/Rep";
-import { RealWorldPom } from "./Fixtures";
+import { Microgrammar } from "../../src/Microgrammar";
+import { Opt } from "../../src/Ops";
+import { PatternMatch } from "../../src/PatternMatch";
+import { RepSep } from "../../src/Rep";
+import { RealWorldPom } from "../Fixtures";
 import {
     ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, LEGAL_VALUE, PLUGIN_GRAMMAR,
     VersionedArtifact,
-} from "./MavenGrammars";
+} from "../MavenGrammars";
 
 describe("MicrogrammarFromStringTest", () => {
 
@@ -104,8 +104,8 @@ describe("MicrogrammarFromStringTest", () => {
         expect(result[0].namex).to.equal("first");
     });
 
-    it("2 elements: whitespace sensitive", () => {
-        const content = "<first> notxml";
+    it("2 elements: whitespace sensitive: match", () => {
+        const content = "<first>  notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
             namex: /[a-zA-Z0-9]+/,
         }, {
@@ -113,6 +113,28 @@ describe("MicrogrammarFromStringTest", () => {
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
+    });
+
+    it("2 elements: whitespace sensitive: no match", () => {
+        const content = "<first>  notxml";
+        const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
+            namex: /[a-zA-Z0-9]+/,
+        }, {
+            consumeWhiteSpaceBetweenTokens: false,
+        });
+        const result = mg.findMatches(content);
+        expect(result.length).to.equal(0);
+    });
+
+    it("2 elements: whitespace sensitive: match with return", () => {
+        const content = "<first>\n\tnotxml";
+        const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}>\n\tnotxml", {
+            namex: /[a-zA-Z0-9]+/,
+        }, {
+            consumeWhiteSpaceBetweenTokens: false,
+        });
+        const result = mg.findMatches(content);
+        expect(result.length).to.equal(1);
     });
 
     it("stop after match", () => {

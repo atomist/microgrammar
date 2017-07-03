@@ -222,9 +222,6 @@ describe("Microgrammar", () => {
         const r0 = result[0] as any;
         expect(r0.$matched).to.equal(content);
         expect(r0.first.namex).to.equal("first");
-
-        // TODO fix this
-        // expect(r0.first.$matched.namex).to.equal("first");
     });
 
     it("2 elements: whitespace insensitive", () => {
