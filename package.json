@@ -21,7 +21,7 @@
     "@types/mocha": "^2.2.41",
     "@types/power-assert": "^1.4.29",
     "chai": "^4.0.2",
-    "espower-typescript": "^8.0.0",
+    "espower-typescript": "^8.0.2",
     "mocha": "^3.4.2",
     "power-assert": "^1.4.4",
     "supervisor": "^0.12.0",

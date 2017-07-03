@@ -2,19 +2,18 @@ import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
-import {DismatchReport, isPatternMatch, MatchFailureReport, PatternMatch} from "./PatternMatch";
+import {DismatchReport, isPatternMatch, PatternMatch} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
-import { inputStateFromStream, inputStateFromString } from "./internal/InputStateFactory";
+import { exactMatch } from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
-import { RestOfInput } from "./matchers/skip/Skip";
 
 /**
  * Holds a set of updatable matches
@@ -72,7 +71,8 @@ export class Microgrammar<T> implements Term {
     public static fromString<T>(spec: string,
                                 components: object = {},
                                 config: Config = DefaultConfig): Microgrammar<T> {
-        return new MicrogrammarSpecParser().fromString<T>(spec, components, config);
+        return new Microgrammar<T>(
+             new MicrogrammarSpecParser().fromString(spec, components, config), config);
     }
 
     public $id;
@@ -115,23 +115,7 @@ export class Microgrammar<T> implements Term {
      * @return {PatternMatch&T}
      */
     public exactMatch(input: string | InputStream): PatternMatch & T | DismatchReport {
-        // Create a matcher that matches our matcher,
-        // plus any trailing content
-        const matcher = new Concat({
-            desired: this.matcher,
-            trailingJunk: RestOfInput,
-        });
-        const match = matcher.matchPrefix(inputStateFromStream(toInputStream(input)), {});
-
-        if (isPatternMatch(match)) {
-            const detyped = match as any;
-            if (detyped.trailingJunk !== "") {
-                return {description: `Not all input was consumed: Left over [${detyped.trailingJunk.$matched}]`};
-            } else {
-                return detyped.desired.$match as (PatternMatch & T);
-            }
-        }
-        return match as MatchFailureReport;
+      return exactMatch<T>(this.matcher, input);
     }
 
 }
@@ -139,7 +123,7 @@ export class Microgrammar<T> implements Term {
 /**
  * Single use, usually stateful, class for matching input.
  * Offers the ability to observe a match, as well as match one,
- * and to change the matcher in use depending on obervation and matching.
+ * and to change the matcher in use depending on observation and matching.
  * E.g. it's possible to choose to start matching pattern B after finding pattern A,
  * or after *seeing* pattern A, even if starting off matching something else.
  * This enables us, for example, to parse XML, with the observer watching element

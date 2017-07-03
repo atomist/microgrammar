@@ -28,6 +28,10 @@ export class Literal implements MatchingLogic {
     }
 }
 
+export function isLiteral(ml: MatchingLogic): ml is Literal {
+    return ml && (ml as Literal).literal !== undefined;
+}
+
 /**
  * Support for regex matching. Subclasses can convert the value to
  * whatever type they require.

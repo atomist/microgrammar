@@ -16,7 +16,7 @@ import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../../
  */
 export class Break implements MatchingLogic {
 
-    private terminateOn: MatchingLogic;
+    public terminateOn: MatchingLogic;
     private badMatcher: MatchingLogic;
 
     /**
@@ -66,4 +66,8 @@ export class Break implements MatchingLogic {
         }
         return new TerminalPatternMatch(this.$id, matched, is.offset, matched, context);
     }
+}
+
+export function isBreak(thing: MatchingLogic): thing is Break {
+    return !!(thing as Break).terminateOn;
 }

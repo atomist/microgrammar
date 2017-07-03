@@ -13,11 +13,18 @@ import { readyToMatch } from "./internal/Whitespace";
  */
 export type TermDef = Term | string | RegExp;
 
+export interface MatchVeto { $id: string; veto: ((ctx: {}) => boolean); }
+export interface ContextChange { $id: string; alter: ((ctx: {}) => void ); }
+
+function isMatchVeto(thing: MatchStep): thing is MatchVeto {
+    return isSpecialMember(thing.$id);
+}
+
 /**
  * Represents a step during matching. Can be a matcher or a function,
  * that can work on the context and return a fresh value.
  */
-export type MatchStep = Matcher | { $id: string, f: ((ctx: {}) => void | boolean) };
+export type MatchStep = Matcher | MatchVeto | ContextChange;
 
 /**
  * Represents a concatenation of multiple matchers. This is the normal
@@ -48,7 +55,11 @@ export class Concat implements MatchingLogic {
                         // A no arg function is invalid
                         throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
                     }
-                    this.matchSteps.push({$id: stepName, f: def});
+                    if (isSpecialMember(stepName)) {
+                        this.matchSteps.push({$id: stepName, veto: def});
+                    } else {
+                        this.matchSteps.push({$id: stepName, alter: def});
+                    }
                 } else {
                     // It's a normal matcher
                     const named = new NamedMatcher(stepName, toMatchingLogic(def));
@@ -56,7 +67,7 @@ export class Concat implements MatchingLogic {
                 }
             }
         }
-        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
+        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0]     as Matcher;
     }
 
     get $id() {
@@ -103,13 +114,12 @@ export class Concat implements MatchingLogic {
                 // It's a function taking the context.
                 // Bind its result to the context and see if
                 // we should stop matching.
-                const r = step.f(context);
-                if (isSpecialMember(step.$id)) {
-                    if (r === false) {
+                if (isMatchVeto(step)) {
+                    if (step.veto(context) === false) {
                         return new MatchFailureReport(this.$id, initialInputState.offset, context);
                     }
                 } else {
-                    context[step.$id] = r;
+                    context[step.$id] = step.alter(context);
                 }
             }
         }
@@ -159,7 +169,7 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
 /**
  * Give an existing matcher a name
  */
-class NamedMatcher implements Matcher {
+export class NamedMatcher implements Matcher {
 
     public $id = this.name;
 
@@ -177,6 +187,10 @@ class NamedMatcher implements Matcher {
     get requiredPrefix(): string {
         return this.ml.requiredPrefix;
     }
+}
+
+export function isNamedMatcher(thing: MatchingLogic): thing is NamedMatcher {
+    return ((thing as NamedMatcher).name !== undefined) && (thing as NamedMatcher).ml !== undefined;
 }
 
 /**
