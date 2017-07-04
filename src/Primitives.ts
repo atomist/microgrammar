@@ -32,6 +32,8 @@ export function isLiteral(ml: MatchingLogic): ml is Literal {
     return ml && (ml as Literal).literal !== undefined;
 }
 
+const LOOK_AHEAD_SIZE = 100;
+
 /**
  * Support for regex matching. Subclasses can convert the value to
  * whatever type they require.
@@ -42,22 +44,33 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     protected log = false;
 
-    constructor(public regex: RegExp) {
+    /**
+     * Match a regular expression
+     * @param regex JavaScript regex to match
+     * @param lookahead number of characters to pull from the input to try to match.
+     * We'll keep grabbing more if a match is found for the whole string
+     */
+    constructor(public regex: RegExp, private lookahead: number = LOOK_AHEAD_SIZE) {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
-        if (is.exhausted()) {
-            return new MatchFailureReport(this.$id, is.offset, context);
-        }
+        let results: RegExpExecArray;
+        let remainder: string;
+        let seen = 0;
 
-        // TODO this is fragile as it only takes the top content
-        const remainder = is.peek(2000);
-        const results: RegExpExecArray = this.regex.exec(remainder);
+        // Keep asking for more input if we have matched all of the input in
+        // our lookahead buffer
+        do {
+            seen += this.lookahead;
+            remainder = is.peek(seen);
+            results = this.regex.exec(remainder);
+        } while (results && results[0] === remainder && remainder.length === seen);
+
         if (this.log) {
             console.log(`AbstractRegex match for ${this.regex} in [${remainder}...] was [${results}]`);
         }
 
-        if (results && results.length > 0 && results[0]) {
+        if (results && results[0]) {
             // Matched may not be the same as results[0]
             // If there's not an anchor, we may match before
             const actualMatch = results[0];
