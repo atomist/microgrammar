@@ -190,4 +190,6 @@ describe("Concat", () => {
         expect(r.hobbies).to.have.members(["golf", "tweeting"]);
     });
 
+    it("does not allow undefined matcher fields");
+
 });
