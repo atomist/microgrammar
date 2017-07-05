@@ -190,6 +190,26 @@ describe("Concat", () => {
         expect(r.hobbies).to.have.members(["golf", "tweeting"]);
     });
 
-    it("does not allow undefined matcher fields");
+    it("does not allow undefined matcher field steps", () => {
+        const literal: string = undefined;
+        assert.throws(() => new Concat({
+            opening: literal,
+            thing: "thing",
+        }), e => {
+            assert(e.message.indexOf("Step [opening] is undefined") !== -1);
+            return true;
+        });
+    });
+
+    it("does not allow null matcher field steps", () => {
+        const literal: string = null;
+        assert.throws(() => new Concat({
+            opening: literal,
+            thing: "thing",
+        }), e => {
+            assert(e.message.indexOf("Step [opening] is null") !== -1);
+            return true;
+        });
+    });
 
 });

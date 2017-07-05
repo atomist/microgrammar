@@ -43,6 +43,9 @@ export class Concat implements MatchingLogic {
         for (const stepName in definitions) {
             if (["$id", "matchPrefix", "canStartWith", "requiredPrefix"].indexOf(stepName) === -1) {
                 const def = definitions[stepName];
+                if (def === undefined || def === null) {
+                    throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
+                }
                 if (Array.isArray(def) && def.length === 2) {
                     // It's a transformation of a matched return
                     const ml = def[0];
