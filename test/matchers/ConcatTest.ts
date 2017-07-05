@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { Concat } from "../src/Concat";
-import { inputStateFromString } from "../src/internal/InputStateFactory";
-import { Term } from "../src/Matchers";
-import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
-import { Integer } from "../src/Primitives";
-import { Rep1Sep, RepSep } from "../src/Rep";
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { Term } from "../../src/Matchers";
+import { Concat } from "../../src/matchers/Concat";
+import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { Integer } from "../../src/Primitives";
+import { Rep1Sep, RepSep } from "../../src/Rep";
 
 import * as assert from "power-assert";
 

@@ -1,6 +1,6 @@
-import { toMatchingLogic } from "./Concat";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
+import { toMatchingLogic } from "./matchers/Concat";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPatternMatch } from "./PatternMatch";
 

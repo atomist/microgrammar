@@ -1,4 +1,3 @@
-import { Concat } from "../../Concat";
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
 import { MatchPrefixResult } from "../../MatchPrefixResult";
@@ -9,6 +8,7 @@ import {
     TerminalPatternMatch,
     TreePatternMatch,
 } from "../../PatternMatch";
+import { Concat } from "../Concat";
 
 import { inputStateFromString } from "../../internal/InputStateFactory";
 

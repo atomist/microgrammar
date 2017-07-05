@@ -1,9 +1,9 @@
 
-import { toMatchingLogic } from "../../Concat";
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
 import { MatchPrefixResult } from "../../MatchPrefixResult";
 import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../../PatternMatch";
+import { toMatchingLogic } from "../Concat";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm

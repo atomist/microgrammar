@@ -1,7 +1,7 @@
-import { isConcat, toMatchingLogic } from "./Concat";
 import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic} from "./Matchers";
+import { isConcat, toMatchingLogic } from "./matchers/Concat";
 import { MatchPrefixResult } from "./MatchPrefixResult";
 import { isPatternMatch, MatchFailureReport, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 

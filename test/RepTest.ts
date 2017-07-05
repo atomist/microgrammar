@@ -3,8 +3,8 @@ import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Rep, Rep1, Rep1Sep, RepSep } from "../src/Rep";
 import { LEGAL_VALUE } from "./MavenGrammars";
 
-import { Alt, Opt } from "../build/src/Ops";
 import { Microgrammar } from "../src/Microgrammar";
+import { Alt, Opt } from "../src/Ops";
 import { RealWorldPom } from "./Fixtures";
 
 import * as assert from "power-assert";

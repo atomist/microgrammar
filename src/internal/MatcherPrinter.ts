@@ -1,5 +1,5 @@
-import {Concat, isNamedMatcher, MatchStep} from "../Concat";
 import {Matcher, MatchingLogic} from "../Matchers";
+import {Concat, isNamedMatcher, MatchStep} from "../matchers/Concat";
 import Match = Chai.Match;
 import {isBreak} from "../matchers/snobol/Break";
 import {isLiteral} from "../Primitives";

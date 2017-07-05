@@ -1,5 +1,5 @@
-import {Concat} from "../Concat";
 import {MatchingLogic} from "../Matchers";
+import {Concat} from "../matchers/Concat";
 import {RestOfInput} from "../matchers/skip/Skip";
 import {DismatchReport, isPatternMatch, MatchFailureReport, PatternMatch} from "../PatternMatch";
 import {InputStream} from "../spi/InputStream";

@@ -1,5 +1,5 @@
-import {Concat} from "../Concat";
 import {Term} from "../Matchers";
+import {Concat} from "../matchers/Concat";
 import {RestOfInput} from "../matchers/skip/Skip";
 import {Break} from "../matchers/snobol/Break";
 import {Literal, Regex} from "../Primitives";

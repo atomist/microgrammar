@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { Concat } from "../../../src/Concat";
 import { Term } from "../../../src/Matchers";
+import { Concat } from "../../../src/matchers/Concat";
 import { isPatternMatch, PatternMatch } from "../../../src/PatternMatch";
 import { Regex } from "../../../src/Primitives";
 

@@ -1,12 +1,12 @@
-import { Config, DefaultConfig } from "./Config";
-import { InputState } from "./InputState";
-import { Matcher, MatchingLogic, Term } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { Microgrammar } from "./Microgrammar";
-import { isPatternMatch, isSpecialMember, MatchFailureReport, PatternMatch, TreePatternMatch } from "./PatternMatch";
-import { Literal, Regex } from "./Primitives";
+import { Config, DefaultConfig } from "../Config";
+import { InputState } from "../InputState";
+import { Matcher, MatchingLogic, Term } from "../Matchers";
+import { MatchPrefixResult } from "../MatchPrefixResult";
+import { Microgrammar } from "../Microgrammar";
+import { isPatternMatch, isSpecialMember, MatchFailureReport, PatternMatch, TreePatternMatch } from "../PatternMatch";
+import { Literal, Regex } from "../Primitives";
 
-import { readyToMatch } from "./internal/Whitespace";
+import { readyToMatch } from "../internal/Whitespace";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -29,7 +29,10 @@ export type MatchStep = Matcher | MatchVeto | ContextChange;
 /**
  * Represents a concatenation of multiple matchers. This is the normal
  * way we compose matches, although this class needn't be used explicitly,
- * as Microgrammars use it.
+ * as Microgrammars use it, via fromDefinitions or by composition involving
+ * an object literal which will be converted to a Concat.
+ * Users should only create Concats directly in the unusual case where they need
+ * to control whitespace handling in a unique way for that particular Concat.
  */
 export class Concat implements MatchingLogic {
 

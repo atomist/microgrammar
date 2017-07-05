@@ -1,7 +1,7 @@
-import { Concat, toMatchingLogic } from "./Concat";
 import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
+import { Concat, toMatchingLogic } from "./matchers/Concat";
 import {DismatchReport, isPatternMatch, PatternMatch} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";

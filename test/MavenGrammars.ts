@@ -1,5 +1,5 @@
-import { Concat } from "../src/Concat";
 import { Term } from "../src/Matchers";
+import { Concat } from "../src/matchers/Concat";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt, when } from "../src/Ops";
 import { Rep, Rep1 } from "../src/Rep";

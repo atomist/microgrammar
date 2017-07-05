@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+### Changed
+
+-   **Breaking** `Concat` moved to `matchers` directory as it should not be
+used directly by end users in most cases.
+
+
 ## [0.4.1] - 2017-07-04
 
 [0.4.1]: https://github.com/atomist/microgrammar/compare/0.4.0...0.4.1
