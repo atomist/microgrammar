@@ -59,8 +59,8 @@ export class Repetition implements MatchingLogic, Configurable {
         let matched = "";
         while (!currentInputState.exhausted()) {
             const eat = readyToMatch(currentInputState, this.config);
-            currentInputState = eat[1];
-            matched += eat[0];
+            currentInputState = eat.state;
+            matched += eat.skipped;
 
             const contextToUse = isConcat(this.matcher) ? {} : context;
 
@@ -75,8 +75,8 @@ export class Repetition implements MatchingLogic, Configurable {
 
             if (this.sepMatcher) {
                 const eaten = readyToMatch(currentInputState, this.config);
-                currentInputState = eaten[1];
-                matched += eaten[0];
+                currentInputState = eaten.state;
+                matched += eaten.skipped;
                 const sepMatch = this.sepMatcher.matchPrefix(currentInputState, context);
                 if (isPatternMatch(sepMatch)) {
                     currentInputState = currentInputState.consume(sepMatch.$matched);

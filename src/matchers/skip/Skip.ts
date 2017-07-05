@@ -18,7 +18,7 @@ export const RestOfInput: MatchingLogic = {
 
     matchPrefix(is: InputState, context: {}) {
         const consumed = is.skipWhile(s => true, 1);
-        return new TerminalPatternMatch(this.$id, consumed[0], is.offset, consumed[0], context);
+        return new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped, context);
     },
 };
 

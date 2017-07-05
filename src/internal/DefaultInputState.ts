@@ -1,5 +1,5 @@
 
-import { InputState } from "../InputState";
+import { InputState, Skipped } from "../InputState";
 import { InputStateManager } from "./InputStateManager";
 
 /**
@@ -16,7 +16,7 @@ export class DefaultInputState implements InputState {
      * @param what what to skip to
      * @return {InputState}
      */
-    public skipTo(what: string): [string, InputState] {
+    public skipTo(what: string): Skipped {
         return this.skipWhile(s => s !== what, what.length);
     }
 
@@ -26,13 +26,13 @@ export class DefaultInputState implements InputState {
      * @param n number of characters to look at
      * @return {InputState}
      */
-    public skipWhile(skip: (char: string) => boolean, n: number): [string, InputState] {
+    public skipWhile(skip: (char: string) => boolean, n: number): Skipped {
         let offset = this.offset;
         while (this.ism.canSatisfy(offset) && skip(this.ism.get(offset, n))) {
             ++offset;
         }
         const is = new DefaultInputState(this.ism, offset);
-        return [is.seenSince(this), is];
+        return { skipped: is.seenSince(this), state: is };
     }
 
     /**

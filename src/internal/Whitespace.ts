@@ -1,4 +1,4 @@
-import { InputState } from "../InputState";
+import { InputState, Skipped } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 
 import { Config, DefaultConfig } from "../Config";
@@ -12,17 +12,16 @@ import { Config, DefaultConfig } from "../Config";
  * we calculate the longest common prefix (if known). Undefined array
  * elements are ignored, after the first matcher.
  * If there is a definite prefix, we can skipWhile content.
- * @return {any}
  */
 export function readyToMatch(is: InputState, config: Config = DefaultConfig,
-                             ...matchers: MatchingLogic[]): [string, InputState] {
+                             ...matchers: MatchingLogic[]): Skipped {
     const lookFor = commonPrefix(matchers);
     if (lookFor) {
         return is.skipTo(lookFor);
     } else if (config.consumeWhiteSpaceBetweenTokens) {
         return is.skipWhile(c => c.trim() === "", 1); // || m && m.canStartWith && !m.canStartWith(c));
     } else {
-        return ["", is];
+        return { skipped: "", state: is };
     }
 }
 

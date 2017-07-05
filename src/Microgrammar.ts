@@ -170,7 +170,7 @@ export abstract class MatchingMachine {
             currentInputState = readyToMatch(currentInputState,
                 this.config,
                 currentMatcher,
-                this.observer)[1];
+                this.observer).state;
 
             const previousIs = currentInputState;
             const tryMatch =

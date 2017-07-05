@@ -31,7 +31,7 @@ export interface InputState {
      * Return tuple of what was skipped and the resulting InputState
      * @param what what to skip to
      */
-    skipTo(what: string): [string, InputState];
+    skipTo(what: string): Skipped;
 
     /**
      * Skip input while it matches the given function
@@ -40,7 +40,7 @@ export interface InputState {
      * Return tuple of what was skipped and the resulting InputState
      * @return {InputState}
      */
-    skipWhile(skip: (s: string) => boolean, n: number): [string, InputState];
+    skipWhile(skip: (s: string) => boolean, n: number): Skipped;
 
     /**
      * Look ahead in the input without consuming characters
@@ -48,5 +48,13 @@ export interface InputState {
      * @return {string}
      */
     peek(n: number): string;
+
+}
+
+export interface Skipped {
+
+    skipped: string;
+
+    state: InputState;
 
 }

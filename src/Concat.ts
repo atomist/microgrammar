@@ -91,8 +91,8 @@ export class Concat implements MatchingLogic {
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.config);
-                currentInputState = eat[1];
-                matched += eat[0];
+                currentInputState = eat.state;
+                matched += eat.skipped;
 
                 // If it's a concat, give it a fresh context
                 const contextToUse = isConcat(step) ? {} : context;
