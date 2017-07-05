@@ -51,7 +51,7 @@ describe("Rep", () => {
     });
 
     it("rep does not match several times when not ignoring whitespace", () => {
-        const rep = new Rep(/^[a-zA-Z]+/).withConfig({ consumeWhiteSpaceBetweenTokens: false });
+        const rep = new Rep(/^[a-zA-Z]+/).withConfig({consumeWhiteSpaceBetweenTokens: false});
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -120,7 +120,24 @@ describe("Rep", () => {
         assert(m.$value.length === 3);
     });
 
-    it.skip("should not infinite loop", () => {
+    it("should not infinite loop on rep of opt", () => {
+        const mgDependency = Microgrammar.fromDefinitions({
+            _dependencyTag: "<dependency>",
+            gav: new Rep(
+                new Opt({
+                    _versionOpeningTag: "<version>",
+                    version: "0.1.1",
+                    _versionClosingtag: "</version>",
+                }),
+            ),
+            _close: "</dependency>",
+        });
+        assert.throws(
+            () => mgDependency.firstMatch(RealWorldPom),
+            m => { assert(m.message.indexOf("empty string") !== -1); return true; });
+    });
+
+    it("should not infinite loop on rep of alt with opt", () => {
         const mgDependency = Microgrammar.fromDefinitions({
             _dependencyTag: "<dependency>",
             gav: new Rep(new Alt(
@@ -142,8 +159,9 @@ describe("Rep", () => {
             )),
             _close: "</dependency>",
         });
-        const m = mgDependency.firstMatch(RealWorldPom);
-        assert(m);
+        assert.throws(
+            () => mgDependency.firstMatch(RealWorldPom),
+            m => { assert(m.message.indexOf("empty string") !== -1); return true; });
     });
 
 });

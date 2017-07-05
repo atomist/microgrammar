@@ -68,6 +68,10 @@ export class Repetition implements MatchingLogic, Configurable {
             if (!isPatternMatch(match)) {
                 break;
             } else {
+                if (match.$matched === "") {
+                    throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
+                     `I do not think this grammar means what you think it means`);
+                }
                 currentInputState = currentInputState.consume(match.$matched);
                 matches.push(match);
                 matched += match.$matched;

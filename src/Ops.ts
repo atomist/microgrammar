@@ -19,9 +19,6 @@ export class Opt implements MatchingLogic {
 
     private matcher: MatchingLogic;
 
-    // tslint:disable-next-line:member-ordering
-    public $id = `Opt[${this.matcher}]`;
-
     /**
      * Optional match
      * @param o matching logic
@@ -29,6 +26,10 @@ export class Opt implements MatchingLogic {
      */
     constructor(o: any, private pullUp?: string) {
         this.matcher = toMatchingLogic(o);
+    }
+
+    get $id() {
+        return `Opt[${this.matcher.$id}]`;
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
