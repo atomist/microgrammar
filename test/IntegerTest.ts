@@ -23,7 +23,7 @@ describe("Integer matching", () => {
 
     it("test one digit", () => {
         const is = inputStateFromString("1");
-        const m = Integer.matchPrefix(is);
+        const m = Integer.matchPrefix(is, {});
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
         assert(match.$matched === "1");
@@ -32,7 +32,7 @@ describe("Integer matching", () => {
 
     it("test multiple digits", () => {
         const is = inputStateFromString("105x");
-        const m = Integer.matchPrefix(is);
+        const m = Integer.matchPrefix(is, {});
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
         assert(match.$matched === "105");

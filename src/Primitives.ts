@@ -13,7 +13,7 @@ export class Literal implements MatchingLogic {
     constructor(public literal: string) {
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         return (is.peek(this.literal.length) === this.literal) ?
             new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
             new MatchFailureReport(this.$id, is.offset, context);
@@ -53,7 +53,7 @@ export abstract class AbstractRegex implements MatchingLogic {
     constructor(public regex: RegExp, private lookahead: number = LOOK_AHEAD_SIZE) {
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         let results: RegExpExecArray;
         let remainder: string;
         let seen = 0;

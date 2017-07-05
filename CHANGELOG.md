@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+## [0.4.1] - 2017-07-04
+
+[0.4.1]: https://github.com/atomist/microgrammar/compare/0.4.0...0.4.1
+
+Bugfix
+
+### Changed
+
+- `Literal` and `Span` were not fully implementing the `matchPrefix` of the 
+  `MatchingLogic` interface
+
 ## [0.4.0] - 2017-07-02
 
 [0.4.0]: https://github.com/atomist/microgrammar/compare/0.4.0...0.3.11

@@ -11,7 +11,7 @@ describe("Regex", () => {
     it("match word letters", () => {
         const regexp = new Regex(/^[a-z]+/);
         const is = inputStateFromString("friday 14");
-        const m = regexp.matchPrefix(is);
+        const m = regexp.matchPrefix(is, {});
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
         assert(match.$matched === "friday");
@@ -21,14 +21,14 @@ describe("Regex", () => {
     it("failed match", () => {
         const regexp = new Regex(/^[a-z]+/);
         const is = inputStateFromString("14 friday");
-        const m = regexp.matchPrefix(is);
+        const m = regexp.matchPrefix(is, {});
         assert(!isPatternMatch(m));
     });
 
     it("without anchors to skip content", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("**friday 14");
-        const m = regexp.matchPrefix(is);
+        const m = regexp.matchPrefix(is, {});
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
         assert(match.$matched === "**friday");
