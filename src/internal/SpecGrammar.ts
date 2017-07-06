@@ -8,7 +8,7 @@ import {Rep} from "../Rep";
 const elementReference = new Concat({
     $id: "component",
     _start: new Literal("${"),
-    elementName: new Regex(/^[a-zA-Z0-9_]+/),
+    elementName: new Regex(/[a-zA-Z0-9_]+/),
     _end: new Literal("}"),
 } as Term);
 

@@ -22,7 +22,7 @@ describe("Break", () => {
     });
 
     it("break matches another matcher", () => {
-        const b = new Break(new Regex(/^[a-z]/));
+        const b = new Break(new Regex(/[a-z]/));
         const is = inputStateFromString("HEY YOU banana");
         const m = b.matchPrefix(is, {});
         assert(isPatternMatch(m));
@@ -31,7 +31,7 @@ describe("Break", () => {
 
     it("break matches a complicated matcher", () => {
         const b = new Break(
-            new Concat({ $id: "yeah", _start: "${", name: new Regex(/^[a-z]+/), _end: "}" } as Term,
+            new Concat({ $id: "yeah", _start: "${", name: new Regex(/[a-z]+/), _end: "}" } as Term,
                 { consumeWhiteSpaceBetweenTokens: false }));
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
         const m = b.matchPrefix(is, {});

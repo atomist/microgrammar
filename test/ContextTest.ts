@@ -81,7 +81,7 @@ describe("ContextTest", () => {
     it("handles nested matches", () => {
         const cc = new Concat({
             nested: {
-                name: /^[a-z]+/,
+                name: /[a-z]+/,
             },
             promote(ctx) { ctx.promoted = ctx.nested.name; },
             b: Integer,
@@ -95,7 +95,7 @@ describe("ContextTest", () => {
     it("handles multiple bound matches in microgrammar", () => {
         const cc = Microgrammar.fromDefinitions({
             nested: {
-                name: /^[a-z]+/,
+                name: /[a-z]+/,
             },
             promoted: ctx => ctx.nested.name,
             b: Integer,
@@ -110,7 +110,7 @@ describe("ContextTest", () => {
     it("doesn't pollute parent context in microgrammar", () => {
         const cc = Microgrammar.fromDefinitions({
             nested: {
-                name: /^[a-z]+/,
+                name: /[a-z]+/,
                 shouty: ctx => ctx.name.toLocaleUpperCase(),
             },
             b: Integer,
@@ -125,7 +125,7 @@ describe("ContextTest", () => {
     it("handles nested bound matches in microgrammar", () => {
         const cc = Microgrammar.fromDefinitions({
             nested: {
-                name: /^[a-z]+/,
+                name: /[a-z]+/,
                 shouty: ctx => ctx.name.toLocaleUpperCase(),
             },
             b: Integer,

@@ -5,11 +5,21 @@ import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 
 import * as assert from "power-assert";
+import { Break } from "../build/src/matchers/snobol/Break";
 
 describe("Regex", () => {
 
     it("match word letters", () => {
-        const regexp = new Regex(/^[a-z]+/);
+        const regexp = new Regex(/[a-z]+/);
+        const is = inputStateFromString("friday 14");
+        const m = regexp.matchPrefix(is, {});
+        assert(isPatternMatch(m));
+        const match = m as PatternMatch;
+        assert(match.$matched === "friday");
+        assert(m.$offset === 0);
+    });
+    it("match word letters using anchor that will be recognized", () => {
+        const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefix(is, {});
         assert(isPatternMatch(m));
@@ -18,23 +28,34 @@ describe("Regex", () => {
         assert(m.$offset === 0);
     });
 
-    it("failed match", () => {
+    it("should add anchor if not present", () => {
+        const regexp = new Regex(/[a-z]+/);
+        assert(regexp.regex.source === "^[a-z]+");
+    });
+
+    it("should not add anchor if present", () => {
         const regexp = new Regex(/^[a-z]+/);
+        assert(regexp.regex.source === "^[a-z]+");
+    });
+
+    it("failed match", () => {
+        const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("14 friday");
         const m = regexp.matchPrefix(is, {});
         assert(!isPatternMatch(m));
     });
 
-    it("without anchors to skip content", () => {
+    // Demonstrate how to achieve old style skipping behavior
+    it("achieve non-anchored behavior with break", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("**friday 14");
-        const m = regexp.matchPrefix(is, {});
+        const withSkip = new Break(regexp, true);
+        const m = withSkip.matchPrefix(is, {});
         assert(isPatternMatch(m));
         const match = m as PatternMatch;
         assert(match.$matched === "**friday");
-        assert(match.$offset === 0);
+        assert(match.$offset === 2);
         assert(match.$value === "friday");
-        assert(m.$offset === 0);
     });
 
     it("matches regex length 20", () => matchRegexOfLength(20));
@@ -45,7 +66,7 @@ describe("Regex", () => {
 
     function matchRegexOfLength(n: number) {
         const mg = Microgrammar.fromDefinitions<{r: string, other: string}>({
-            r: /^[a-z]+/,
+            r: /[a-z]+/,
             other: ".",
         });
         let long = "";

@@ -142,7 +142,7 @@ describe("MicrogrammarFromStringTest", () => {
             name: string;
         }
         const mg = Microgrammar.fromString<Named>("${name}", {
-            name: /^[A-Z][a-z]+/,
+            name: /[A-Z][a-z]+/,
         });
         const result = mg.findMatches("Greg Tony");
         expect(result.length).to.equal(2);

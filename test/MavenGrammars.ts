@@ -10,7 +10,7 @@ export interface VersionedArtifact {
     version: string;
 }
 
-export const LEGAL_VALUE = /^[a-zA-Z_\.0-9\-]+/;
+export const LEGAL_VALUE = /[a-zA-Z_\.0-9\-]+/;
 
 const VERSION = {
     lx2: "<version>",
@@ -76,7 +76,7 @@ const property = {
     _gt: "<",
     name: LEGAL_VALUE,
     _close: ">",
-    value: /^[^<]+/,
+    value: /[^<]+/,
     _gt2: "</",
     _closing: LEGAL_VALUE,
     _done: ">",

@@ -37,7 +37,7 @@ describe("When", () => {
     });
 
     it("ability to veto content: not vetoed", () => {
-        const primitive = new RegExp(/^[a-z]+/);
+        const primitive = new RegExp(/[a-z]+/);
         const is = inputStateFromString("bar and this is a load of other stuff");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
         const m = hatesFoo.matchPrefix(is);

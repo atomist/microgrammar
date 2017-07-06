@@ -26,7 +26,7 @@ describe("Concat", () => {
         const content = "2";
         const mg = new Concat({
             $id: "Foo",
-            num: /^[1-9][0-9]*/,
+            num: /[1-9][0-9]*/,
         } as Term);
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;

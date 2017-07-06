@@ -64,7 +64,7 @@ describe("GrammarWithOnlyARep", () => {
 
 });
 
-export const JAVA_IDENTIFIER = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
+export const JAVA_IDENTIFIER = /[a-zA-Z_$][a-zA-Z0-9_$]*/;
 
 export const AnyAnnotation = Microgrammar.fromDefinitions<RawAnnotation>({
     _at: "@",

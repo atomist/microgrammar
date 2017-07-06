@@ -41,7 +41,7 @@ describe("Rep", () => {
     });
 
     it("rep matches several times", () => {
-        const rep = new Rep(/^[a-zA-Z]+/);
+        const rep = new Rep(/[a-zA-Z]+/);
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -51,7 +51,7 @@ describe("Rep", () => {
     });
 
     it("rep does not match several times when not ignoring whitespace", () => {
-        const rep = new Rep(/^[a-zA-Z]+/).withConfig({consumeWhiteSpaceBetweenTokens: false});
+        const rep = new Rep(/[a-zA-Z]+/).withConfig({consumeWhiteSpaceBetweenTokens: false});
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -61,7 +61,7 @@ describe("Rep", () => {
     });
 
     it("can extract data after rep matches several times", () => {
-        const rep = new Rep(/^[a-zA-Z]+/);
+        const rep = new Rep(/[a-zA-Z]+/);
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -70,7 +70,7 @@ describe("Rep", () => {
     });
 
     it("repsep matches several times", () => {
-        const rep = new RepSep(/^[a-zA-Z]+/, ",");
+        const rep = new RepSep(/[a-zA-Z]+/, ",");
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -80,7 +80,7 @@ describe("Rep", () => {
     });
 
     it("rep1sep matches several times", () => {
-        const rep = new Rep1Sep(/^[a-zA-Z]+/, ",");
+        const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -90,7 +90,7 @@ describe("Rep", () => {
     });
 
     it("rep1sep matches once", () => {
-        const rep = new Rep1Sep(/^[a-zA-Z]+/, ",");
+        const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
         const toMatch = "And";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -99,7 +99,7 @@ describe("Rep", () => {
     });
 
     it("rep1sep does not match zero times", () => {
-        const rep = new Rep1Sep(/^[a-zA-Z]+/, ",");
+        const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
         const toMatch = "16And";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
@@ -170,7 +170,7 @@ const property = {
     _gt: "<",
     name: LEGAL_VALUE,
     _close: ">",
-    value: /^[^<]+/,
+    value: /[^<]+/,
     _gt2: "</",
     _closing: LEGAL_VALUE,
     _done: ">",

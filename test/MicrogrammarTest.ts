@@ -259,7 +259,7 @@ describe("Microgrammar", () => {
             name: string;
         }
         const mg = Microgrammar.fromDefinitions<Named>({
-            name: /^[A-Z][a-z]+/,
+            name: /[A-Z][a-z]+/,
         });
         const result = mg.findMatches("Emmanuel Marine");
         expect(result.length).to.equal(2);
@@ -278,7 +278,7 @@ describe("Microgrammar", () => {
             name: string;
         }
         const mg = Microgrammar.fromDefinitions<Named>({
-            name: /^[A-Z][a-z]+/,
+            name: /[A-Z][a-z]+/,
         });
         const result = mg.findMatches("Emmanuel Marine");
         expect(result.length).to.equal(2);
@@ -450,7 +450,7 @@ describe("Microgrammar", () => {
     });
 
     it("microgrammars can compose: no match", () => {
-        const names = new Rep1Sep(/^[a-zA-Z0-9]+/, ",");
+        const names = new Rep1Sep(/[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
         });
@@ -508,7 +508,7 @@ describe("Microgrammar", () => {
     });
 
     it("opt is flattened and returns undefined", () => {
-        const names = new Rep1Sep(/^[a-zA-Z0-9]+/, ",");
+        const names = new Rep1Sep(/[a-zA-Z0-9]+/, ",");
         const nested = Microgrammar.fromDefinitions({
             pigs: names,
         });

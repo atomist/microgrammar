@@ -62,7 +62,7 @@ describe("JavaBlock", () => {
         const balanced = "{ x = y; }";
         const is = inputStateFromString(balanced);
         const inner = Microgrammar.fromDefinitions({
-            left: new Regex(/^[a-z]+/),
+            left: new Regex(/[a-z]+/),
             equals: "=",
             right: "y",
             _whatever: new Break("//////"),

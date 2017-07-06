@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+-   **Breaking** `Regex` now adds a start anchor if none is specified.
 -   **Breaking** `Concat` moved to `matchers` directory as it should not be
 used directly by end users in most cases.
 

@@ -83,8 +83,8 @@ describe("Real world usage", () => {
 
 class MethodSignatureGrammar {
 
-    public readonly javaIdentifierPattern = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
-    public readonly javaTypePattern = /^[a-zA-Z_$\.][a-zA-Z0-9_$\.]*/;
+    public readonly javaIdentifierPattern = /[a-zA-Z_$][a-zA-Z0-9_$]*/;
+    public readonly javaTypePattern = /[a-zA-Z_$\.][a-zA-Z0-9_$\.]*/;
 
     public javaAnnotationGrammar = new AnnotationGrammar();
 
@@ -112,8 +112,8 @@ class MethodSignatureGrammar {
 
 export class AnnotationGrammar {
 
-    public readonly javaIdentifierPattern = /^[a-zA-Z_$][a-zA-Z0-9_$]*/;
-    public readonly javaTypePattern = /^[a-zA-Z_$\.][a-zA-Z0-9_$\.]*/;
+    public readonly javaIdentifierPattern = /[a-zA-Z_$][a-zA-Z0-9_$]*/;
+    public readonly javaTypePattern = /[a-zA-Z_$\.][a-zA-Z0-9_$\.]*/;
 
     public readonly javaType = Microgrammar.fromDefinitions({
         text: this.javaTypePattern,

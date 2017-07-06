@@ -40,17 +40,23 @@ const LOOK_AHEAD_SIZE = 100;
  */
 export abstract class AbstractRegex implements MatchingLogic {
 
-    public $id = `Regex: ${this.regex.source}`;
+    public readonly regex: RegExp;
+
+    get $id() {
+        return `Regex: ${this.regex.source}`;
+    }
 
     protected log = false;
 
     /**
      * Match a regular expression
-     * @param regex JavaScript regex to match
+     * @param regex JavaScript regex to match. Don't use an end anchor.
+     * Start anchor will be added if not already there
      * @param lookahead number of characters to pull from the input to try to match.
      * We'll keep grabbing more if a match is found for the whole string
      */
-    constructor(public regex: RegExp, private lookahead: number = LOOK_AHEAD_SIZE) {
+    constructor(regex: RegExp, private lookahead: number = LOOK_AHEAD_SIZE) {
+        this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
@@ -102,11 +108,9 @@ export class Regex extends AbstractRegex {
     /**
      * Create wrapping a native JavaScript regular expression
      * @param regex Regular expression to wrap.
-     * Do not use an end anchor.
-     * If you use a start anchor, the match must begin at the beginning.
-     * If you do not use a start anchor, content can be skipped.
+     * Do not use an end anchor. If a start anchor isn't provided it will be added
      */
-    constructor(public regex: RegExp) {
+    constructor(regex: RegExp) {
         super(regex);
     }
 
@@ -118,7 +122,7 @@ export class Regex extends AbstractRegex {
 export class MatchInteger extends AbstractRegex {
 
     constructor() {
-        super(/^[1-9][0-9]*/);
+        super(/[1-9][0-9]*/);
     }
 
     public canStartWith(c: string): boolean {
@@ -139,7 +143,7 @@ export const Integer = new MatchInteger();
 export class MatchFloat extends AbstractRegex {
 
     constructor() {
-        super(/^[+-]?\d*[\.]?\d+/);
+        super(/[+-]?\d*[\.]?\d+/);
     }
 
     protected toValue(s: string) {

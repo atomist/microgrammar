@@ -20,7 +20,7 @@ describe("MatchingMachine", () => {
 
             constructor() {
                 super({
-                    name: /^[A-Z][a-z]+/,
+                    name: /[A-Z][a-z]+/,
                 });
                 // console.log("The matcher is " + JSON.stringify(this.matcher))
             }
@@ -48,7 +48,7 @@ describe("MatchingMachine", () => {
 
             constructor() {
                 super({
-                    name: /^[A-Za-z]+/,
+                    name: /[A-Za-z]+/,
                 });
 
             }
@@ -56,7 +56,7 @@ describe("MatchingMachine", () => {
             protected onMatch(pm: PatternMatch): any {
                 this.matches.push(pm);
                 return {
-                    number: /^[0-9]+/,
+                    number: /[0-9]+/,
                 };
             }
         }
@@ -70,15 +70,15 @@ describe("MatchingMachine", () => {
 
     const pyClass = {
         _class: "class",
-        name: /^[A-Za-z]+/,
+        name: /[A-Za-z]+/,
         _sep: ":",
     };
 
     const pyMethod = {
         _def: "def",
-        name: /^[a-z]+/,
+        name: /[a-z]+/,
         _lp: "(",
-        args: /^[^)]*/,
+        args: /[^)]*/,
         _rp: ")",
         _sep: ":",
     };
