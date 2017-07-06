@@ -1,9 +1,10 @@
 import { Config, DefaultConfig } from "../Config";
 import { InputState } from "../InputState";
 import { Matcher, MatchingLogic, Term } from "../Matchers";
-import { MatchPrefixResult } from "../MatchPrefixResult";
+import {isSuccessfulMatch, MatchFailureReport, matchPrefixSuccess} from "../MatchPrefixResult";
+import {MatchPrefixResult, SuccessfulMatch} from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
-import { isPatternMatch, isSpecialMember, MatchFailureReport, PatternMatch, TreePatternMatch } from "../PatternMatch";
+import {  isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
 
 import { readyToMatch } from "../internal/Whitespace";
@@ -102,8 +103,9 @@ export class Concat implements MatchingLogic {
 
                 // If it's a concat, give it a fresh context
                 const contextToUse = isConcat(step) ? {} : context;
-                const report = step.matchPrefix(currentInputState, contextToUse);
-                if (isPatternMatch(report)) {
+                const reportResult = step.matchPrefix(currentInputState, contextToUse);
+                if (isSuccessfulMatch(reportResult)) {
+                    const report = reportResult.match;
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
@@ -115,7 +117,7 @@ export class Concat implements MatchingLogic {
                     }
                 } else {
                     return new MatchFailureReport(this.$id, initialInputState.offset, context,
-                        `Failed at step '${step.name}' due to ${(report as any).description}`);
+                        `Failed at step '${step.name}' due to ${(reportResult as any).description}`);
                 }
             } else {
                 // It's a function taking the context.
@@ -130,13 +132,13 @@ export class Concat implements MatchingLogic {
                 }
             }
         }
-        return new TreePatternMatch(
+        return matchPrefixSuccess(new TreePatternMatch(
             this.$id,
             matched,
             initialInputState.offset,
             this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
             matches,
-            context);
+            context));
     }
 
 }
@@ -212,7 +214,7 @@ class TransformingMatcher implements Matcher {
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         const mpr = this.m.matchPrefix(is, context) as PatternMatch;
-        if (isPatternMatch(mpr)) {
+        if (isSuccessfulMatch(mpr)) {
             const computed = this.f(mpr.$value, context);
             context[this.name] = mpr[this.name] = computed;
         }

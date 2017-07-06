@@ -6,6 +6,7 @@ import { MatchingLogic } from "../../Matchers";
 import { Break } from "../snobol/Break";
 
 import { InputState } from "../../InputState";
+import {matchPrefixSuccess} from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
@@ -18,7 +19,8 @@ export const RestOfInput: MatchingLogic = {
 
     matchPrefix(is: InputState, context: {}) {
         const consumed = is.skipWhile(s => true, 1);
-        return new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped, context);
+        return matchPrefixSuccess(
+            new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped, context));
     },
 };
 

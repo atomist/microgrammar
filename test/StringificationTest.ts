@@ -34,7 +34,6 @@ describe("stringification", () => {
         });
         const result = mg.findMatches(content);
 
-        console.log("Result is " + JSON.stringify(result));
         assert(result.length === 1);
 
         const stringified = JSON.stringify(result[0]);

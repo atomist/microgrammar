@@ -1,19 +1,20 @@
-import { expect } from "chai";
+import {expect} from "chai";
 import * as assert from "power-assert";
-import { MatchingLogic, Term } from "../src/Matchers";
-import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
-import { Opt } from "../src/Ops";
+import {MatchingLogic, Term} from "../src/Matchers";
+import {isSuccessfulMatch} from "../src/MatchPrefixResult";
+import {MatchingMachine, Microgrammar} from "../src/Microgrammar";
+import {Alt, Opt} from "../src/Ops";
 import {isPatternMatch, PatternMatch} from "../src/PatternMatch";
-import { Rep1Sep, RepSep } from "../src/Rep";
-import { RealWorldPom } from "./Fixtures";
+import {Rep, Rep1Sep, RepSep} from "../src/Rep";
+import {RealWorldPom} from "./Fixtures";
 import {
     ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, DEPENDENCY_GRAMMAR, PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "./MavenGrammars";
 
-import { fail } from "power-assert";
-import { JavaParenthesizedExpression } from "../src/matchers/java/JavaBody";
-import { JAVA_IDENTIFIER } from "./matchers/java/JavaBlockMicrogrammarTest";
+import {fail} from "power-assert";
+import {JavaParenthesizedExpression} from "../src/matchers/java/JavaBody";
+import {JAVA_IDENTIFIER} from "./matchers/java/JavaBlockMicrogrammarTest";
 
 describe("Microgrammar", () => {
 
@@ -89,7 +90,7 @@ describe("Microgrammar", () => {
 
     it("parse all content: dismatch report recognized in output", () => {
         const content = "not-matchy void";
-        const mg = Microgrammar.fromDefinitions<{type: string }>({
+        const mg = Microgrammar.fromDefinitions<{ type: string }>({
             _p: "public",
             type: JAVA_IDENTIFIER,
         });
@@ -110,7 +111,7 @@ describe("Microgrammar", () => {
             _semi: ";",
         });
         const result = mg.exactMatch(content);
-        assert(!isPatternMatch(result));
+        assert(!isSuccessfulMatch(result));
     });
 
     it("parse all content: Fail due to irrelevant content before match", () => {
@@ -123,7 +124,7 @@ describe("Microgrammar", () => {
             _semi: ";",
         });
         const result = mg.exactMatch(content);
-        assert(!isPatternMatch(result));
+        assert(!isSuccessfulMatch(result));
     });
 
     it("XML element", () => {
@@ -517,6 +518,70 @@ describe("Microgrammar", () => {
         expect(m2.pigs).to.have.members(["Porker"]);
     });
 
+});
+
+class StringGrammar {
+
+    public static readonly stringTextPattern =
+        new Rep(new Alt("\\\"", /[^"]/)).withConfig({consumeWhiteSpaceBetweenTokens: false}); // (?:\\"|[^"])*/;
+
+    public static readonly stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
+        foo: ctx => {
+            console.log("commence match");
+        },
+        _p1: '"',
+        foo2: ctx => {
+            console.log("1");
+        },
+        charArray: StringGrammar.stringTextPattern,
+
+        foo3: ctx => {
+            console.log(`3 + [${JSON.stringify(ctx.charArray)})]`);
+        },
+        _p2: '"',
+
+        foo4: ctx => {
+            console.log("4");
+        },
+        text: ctx => ctx.charArray.join(""),
+        $id: "stringText",
+    });
+
+}
+
+describe("StringGrammarTest", () => {
+
+    it("string found in alt", () => {
+        const strings = Microgrammar.fromDefinitions<any>(
+            {stringOrLa: new Alt(StringGrammar.stringGrammar, "la")}).findMatches('"winter is coming" la la la');
+        assert(isPatternMatch(strings[0]));
+        const match = strings[0].matchedStructure();
+        assert(match.$matched === '"winter is coming"');
+        assert(match.stringOrLa.text, "winter is coming");
+    });
+
+    it("string found", () => {
+        const strings = Microgrammar.fromDefinitions<any>(
+            {stringOrLa: StringGrammar.stringGrammar}).findMatches('"winter is coming"');
+        const match = strings[0];
+        if (isPatternMatch(match)) {
+            const mmmm = match as any;
+            assert(mmmm.$matched === '"winter is coming"');
+            console.log(JSON.stringify(mmmm.stringOrLa));
+            assert(mmmm.stringOrLa.text, "winter is coming");
+
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
+
+    it("string found with escaped quotes", () => {
+            const strings = StringGrammar.stringGrammar.findMatches("\"winter is \\\"coming\\\"\"  ");
+            const match = strings[0];
+            assert(match.$matched === "\"winter is \\\"coming\\\"\"");
+            assert(match.text === "winter is \\\"coming\\\"");
+        },
+    );
 });
 
 interface CatsDogsAndPigs {

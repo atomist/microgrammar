@@ -1,5 +1,6 @@
 import { inputStateFromString } from "../src/internal/InputStateFactory";
-import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
+import {  PatternMatch } from "../src/PatternMatch";
 import { Rep, Rep1, Rep1Sep, RepSep } from "../src/Rep";
 import { LEGAL_VALUE } from "./MavenGrammars";
 
@@ -15,30 +16,45 @@ describe("Rep", () => {
         const rep = new Rep("A");
         const is = inputStateFromString("friday 14");
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        // expect(is.peek(2)).to.equal(m.$resultingInputState.peek(2));
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       // expect(is.peek(2)).to.equal(mmmm.$resultingInputState.peek(2));
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep(1) should NOT match 0 when matcher doesn't match", () => {
         const rep = new Rep1("A");
         const is = inputStateFromString("friday 14");
         const m = rep.matchPrefix(is, {});
-        assert(!isPatternMatch(m));
+        assert(!isSuccessfulMatch(m));
     });
 
     it("should match when matcher matches once", () => {
         const rep = new Rep("A");
         const is = inputStateFromString("And there was light!");
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("repsep should match when matcher matches once", () => {
         const rep = new RepSep("A", "abcd");
         const is = inputStateFromString("And there was light!");
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep matches several times", () => {
         const rep = new Rep(/[a-zA-Z]+/);
@@ -46,9 +62,14 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        assert((m as PatternMatch).$matched === toMatch);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       assert((mmmm).$matched === toMatch);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep does not match several times when not ignoring whitespace", () => {
         const rep = new Rep(/[a-zA-Z]+/).withConfig({consumeWhiteSpaceBetweenTokens: false});
@@ -56,9 +77,14 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        assert((m as PatternMatch).$matched === "And");
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       assert((mmmm).$matched === "And");
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("can extract data after rep matches several times", () => {
         const rep = new Rep(/[a-zA-Z]+/);
@@ -75,9 +101,14 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        assert((m as PatternMatch).$matched === toMatch);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       assert((mmmm).$matched === toMatch);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep1sep matches several times", () => {
         const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
@@ -85,9 +116,14 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        assert((m as PatternMatch).$matched === toMatch);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       assert((mmmm).$matched === toMatch);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep1sep matches once", () => {
         const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
@@ -95,8 +131,13 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("rep1sep does not match zero times", () => {
         const rep = new Rep1Sep(/[a-zA-Z]+/, ",");
@@ -104,7 +145,7 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {});
-        assert(!isPatternMatch(m));
+        assert(!isSuccessfulMatch(m));
     });
 
     it("Maven property", () => {
@@ -116,9 +157,14 @@ describe("Rep", () => {
         `;
         const is = inputStateFromString(toMatch);
         const m = rep.matchPrefix(is, {}) as PatternMatch;
-        assert(isPatternMatch(m));
-        assert(m.$value.length === 3);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       assert(mmmm.$value.length === 3);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("should not infinite loop on rep of opt", () => {
         const mgDependency = Microgrammar.fromDefinitions({

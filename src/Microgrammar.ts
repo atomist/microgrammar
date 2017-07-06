@@ -2,7 +2,8 @@ import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
 import { Concat, toMatchingLogic } from "./matchers/Concat";
-import {DismatchReport, isPatternMatch, PatternMatch} from "./PatternMatch";
+import { isSuccessfulMatch } from "./MatchPrefixResult";
+import {DismatchReport,  PatternMatch} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
@@ -178,11 +179,12 @@ export abstract class MatchingMachine {
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
-            if (isPatternMatch(tryMatch) && tryMatch.$matched !== "") {
+            if (isSuccessfulMatch(tryMatch) && tryMatch.$matched !== "") {
+                const match = tryMatch.match;
                 // Enrich with the name
-                (tryMatch as any).$name = tryMatch.$matcherId;
-                currentMatcher = toMatchingLogic(this.onMatch(tryMatch));
-                currentInputState = currentInputState.consume(tryMatch.$matched);
+                (match as any).$name = match.$matcherId;
+                currentMatcher = toMatchingLogic(this.onMatch(match));
+                currentInputState = currentInputState.consume(match.$matched);
             } else {
                 // We didn't match. Discard the current input character and try again
                 if (!currentInputState.exhausted()) {
@@ -191,7 +193,7 @@ export abstract class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (isPatternMatch(tryMatch)) {
+                if (isSuccessfulMatch(tryMatch)) {
                     // TODO will this spoil offsets? Might want to create an input state
                     const matches = omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
@@ -199,8 +201,8 @@ export abstract class MatchingMachine {
                     }
                 } else {
                     const observerMatch = this.observer.matchPrefix(previousIs, {});
-                    if (isPatternMatch(observerMatch)) {
-                        currentMatcher = toMatchingLogic(this.observeMatch(observerMatch));
+                    if (isSuccessfulMatch(observerMatch)) {
+                        currentMatcher = toMatchingLogic(this.observeMatch(observerMatch.match));
                     }
                 }
             }
@@ -215,7 +217,7 @@ export abstract class MatchingMachine {
      * @param pm pattern to observe
      * @returns {MatchingLogic}
      */
-    protected observeMatch(pm): any {
+    protected observeMatch(pm: PatternMatch): any {
         return this.matcher;
     }
 

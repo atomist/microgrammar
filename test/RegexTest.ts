@@ -1,7 +1,8 @@
 import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 
 import { Microgrammar } from "../src/Microgrammar";
-import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
+import {  PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 
 import * as assert from "power-assert";
@@ -13,20 +14,30 @@ describe("Regex", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        const match = m as PatternMatch;
-        assert(match.$matched === "friday");
-        assert(m.$offset === 0);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       const match = mmmm;
+                       assert(match.$matched === "friday");
+                       assert(mmmm.$offset === 0);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
     it("match word letters using anchor that will be recognized", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        const match = m as PatternMatch;
-        assert(match.$matched === "friday");
-        assert(m.$offset === 0);
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       const match = mmmm;
+                       assert(match.$matched === "friday");
+                       assert(mmmm.$offset === 0);
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("should add anchor if not present", () => {
         const regexp = new Regex(/[a-z]+/);
@@ -42,7 +53,7 @@ describe("Regex", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("14 friday");
         const m = regexp.matchPrefix(is, {});
-        assert(!isPatternMatch(m));
+        assert(!isSuccessfulMatch(m));
     });
 
     // Demonstrate how to achieve old style skipping behavior
@@ -51,12 +62,17 @@ describe("Regex", () => {
         const is = inputStateFromString("**friday 14");
         const withSkip = new Break(regexp, true);
         const m = withSkip.matchPrefix(is, {});
-        assert(isPatternMatch(m));
-        const match = m as any as PatternMatch;
-        assert(match.$matched === "**friday");
-        assert(match.$offset === 2);
-        assert(match.$value === "friday");
-    });
+        if (isSuccessfulMatch(m)) {
+                       const mmmm = m.match as any;
+                       const match = m as any as PatternMatch;
+                       assert(match.$matched === "**friday");
+                       assert(match.$offset === 2);
+                       assert(match.$value === "friday");
+
+                    } else {
+                       assert.fail("Didn't match");
+                    }
+                   });
 
     it("matches regex length 20", () => matchRegexOfLength(20));
 

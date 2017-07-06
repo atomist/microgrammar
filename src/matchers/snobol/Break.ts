@@ -1,9 +1,8 @@
-
-import { InputState } from "../../InputState";
-import { MatchingLogic } from "../../Matchers";
-import { MatchPrefixResult } from "../../MatchPrefixResult";
-import { isPatternMatch, MatchFailureReport, TerminalPatternMatch } from "../../PatternMatch";
-import { toMatchingLogic } from "../Concat";
+import {InputState} from "../../InputState";
+import {MatchingLogic} from "../../Matchers";
+import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "../../MatchPrefixResult";
+import {TerminalPatternMatch} from "../../PatternMatch";
+import {toMatchingLogic} from "../Concat";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -40,16 +39,16 @@ export class Break implements MatchingLogic {
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new TerminalPatternMatch(this.$id, "", is.offset, is, context);
+            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is, context));
         }
 
         let currentIs = is;
         let matched = "";
         let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, context);
-        while (!currentIs.exhausted() && !isPatternMatch(terminalMatch)) { // if it fits, it sits
+        while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
-                if (isPatternMatch(this.badMatcher.matchPrefix(currentIs, context))) {
+                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, context))) {
                     return new MatchFailureReport(this.$id, is.offset, context);
                 }
             }
@@ -60,11 +59,11 @@ export class Break implements MatchingLogic {
             }
         }
         // We have found the terminal if we get here
-        if (this.consume && isPatternMatch(terminalMatch)) {
-            return new TerminalPatternMatch(this.$id, matched + terminalMatch.$matched,
-                terminalMatch.$offset, terminalMatch.$matched, context);
+        if (this.consume && isSuccessfulMatch(terminalMatch)) {
+            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched + terminalMatch.match.$matched,
+                terminalMatch.$offset, terminalMatch.match.$matched, context));
         }
-        return new TerminalPatternMatch(this.$id, matched, is.offset, matched, context);
+        return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched, context));
     }
 }
 

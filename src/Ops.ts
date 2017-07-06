@@ -1,8 +1,8 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPatternMatch } from "./PatternMatch";
+import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
+import {  MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
 
 /**
  * Optional match on the given matcher
@@ -35,22 +35,22 @@ export class Opt implements MatchingLogic {
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
-            return new UndefinedPatternMatch(this.$id, is.offset);
+            return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
         }
 
         const maybe = this.matcher.matchPrefix(is, context);
-        if (isPatternMatch(maybe)) {
+        if (isSuccessfulMatch(maybe)) {
             if (this.pullUp) {
                 const f = this.pullUp + MATCH_INFO_SUFFIX;
                 const field = maybe.$value[f];
                 if (!field) {
                     throw new Error(`Cannot pull up field ${f} in ${maybe}`);
                 }
-                maybe.$value = field.$value;
+                maybe.match.$value = field.$value;
             }
             return maybe;
         }
-        return new UndefinedPatternMatch(this.$id, is.offset);
+        return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
     }
 }
 
@@ -78,7 +78,7 @@ export class Alt implements MatchingLogic {
 
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefix(is, context);
-            if (isPatternMatch(m)) {
+            if (isSuccessfulMatch(m)) {
                 return m;
             }
         }
@@ -105,9 +105,9 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
     }
 
     function conditionalMatch(is: InputState, context: {}): MatchPrefixResult {
-        const match = matcher.matchPrefix(is, context);
-        return (isPatternMatch(match) && matchTest(match)) ?
-            match :
+        const result = matcher.matchPrefix(is, context);
+        return (isSuccessfulMatch(result) && matchTest(result.match)) ?
+            result :
             new MatchFailureReport(this.$id, is.offset, context);
     }
 

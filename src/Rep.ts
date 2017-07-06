@@ -2,8 +2,9 @@ import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic} from "./Matchers";
 import { isConcat, toMatchingLogic } from "./matchers/Concat";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { isPatternMatch, MatchFailureReport, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+import { isSuccessfulMatch } from "./MatchPrefixResult";
+import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
+import {  PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 
 import { readyToMatch } from "./internal/Whitespace";
 
@@ -64,10 +65,11 @@ export class Repetition implements MatchingLogic, Configurable {
 
             const contextToUse = isConcat(this.matcher) ? {} : context;
 
-            const match = this.matcher.matchPrefix(currentInputState, contextToUse);
-            if (!isPatternMatch(match)) {
+            const result = this.matcher.matchPrefix(currentInputState, contextToUse);
+            if (!isSuccessfulMatch(result)) {
                 break;
             } else {
+                const match = result.match;
                 if (match.$matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                      `I do not think this grammar means what you think it means`);
@@ -81,8 +83,9 @@ export class Repetition implements MatchingLogic, Configurable {
                 const eaten = readyToMatch(currentInputState, this.config);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatch = this.sepMatcher.matchPrefix(currentInputState, context);
-                if (isPatternMatch(sepMatch)) {
+                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, context);
+                if (isSuccessfulMatch(sepMatchResult)) {
+                    const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched);
                     matched += (sepMatch as PatternMatch).$matched;
                 } else {
@@ -98,11 +101,11 @@ export class Repetition implements MatchingLogic, Configurable {
         );
 
         return (matches.length >= this.min) ?
-            new TerminalPatternMatch(this.$id,
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
                 values,
-                context) :
+                context)) :
             new MatchFailureReport(this.$id, is.offset, context);
     }
 }

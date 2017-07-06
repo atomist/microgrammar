@@ -1,12 +1,12 @@
-import { ChangeSet } from "../../src/internal/ChangeSet";
-import { Microgrammar } from "../../src/Microgrammar";
-import { Opt } from "../../src/Ops";
+import {ChangeSet} from "../../src/internal/ChangeSet";
+import {isSuccessfulMatch} from "../../src/MatchPrefixResult";
+import {Microgrammar} from "../../src/Microgrammar";
+import {Opt} from "../../src/Ops";
 
 import * as assert from "power-assert";
 
-import { isPatternMatch } from "../../src/PatternMatch";
-import { Integer } from "../../src/Primitives";
-import { RepSep } from "../../src/Rep";
+import {Integer} from "../../src/Primitives";
+import {RepSep} from "../../src/Rep";
 
 describe("MicrogrammarUpdateTest", () => {
 
@@ -176,14 +176,18 @@ describe("MicrogrammarUpdateTest", () => {
         });
 
         const match: any = mg.firstMatch(input);
-        assert(isPatternMatch(match));
-        assert(match.listItems.commaSeparated[0] === "carrots");
+        if (isSuccessfulMatch(match)) {
+            const mmmm = match.match as any;
+            assert(mmmm.listItems.commaSeparated[0] === "carrots");
 
-        // how about we also accept a microgrammar as the first arg? ... and all firstMatch on it?
-        const updater: any = Microgrammar.updatableMatch(match, input);
-        updater.listItems.commaSeparated[0] = "garbage";
-        assert(updater.newContent() === "I love garbage, apples, lizards, bananas");
+            // how about we also accept a microgrammar as the first arg? ... and all firstMatch on it?
+            const updater: any = Microgrammar.updatableMatch(mmmm, input);
+            updater.listItems.commaSeparated[0] = "garbage";
+            assert(updater.newContent() === "I love garbage, apples, lizards, bananas");
 
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
 });

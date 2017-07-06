@@ -1,7 +1,7 @@
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
-import { MatchPrefixResult } from "../../MatchPrefixResult";
-import { MatchFailureReport, TerminalPatternMatch } from "../../PatternMatch";
+import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "../../MatchPrefixResult";
+import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
  * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -23,7 +23,7 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) :
+           matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) ) :
             new MatchFailureReport(this.$id, is.offset, context);
     }
 }

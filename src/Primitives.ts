@@ -1,7 +1,7 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { MatchFailureReport, TerminalPatternMatch } from "./PatternMatch";
+import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
+import {  TerminalPatternMatch } from "./PatternMatch";
 
 /**
  * Match a literal string
@@ -16,7 +16,7 @@ export class Literal implements MatchingLogic {
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) ) :
             new MatchFailureReport(this.$id, is.offset, context,
                 `Did not match literal [${this.literal}]: saw [${peek}]`);
     }
@@ -77,12 +77,12 @@ export abstract class AbstractRegex implements MatchingLogic {
             // If there's not an anchor, we may match before
             const actualMatch = results[0];
             const matched = remainder.substring(0, remainder.indexOf(actualMatch)) + actualMatch;
-            return new TerminalPatternMatch(
+            return matchPrefixSuccess(new TerminalPatternMatch(
                 this.$id,
                 matched,
                 is.offset,
                 this.toValue(actualMatch),
-                context);
+                context));
         } else {
             return new MatchFailureReport(this.$id, is.offset, context,
                 `Did not match regex /${this.regex.source}/ in [${remainder}]`);

@@ -1,8 +1,11 @@
-import { expect } from "chai";
-import { inputStateFromString } from "../src/internal/InputStateFactory";
-import { when } from "../src/Ops";
-import { isPatternMatch } from "../src/PatternMatch";
-import { Literal } from "../src/Primitives";
+import {expect} from "chai";
+import {inputStateFromString} from "../src/internal/InputStateFactory";
+import {isSuccessfulMatch} from "../src/MatchPrefixResult";
+import {when} from "../src/Ops";
+
+import {Literal} from "../src/Primitives";
+
+import * as assert from "power-assert";
 
 describe("When", () => {
 
@@ -17,7 +20,12 @@ describe("When", () => {
             throw new Error("Error: matcher.matchPrefix returned by when is undefined");
         }
         const m = matcher.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("when false should not match", () => {
@@ -25,7 +33,7 @@ describe("When", () => {
         const is = inputStateFromString("foo bar");
         const matcher = when(primitive, pm => false);
         const m = matcher.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("ability to veto content", () => {
@@ -33,7 +41,7 @@ describe("When", () => {
         const is = inputStateFromString("foo bar");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
         const m = hatesFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("ability to veto content: not vetoed", () => {
@@ -41,7 +49,12 @@ describe("When", () => {
         const is = inputStateFromString("bar and this is a load of other stuff");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
         const m = hatesFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("ability to require content: match", () => {
@@ -49,7 +62,12 @@ describe("When", () => {
         const is = inputStateFromString("foo bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
         const m = requiresFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("ability to require content: no match", () => {
@@ -57,7 +75,7 @@ describe("When", () => {
         const is = inputStateFromString("bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
         const m = requiresFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("preserves properties", () => {

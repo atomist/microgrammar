@@ -1,7 +1,7 @@
 import assert = require("power-assert");
 import { exactMatch } from "../../src/internal/ExactMatch";
 import { MicrogrammarSpec, specGrammar } from "../../src/internal/SpecGrammar";
-import { isPatternMatch } from "../../src/PatternMatch";
+import {isPatternMatch} from "../../src/PatternMatch";
 
 describe("SpecGrammar", () => {
 

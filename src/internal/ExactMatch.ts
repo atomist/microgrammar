@@ -1,7 +1,8 @@
 import {MatchingLogic} from "../Matchers";
 import {Concat} from "../matchers/Concat";
 import {RestOfInput} from "../matchers/skip/Skip";
-import {DismatchReport, isPatternMatch, MatchFailureReport, PatternMatch} from "../PatternMatch";
+import {isSuccessfulMatch, MatchFailureReport} from "../MatchPrefixResult";
+import {DismatchReport, PatternMatch} from "../PatternMatch";
 import {InputStream} from "../spi/InputStream";
 import {StringInputStream} from "../spi/StringInputStream";
 import {inputStateFromStream} from "./InputStateFactory";
@@ -14,8 +15,8 @@ export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStrea
     });
     const match = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)), {});
 
-    if (isPatternMatch(match)) {
-        const detyped = match as any;
+    if (isSuccessfulMatch(match)) {
+        const detyped = match.match as any;
         if (detyped.trailingJunk !== "") {
             return {description:
                 `Not all input was consumed: Left over [${detyped.trailingJunk.$matched}]`};

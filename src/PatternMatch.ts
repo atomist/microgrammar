@@ -1,5 +1,4 @@
 import { Matcher } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
 
 /**
  * Returned when we failed to match prefix
@@ -10,23 +9,10 @@ export interface DismatchReport {
     description: string;
 }
 
-export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport {
-
-    public constructor(public readonly $matcherId: string,
-                       public readonly $offset: number,
-                       $context: {},
-                       private readonly cause?: string | MatchFailureReport) {
-    }
-
-    get description(): string {
-        return `Match failed on ${this.$matcherId}: ${this.cause}`;
-    }
-}
-
 /**
  * Represents a successful match.
  */
-export abstract class PatternMatch implements MatchPrefixResult {
+export abstract class PatternMatch {
 
     /**
      * Value extracted from matcher.
@@ -69,7 +55,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
 }
 
-export function isPatternMatch(mpr: MatchPrefixResult | DismatchReport): mpr is PatternMatch {
+export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
     return mpr != null && (mpr as PatternMatch).$matched !== undefined;
 }
 
@@ -170,8 +156,8 @@ export class TreePatternMatch extends PatternMatch {
 
 }
 
-export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
-    return mpr != null && (mpr as TreePatternMatch).submatches !== undefined;
+export function isTreePatternMatch(om: PatternMatch): om is TreePatternMatch {
+    return om != null && (om as TreePatternMatch).submatches !== undefined;
 }
 
 /**

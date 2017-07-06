@@ -1,11 +1,10 @@
 import {Config, DefaultConfig} from "../Config";
 import {MatchingLogic} from "../Matchers";
 import {Concat, toMatchingLogic} from "../matchers/Concat";
-import {isPatternMatch} from "../PatternMatch";
 import {Literal} from "../Primitives";
-import * as MatcherPrinter from "./MatcherPrinter";
 
 import {Break} from "../matchers/snobol/Break";
+import {isPatternMatch} from "../PatternMatch";
 import {exactMatch} from "./ExactMatch";
 import {MicrogrammarSpec, specGrammar} from "./SpecGrammar";
 

@@ -1,3 +1,4 @@
+import {PatternMatch} from "./PatternMatch";
 /**
  * Pattern match. Holds user properties, with user-defined names,
  * and Atomist pattern match properties with a $ prefix.
@@ -14,4 +15,42 @@ export interface MatchPrefixResult {
      */
     readonly $matcherId: string;
 
+}
+
+export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport {
+
+    public constructor(public readonly $matcherId: string,
+                       public readonly $offset: number,
+                       $context: {},
+                       private readonly cause?: string | MatchFailureReport) {
+    }
+
+    get description(): string {
+        return `Match failed on ${this.$matcherId}: ${this.cause}`;
+    }
+}
+
+export class SuccessfulMatch implements MatchPrefixResult {
+    public constructor(public readonly match: PatternMatch) {
+        if (match === undefined) {
+            throw new Error("You can't be successful with an undefined match");
+        }
+    }
+
+    get $offset() { return this.match.$offset; }
+
+    get $matcherId() { return this.match.$matcherId; }
+
+    get $matched() {
+        return this.match.$matched; } // convenience
+
+    get $value() { return this.match.$value; } // convenience
+}
+
+export function matchPrefixSuccess(match: PatternMatch): MatchPrefixResult {
+    return new SuccessfulMatch(match);
+}
+
+export function isSuccessfulMatch(mpr: MatchPrefixResult): mpr is SuccessfulMatch {
+    return mpr && (mpr as SuccessfulMatch).match !== undefined;
 }

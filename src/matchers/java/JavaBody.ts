@@ -1,6 +1,6 @@
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
-import { MatchPrefixResult } from "../../MatchPrefixResult";
+import {MatchPrefixResult, matchPrefixSuccess, SuccessfulMatch} from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
 import { Concat } from "../Concat";
 
@@ -35,7 +35,7 @@ class JavaBody implements MatchingLogic {
         const sm = new JavaContentStateMachine();
         let depth = 1;
         if (is.exhausted()) {
-            return new TerminalPatternMatch(this.$id, "", is.offset, is, context);
+            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is, context));
         }
 
         let currentIs = is;
@@ -66,12 +66,12 @@ class JavaBody implements MatchingLogic {
             }
         }
         if (!this.inner) {
-            return new TerminalPatternMatch(
+            return matchPrefixSuccess(new TerminalPatternMatch(
                 this.$id,
                 matched,
                 is.offset,
                 matched,
-                context);
+                context));
         }
 
         // We supply the offset to preserve it in this match
