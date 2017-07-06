@@ -1,20 +1,25 @@
 import assert = require("power-assert");
-import {exactMatch} from "../../src/internal/ExactMatch";
-import {MicrogrammarSpec, specGrammar} from "../../src/internal/SpecGrammar";
-import {isPatternMatch} from "../../src/PatternMatch";
+import { exactMatch } from "../../src/internal/ExactMatch";
+import { MicrogrammarSpec, specGrammar } from "../../src/internal/SpecGrammar";
+import { isPatternMatch } from "../../src/PatternMatch";
 
-describe("MicrogrammarFromStringTest", () => {
+describe("SpecGrammar", () => {
 
     it("can parse a series of literals and references", () => {
         const microgrammarSpecString = "->${fruit}<-";
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar, microgrammarSpecString);
         if (isPatternMatch(specMatch)) {
             assert(specMatch.these.length === 1);
-            assert.deepEqual(justTheData(specMatch),
-            { these: [ {
-                elementName: "fruit", // TODO: this doesn't belong here. Is it a bug in concat?
-                literal: "->", element: {elementName: "fruit"}}]
-            , trailing: "<-"});
+            const json = JSON.stringify(justTheData(specMatch));
+            assert(json ===
+                JSON.stringify({
+                    these: [{
+                        elementName: "fruit", // TODO: this doesn't belong here. Is it a bug in concat?
+                        literal: "->", element: {elementName: "fruit"},
+                    }]
+                    , trailing: "<-",
+                }),
+                json);
         } else {
             assert.fail();
         }

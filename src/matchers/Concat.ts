@@ -140,7 +140,7 @@ export class Concat implements MatchingLogic {
 
 }
 
-export function isConcat(m: MatchingLogic): boolean {
+export function isConcat(m: MatchingLogic): m is Concat {
     return m && !!((m as Concat).matchSteps || isConcat((m as NamedMatcher).ml));
 }
 

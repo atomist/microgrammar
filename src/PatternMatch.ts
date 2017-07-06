@@ -14,7 +14,7 @@ export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport
 
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
-                       public readonly $context: {},
+                       $context: {},
                        private readonly cause?: MatchFailureReport) {
     }
 
@@ -34,7 +34,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
      * scalar or an array, or a nested structure. May or not be the
      * same as $matched property.
      */
-    public $value: any;
+    public abstract $value: any;
 
     /**
      * Represents a match
@@ -46,7 +46,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,
                 public readonly $offset: number,
-                public readonly $context: {}) {
+                $context: {}) {
         // Copy top level context properties
         // tslint:disable-next-line:forin
         for (const p in $context) {
@@ -89,7 +89,7 @@ export class TerminalPatternMatch extends PatternMatch {
             this.$matched,
             this.$offset + additionalOffset,
             this.$value,
-            this.$context);
+            {});
     }
 
 }

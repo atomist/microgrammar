@@ -52,7 +52,7 @@ describe("Regex", () => {
         const withSkip = new Break(regexp, true);
         const m = withSkip.matchPrefix(is, {});
         assert(isPatternMatch(m));
-        const match = m as PatternMatch;
+        const match = m as any as PatternMatch;
         assert(match.$matched === "**friday");
         assert(match.$offset === 2);
         assert(match.$value === "friday");

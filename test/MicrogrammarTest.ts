@@ -126,24 +126,6 @@ describe("Microgrammar", () => {
         assert(!isPatternMatch(result));
     });
 
-    it("can JSON stringify", () => {
-        const content = "<foo>";
-        const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
-            lx: "<",
-            name: /[a-zA-Z0-9]+/,
-            rx: ">",
-        } as Term);
-        const result = mg.findMatches(content);
-
-        // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
-        const r0 = result[0] as any;
-        const stringified = JSON.stringify(r0);
-        assert(stringified.indexOf("$resultingInputState") === -1);
-        assert(stringified.length < 1500);
-    });
-
     it("XML element", () => {
         const content = "<foo>";
         const mg = Microgrammar.fromDefinitions({

@@ -93,7 +93,7 @@ export class Repetition implements MatchingLogic, Configurable {
 
         const values = matches.map(m =>
             (typeof m.$value === "object") ?
-                m.$context :
+                m :
                 m.$value,
         );
 
