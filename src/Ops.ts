@@ -1,8 +1,8 @@
-import { InputState } from "./InputState";
-import { MatchingLogic } from "./Matchers";
-import { toMatchingLogic } from "./matchers/Concat";
+import {InputState} from "./InputState";
+import {MatchingLogic} from "./Matchers";
+import {toMatchingLogic} from "./matchers/Concat";
 import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
-import {  MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
+import {MATCH_INFO_SUFFIX, UndefinedPatternMatch} from "./PatternMatch";
 
 /**
  * Optional match on the given matcher
@@ -11,8 +11,8 @@ import {  MATCH_INFO_SUFFIX, UndefinedPatternMatch } from "./PatternMatch";
  * parent if specified
  * @return {Opt}
  */
-export function optional(o: any, pullUp?: string): MatchingLogic {
-    return new Opt(o, pullUp);
+export function optional(o: any): MatchingLogic {
+    return new Opt(o);
 }
 
 export class Opt implements MatchingLogic {
@@ -24,7 +24,7 @@ export class Opt implements MatchingLogic {
      * @param o matching logic
      * @param pullUp property to pull up if we want one
      */
-    constructor(o: any, private pullUp?: string) {
+    constructor(o: any) {
         this.matcher = toMatchingLogic(o);
     }
 
@@ -40,17 +40,7 @@ export class Opt implements MatchingLogic {
 
         const maybe = this.matcher.matchPrefix(is);
         if (isSuccessfulMatch(maybe)) {
-            if (this.pullUp) {
-                const f = this.pullUp + MATCH_INFO_SUFFIX;
-                const field = maybe.$value[f];
-                if (!field) {
-                    throw new Error(`Cannot pull up field ${f} in ${maybe}`);
-                }
-                maybe.match.$value = field.$value;
-                return matchPrefixSuccess(maybe.match)
-            } else {
-                return maybe;
-            }
+            return maybe;
         }
         return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
     }

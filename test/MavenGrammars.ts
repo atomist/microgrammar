@@ -42,7 +42,8 @@ export const ALL_DEPENDENCY_GRAMMAR =
         lx: "<artifactId>",
         artifact: LEGAL_VALUE,
         rx: "</artifactId>",
-        version: new Opt(VERSION, "version"),
+        _version: new Opt(VERSION),
+        version: ctx => ctx._version ? ctx._version.version : undefined
     });
 
 export const PLUGIN_GRAMMAR = Microgrammar.fromDefinitions<VersionedArtifact>({
@@ -69,7 +70,8 @@ export const ALL_PLUGIN_GRAMMAR =
         lx: "<artifactId>",
         artifact: LEGAL_VALUE,
         rx: "</artifactId>",
-        version: new Opt(VERSION, "version"),
+        _version: new Opt(VERSION),
+        version: ctx => ctx._version ? ctx._version.version : undefined
     });
 
 const property = {

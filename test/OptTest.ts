@@ -80,7 +80,8 @@ describe("Opt", () => {
             } as Term,
         );
         const mg = Microgrammar.fromDefinitions({
-                x: new Ogpt(nested, "x"),
+                _x: new Opt(nested),
+            x: ctx => ctx._x.x,
                 $id: "x",
             } as Term,
         );
