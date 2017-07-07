@@ -62,7 +62,7 @@ export class Break implements MatchingLogic {
         // We have found the terminal if we get here
         if (this.consume && isPatternMatch(terminalMatch)) {
             return new TerminalPatternMatch(this.$id, matched + terminalMatch.$matched,
-                terminalMatch.$offset, terminalMatch.$matched, context);
+                terminalMatch.$offset, terminalMatch.$value, context);
         }
         return new TerminalPatternMatch(this.$id, matched, is.offset, matched, context);
     }
