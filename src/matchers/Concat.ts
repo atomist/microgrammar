@@ -95,7 +95,6 @@ export class Concat implements MatchingLogic {
         let matched = "";
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
-                // JESS: pass the matcher in for requiredPrefix optimization?
                 const eat = readyToMatch(currentInputState, this.config);
                 currentInputState = eat.state;
                 matched += eat.skipped;

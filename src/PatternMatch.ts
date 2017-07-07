@@ -31,14 +31,7 @@ export abstract class PatternMatch {
      */
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,
-                public readonly $offset: number,
-                $context?: {}) {
-        // Copy top level context properties
-        for (const p in $context) {
-            if (!isSpecialMember(p) && typeof $context[p] !== "function") {
-                this[p] = $context[p];
-            }
-        }
+                public readonly $offset: number) {
     }
 
     /**
@@ -81,7 +74,7 @@ export class UndefinedPatternMatch extends PatternMatch {
     constructor(matcherId: string,
                 offset: number) {
 
-        super(matcherId, "", offset, {});
+        super(matcherId, "", offset);
     }
 }
 
@@ -99,6 +92,9 @@ export const MATCH_INFO_SUFFIX = "$match";
  */
 export class TreePatternMatch extends PatternMatch {
 
+    // JESS: can we put the matcher bits in a $valueMatchers
+    // and then not have a $value
+
     public readonly $value;
 
     constructor($matcherId: string,
@@ -110,8 +106,15 @@ export class TreePatternMatch extends PatternMatch {
         // JESS: I think the context processing should be at this level
         // only TreePatternMatches generate context
 
-        super($matcherId, $matched, $offset, context);
+        super($matcherId, $matched, $offset);
         this.$value = {};
+
+        // Copy top level context properties
+        for (const p in context) {
+            if (!isSpecialMember(p) && typeof context[p] !== "function") {
+                this[p] = context[p];
+            }
+        }
 
         for (let i = 0; i < $subMatches.length; i++) {
             const match = $subMatches[i];
