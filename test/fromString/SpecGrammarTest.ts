@@ -10,7 +10,7 @@ describe("SpecGrammar", () => {
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar, microgrammarSpecString);
         if (isPatternMatch(specMatch)) {
             assert(specMatch.these.length === 1);
-            const json = JSON.stringify(justTheData(specMatch));
+            const json = JSON.stringify(specMatch.matchedStructure());
             assert(json ===
                 JSON.stringify({
                     these: [{
@@ -39,26 +39,3 @@ describe("SpecGrammar", () => {
         }
     });
 });
-
-// This will let you print a nested match.
-// (Some of the internal fields are recursive, which can't print;
-//  this strips all internal fields)
-// I want this kind of functionality more globally; I'd rather return
-// to callers of the Microgrammar API matches that have only their data.
-// Or at least give them a way to convert it to only their data.
-function justTheData(match: any): any {
-    if (Array.isArray(match)) {
-        return match.map(m => justTheData(m));
-    }
-
-    if (typeof match !== "object") {
-        return match;
-    }
-    const output = {}; // it is not a const, I mutate it, but tslint won't let me declare otherwise :-(
-    for (const p in match.$context || match) {
-        if (!(p.indexOf("_") === 0 || p.indexOf("$") === 0)) {
-            output[p] = justTheData(match[p]);
-        }
-    }
-    return output;
-}

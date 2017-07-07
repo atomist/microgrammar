@@ -4,8 +4,8 @@ import { StringInputStream } from "../spi/StringInputStream";
 import { DefaultInputState } from "./DefaultInputState";
 import { InputStateManager } from "./InputStateManager";
 
-import { InputStream } from "../spi/InputStream";
 import { PatternMatch } from "../PatternMatch";
+import { InputStream } from "../spi/InputStream";
 
 /**
  * Return an input state from a string

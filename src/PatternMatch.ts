@@ -54,12 +54,17 @@ export abstract class PatternMatch implements MatchPrefixResult {
                 const val = $context[p];
                 if (typeof val !== "function") {
                     this[p] = val;
-                    if (this.$value && typeof this.$value === "object") {
-                        this.$value[p] = val;
-                    }
                 }
             }
         }
+    }
+
+    /**
+     * Return just the structure that was matched, throwing away offset and matcher information.
+     * This is useful if you want to store PatternMatches after you're done with their internal information.
+     */
+    public matchedStructure<T>(): T {
+        return justTheData(this);
     }
 
 }
@@ -125,8 +130,8 @@ export class TreePatternMatch extends PatternMatch {
     constructor($matcherId: string,
                 $matched: string,
                 $offset: number,
-                public $matchers: Matcher[],
-                public $subMatches: PatternMatch[],
+                $matchers: Matcher[],
+                $subMatches: PatternMatch[],
                 context: {}) {
 
         super($matcherId, $matched, $offset, context);
@@ -150,8 +155,15 @@ export class TreePatternMatch extends PatternMatch {
 
     public submatches() {
         const output = {};
-        for (let i = 0; i < this.$subMatches.length; i++) {
-            output[this.$matchers[i].name] = this.$subMatches[i];
+        for (const key of Object.getOwnPropertyNames(this)) {
+            if (key.charAt(0) !== "$") {
+                const value = this[key];
+                if (typeof value === "object") {
+                    output[key] = value.$match;
+                } else {
+                    output[key] = this.$value[key + MATCH_INFO_SUFFIX];
+                }
+            }
         }
         return output;
     }
@@ -159,7 +171,7 @@ export class TreePatternMatch extends PatternMatch {
 }
 
 export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
-    return mpr != null && (mpr as TreePatternMatch).$matchers !== undefined;
+    return mpr != null && (mpr as TreePatternMatch).submatches !== undefined;
 }
 
 /**
@@ -171,4 +183,21 @@ export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMa
  */
 export function isSpecialMember(name: string) {
     return name.indexOf("_") === 0;
+}
+
+function justTheData(match: object): any {
+    if (Array.isArray(match)) {
+        return match.map(m => justTheData(m));
+    }
+
+    if (typeof match !== "object") {
+        return match;
+    }
+    const output = {}; // it is not a const, I mutate it, but tslint won't let me declare otherwise :-(
+    for (const p in match) {
+        if (!(p.indexOf("_") === 0 || p.indexOf("$") === 0 || typeof match[p] === "function")) {
+            output[p] = justTheData(match[p]);
+        }
+    }
+    return output;
 }

@@ -48,20 +48,3 @@ describe("Elements default to non-greedy any", () => {
     });
 
 });
-
-function justTheData(match: object): any {
-    if (Array.isArray(match)) {
-        return match.map(m => justTheData(m));
-    }
-
-    if (typeof match !== "object") {
-        return match;
-    }
-    const output = {}; // it is not a const, I mutate it, but tslint won't let me declare otherwise :-(
-    for (const p in match) {
-        if (!(p.indexOf("_") === 0 || p.indexOf("$") === 0)) {
-            output[p] = justTheData(match[p]);
-        }
-    }
-    return output;
-}
