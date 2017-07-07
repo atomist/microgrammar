@@ -61,7 +61,8 @@ describe("ContextTest", () => {
     it("rewrites property using transformation", () => {
         const cc = new Concat({
             a: Integer,
-            b: [/[0-9]+/, b => parseInt(b, 10)],
+            stringB: /[0-9]+/,
+            b: ctx => parseInt(ctx.stringB, 10),
         });
         const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}) as SuccessfulMatch).match;
         assert(matched.a === 24);

@@ -50,13 +50,7 @@ export class Concat implements MatchingLogic {
                 if (def === undefined || def === null) {
                     throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
                 }
-                if (Array.isArray(def) && def.length === 2) {
-                    // It's a transformation of a matched return
-                    const ml = def[0];
-                    const m = toMatchingLogic(ml);
-                    const named = new NamedMatcher(stepName, m);
-                    this.matchSteps.push(new TransformingMatcher(named, def[1]));
-                } else if (typeof def === "function") {
+                if (typeof def === "function") {
                     // It's a calculation function
                     if (def.length === 0) {
                         // A no arg function is invalid
@@ -102,16 +96,15 @@ export class Concat implements MatchingLogic {
                 matched += eat.skipped;
 
                 // If it's a concat, give it a fresh context
-                const contextToUse = isConcat(step) ? {} : context;
-                const reportResult = step.matchPrefix(currentInputState, contextToUse);
+                const reportResult = step.matchPrefix(currentInputState, {});
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
-                    if (contextToUse !== context) {
+                    if (reportResult.context) {
                         // Bind the nested context if necessary
-                        context[step.$id] = contextToUse;
+                        context[step.$id] = reportResult.context;
                     } else {
                         context[step.$id] = report.$value;
                     }
@@ -138,7 +131,7 @@ export class Concat implements MatchingLogic {
             initialInputState.offset,
             this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
             matches,
-            context));
+            context), context);
     }
 
 }
@@ -200,32 +193,4 @@ export class NamedMatcher implements Matcher {
 
 export function isNamedMatcher(thing: MatchingLogic): thing is NamedMatcher {
     return ((thing as NamedMatcher).name !== undefined) && (thing as NamedMatcher).ml !== undefined;
-}
-
-/**
- * Transforms the result of a matcher using a function
- */
-class TransformingMatcher implements Matcher {
-
-    public readonly name = this.m.name;
-
-    constructor(public m: Matcher, private f: (val, ctx) => any) {
-    }
-
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        const mpr = this.m.matchPrefix(is, context) as PatternMatch;
-        if (isSuccessfulMatch(mpr)) {
-            const computed = this.f(mpr.$value, context);
-            context[this.name] = mpr[this.name] = computed;
-        }
-        return mpr;
-    }
-
-    public canStartWith(char: string): boolean {
-        return !this.m.canStartWith || this.m.canStartWith(char);
-    }
-
-    get requiredPrefix(): string {
-        return this.m.requiredPrefix;
-    }
 }

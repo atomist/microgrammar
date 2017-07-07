@@ -31,7 +31,7 @@ export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport
 }
 
 export class SuccessfulMatch implements MatchPrefixResult {
-    public constructor(public readonly match: PatternMatch) {
+    public constructor(public readonly match: PatternMatch, public readonly context?: {} ) {
         if (match === undefined) {
             throw new Error("You can't be successful with an undefined match");
         }
@@ -47,8 +47,8 @@ export class SuccessfulMatch implements MatchPrefixResult {
     get $value() { return this.match.$value; } // convenience
 }
 
-export function matchPrefixSuccess(match: PatternMatch): MatchPrefixResult {
-    return new SuccessfulMatch(match);
+export function matchPrefixSuccess(match: PatternMatch, context? : {}): MatchPrefixResult {
+    return new SuccessfulMatch(match, context);
 }
 
 export function isSuccessfulMatch(mpr: MatchPrefixResult): mpr is SuccessfulMatch {

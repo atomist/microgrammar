@@ -47,8 +47,10 @@ export class Opt implements MatchingLogic {
                     throw new Error(`Cannot pull up field ${f} in ${maybe}`);
                 }
                 maybe.match.$value = field.$value;
+                return matchPrefixSuccess(maybe.match)
+            } else {
+                return maybe;
             }
-            return maybe;
         }
         return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
     }
