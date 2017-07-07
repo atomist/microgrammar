@@ -11,7 +11,10 @@ import {isSuccessfulMatch} from "../src/MatchPrefixResult";
 describe("StringGrammarTest", () => {
 
     it("broken in concat", () => {
-        const strings = Microgrammar.fromDefinitions<any>({theString: new Alt(StringGrammar.stringGrammar, "la")}).findMatches('"    winter is coming " la la la');
+        const strings =
+            Microgrammar.fromDefinitions<any>(
+                {theString: new Alt(StringGrammar.stringGrammar, "la")}).
+            findMatches('"    winter is coming " la la la');
         const match = strings[0];
         assert(isPatternMatch(match));
 
@@ -25,9 +28,10 @@ describe("StringGrammarTest", () => {
     });
 
     it("not broken without concat", () => {
-        const result = new Alt(StringGrammar.stringGrammar, "la").matchPrefix(inputStateFromString('"    winter is coming " la la la'));
+        const result = new Alt(StringGrammar.stringGrammar, "la").
+        matchPrefix(inputStateFromString('"    winter is coming " la la la'));
         if (isSuccessfulMatch(result)) {
-            const match = result.match
+            const match = result.match;
             if (isPatternMatch(match)) {
                 assert(isPatternMatch(match));
                 assert(match.$matched === '"    winter is coming "');
@@ -45,7 +49,8 @@ class StringGrammar {
     public static readonly stringTextPattern = new Rep(new Alt("\\\"", /^[^"]/))
         .withConfig({consumeWhiteSpaceBetweenTokens: false});
 
-    public static readonly stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
+    public static readonly stringGrammar: Microgrammar<any> =
+        Microgrammar.fromDefinitions<any>({
         _p1: '"',
         charArray: StringGrammar.stringTextPattern,
         _p2: '"',

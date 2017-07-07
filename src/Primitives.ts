@@ -72,10 +72,9 @@ export abstract class AbstractRegex implements MatchingLogic {
             return results[0] === lookAt;
         }
 
-        function thereIsMoreToRead() : boolean {
+        function thereIsMoreToRead(): boolean {
             return lookAt.length === charactersToSee;
         }
-
 
         // Keep asking for more input if we have matched all of the input in
         // our lookahead buffer

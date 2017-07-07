@@ -42,7 +42,6 @@ export interface MatchingLogic extends Term {
 
 }
 
-
 /**
  * Matching logic associated with a name
  */

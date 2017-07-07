@@ -27,7 +27,7 @@ function isMatchVeto(thing: MatchStep): thing is MatchVeto {
  */
 export type MatchStep = Matcher | MatchVeto | ContextChange;
 
-const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requiredPrefix"]
+const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requiredPrefix"];
 
 /**
  * Represents a concatenation of multiple matchers. This is the normal
@@ -44,7 +44,6 @@ export class Concat implements MatchingLogic {
     // Used to check first matcher. We want to do that to check
     // for required prefix etc.
     private readonly firstMatcher: Matcher;
-
 
     constructor(public definitions: any, public config: Config = DefaultConfig) {
         for (const stepName in definitions) {

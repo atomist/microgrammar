@@ -177,13 +177,15 @@ describe("Microgrammar", () => {
 
     it("2 XML elements with intervening whitespace and leading junk via microgrammar", () => {
         // tslint:disable-next-line:max-line-length
-        testTwoXmlElements("and this is a load of nonsense we don't care about <foo>   <bar> who cares about this hunk of junk",
+        testTwoXmlElements(
+            "and this is a load of nonsense we don't care about <foo>   <bar> who cares about this hunk of junk",
             "foo", "bar");
     });
 
     it("2 XML elements with intervening whitespace and junk and leading junk via microgrammar", () => {
         // tslint:disable-next-line:max-line-length
-        testTwoXmlElements("and this is a load of nonsense we don't care about <foo> and SO **** 7&&@#$@#$ is this  <bar> who cares about this hunk of junk",
+        testTwoXmlElements(
+            "and this is a load of nonsense we don't care about <foo> and SO **** 7&&@#$@#$ is this  <bar> who cares about this hunk of junk",
             "foo", "bar");
     });
 
@@ -312,14 +314,15 @@ describe("Microgrammar", () => {
         const nameMatch = r0.second.$valueMatches.name as PatternMatch;
 
         for (const p in r0.second) {
-            console.log(`property ${p}:`)
-            console.log(`[${JSON.stringify(r0.second[p])}]`)
+            if ("tslint wants an if") {
+                console.log(`property ${p}:`);
+                console.log(`[${JSON.stringify(r0.second[p])}]`);
+            }
         }
 
-
-        console.log(`yo [${JSON.stringify(r0.second)}]`)
+        console.log(`yo [${JSON.stringify(r0.second)}]`);
         assert(nameMatch.$value === "second");
-        console.log("not yo")
+        console.log("not yo");
         assert(nameMatch.$matched === nameMatch.$value);
         assert(nameMatch.$offset === "<first><".length);
     });
