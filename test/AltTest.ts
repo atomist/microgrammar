@@ -11,21 +11,21 @@ describe("Alt", () => {
     it("should not match when neither A or B matches", () => {
         const alt = new Alt("A", "B");
         const is = inputStateFromString("friday 14");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         assert(!isSuccessfulMatch(m));
     });
 
     it("should not match when none of many matches", () => {
         const alt = new Alt("A", "B", "C", "D", "Cat");
         const is = inputStateFromString("friday 14");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         assert(!isSuccessfulMatch(m));
     });
 
     it("should match when A matches", () => {
         const alt = new Alt("A", "B");
         const is = inputStateFromString("AB");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
 
@@ -37,7 +37,7 @@ describe("Alt", () => {
     it("should match when B matches", () => {
         const alt = new Alt("A", "B");
         const is = inputStateFromString("BA");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
 
@@ -49,7 +49,7 @@ describe("Alt", () => {
     it("should match when C matches", () => {
         const alt = new Alt("A", "B", "C");
         const is = inputStateFromString("CXY");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             assert(m.$matched === "C");
         } else {
@@ -60,7 +60,7 @@ describe("Alt", () => {
     it("should match with 3 when early matcher matches", () => {
         const alt = new Alt("A", "B", "C");
         const is = inputStateFromString("AD");
-        const m = alt.matchPrefix(is, {});
+        const m = alt.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
 

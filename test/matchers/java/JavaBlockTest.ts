@@ -54,7 +54,7 @@ describe("JavaBlock", () => {
     it("should match till balance", () => {
         const balanced = "{  x = y; { }  2; }";
         const is = inputStateFromString(balanced + "// this is a comment }");
-        const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
+        const m = JavaBlock.matchPrefix(is) as PatternMatch;
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        assert(mmmm.$matched === balanced);
@@ -73,7 +73,7 @@ describe("JavaBlock", () => {
             right: "y",
             _whatever: new Break("//////"),
         });
-        const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {});
+        const m: any = javaBlockContaining(inner.matcher).matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        assert(mmmm.$matched === balanced);
@@ -89,7 +89,7 @@ describe("JavaBlock", () => {
 
     function match(what: string) {
         const is = inputStateFromString(what);
-        const m = JavaBlock.matchPrefix(is, {}) as PatternMatch;
+        const m = JavaBlock.matchPrefix(is) as PatternMatch;
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        assert(mmmm.$matched === what);
@@ -101,7 +101,7 @@ describe("JavaBlock", () => {
 
     function shouldNotMatch(what: string) {
         const is = inputStateFromString(what);
-        const m = JavaBlock.matchPrefix(is, {});
+        const m = JavaBlock.matchPrefix(is);
         assert(!isSuccessfulMatch(m));
     }
 

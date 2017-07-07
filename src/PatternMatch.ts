@@ -60,12 +60,13 @@ export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is Patte
  */
 export class TerminalPatternMatch extends PatternMatch {
 
+    public terminalness = true;
+
     constructor(matcherId: string,
                 matched: string,
                 offset: number,
-                public readonly $value: any,
-                context: {} = {}) {
-        super(matcherId, matched, offset, context);
+                public readonly $value: any) {
+        super(matcherId, matched, offset);
     }
 
 }
@@ -106,22 +107,29 @@ export class TreePatternMatch extends PatternMatch {
                 $matchers: Matcher[],
                 $subMatches: PatternMatch[],
                 context: {}) {
+        // JESS: I think the context processing should be at this level
+        // only TreePatternMatches generate context
 
         super($matcherId, $matched, $offset, context);
         this.$value = {};
 
         for (let i = 0; i < $subMatches.length; i++) {
-            const value = $subMatches[i].$value;
-            this.$value[$matchers[i].name] = value;
-            if (typeof value === "object") {
-                if (!(this as any)[$matchers[i].name]) {
-                    (this as any)[$matchers[i].name] = value;
+            const match = $subMatches[i];
+            const name = $matchers[i].name;
+            if (!isSpecialMember(name)) {
+                const value = $subMatches[i].$value;
+                this.$value[$matchers[i].name] = value;
+                if (isTreePatternMatch(match)) {
+                    this[name] = match;
+                } else {
+                    // if the context defined it already, let that stand
+                    if (this[name] === undefined) {
+                        this[name] = value;
+                    }
+                    // We've got nowhere to put the matching information on a simple value,
+                    // so create a parallel property on the parent with an out of band name
+                    this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
                 }
-             //   (this as any)[$matchers[i].name].$match = $subMatches[i];
-            } else {
-                // We've got nowhere to put the matching information on a simple value,
-                // so create a parallel property on the parent with an out of band name
-                this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
             }
         }
     }

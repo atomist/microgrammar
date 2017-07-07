@@ -31,11 +31,11 @@ class JavaBody implements MatchingLogic {
         }
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         const sm = new JavaContentStateMachine();
         let depth = 1;
         if (is.exhausted()) {
-            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is, context));
+            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
         }
 
         let currentIs = is;
@@ -70,12 +70,11 @@ class JavaBody implements MatchingLogic {
                 this.$id,
                 matched,
                 is.offset,
-                matched,
-                context));
+                matched));
         }
 
         // We supply the offset to preserve it in this match
-        return this.inner.matchPrefix(inputStateFromString(matched, is.offset), context);
+        return this.inner.matchPrefix(inputStateFromString(matched, is.offset));
     }
 }
 

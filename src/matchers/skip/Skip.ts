@@ -11,16 +11,16 @@ import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
  * Match the rest of the input.
- * @type {{$id: string; matchPrefix: ((is:InputState, context:{})=>TerminalPatternMatch)}}
+ * @type {{$id: string; matchPrefix: ((is:InputState)}}
  */
 export const RestOfInput: MatchingLogic = {
 
     $id: "RestOfInput",
 
-    matchPrefix(is: InputState, context: {}) {
+    matchPrefix(is: InputState) {
         const consumed = is.skipWhile(s => true, 1);
         return matchPrefixSuccess(
-            new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped, context));
+            new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped));
     },
 };
 

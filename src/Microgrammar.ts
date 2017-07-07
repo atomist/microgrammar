@@ -175,7 +175,7 @@ export abstract class MatchingMachine {
 
             const previousIs = currentInputState;
             const tryMatch =
-                currentMatcher.matchPrefix(currentInputState, {});
+                currentMatcher.matchPrefix(currentInputState);
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
@@ -200,7 +200,7 @@ export abstract class MatchingMachine {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }
                 } else {
-                    const observerMatch = this.observer.matchPrefix(previousIs, {});
+                    const observerMatch = this.observer.matchPrefix(previousIs);
                     if (isSuccessfulMatch(observerMatch)) {
                         currentMatcher = toMatchingLogic(this.observeMatch(observerMatch.match));
                     }

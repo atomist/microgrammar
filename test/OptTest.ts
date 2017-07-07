@@ -14,7 +14,7 @@ describe("Opt", () => {
     it("should match when matcher doesn't match", () => {
         const alt = new Opt("A");
         const is = inputStateFromString("friday 14");
-        const m = alt.matchPrefix(is, {}) as PatternMatch;
+        const m = alt.matchPrefix(is) as PatternMatch;
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             expect(mmmm.$value).to.equal(undefined);
@@ -27,7 +27,7 @@ describe("Opt", () => {
     it("should match when matcher matches", () => {
         const alt = new Opt("A");
         const is = inputStateFromString("AB");
-        const m = alt.matchPrefix(is, {}) as PatternMatch;
+        const m = alt.matchPrefix(is) as PatternMatch;
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             expect(mmmm.$value).to.equal("A");
@@ -41,7 +41,7 @@ describe("Opt", () => {
         const content = "";
         const mg = new Opt(new Literal("x"));
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as PatternMatch;
+        const result = mg.matchPrefix(is) as PatternMatch;
         // console.log(JSON.stringify(result));
         expect(result.$matched).to.equal("");
     });
@@ -50,7 +50,7 @@ describe("Opt", () => {
         const content = "x";
         const mg = new Opt(new Literal("x"));
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as PatternMatch;
+        const result = mg.matchPrefix(is) as PatternMatch;
         // console.log(JSON.stringify(result));
         expect(result.$matched).to.equal("x");
     });
@@ -80,7 +80,7 @@ describe("Opt", () => {
             } as Term,
         );
         const mg = Microgrammar.fromDefinitions({
-                x: new Opt(nested, "x"),
+                x: new Ogpt(nested, "x"),
                 $id: "x",
             } as Term,
         );

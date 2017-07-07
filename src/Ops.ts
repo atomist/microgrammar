@@ -32,13 +32,13 @@ export class Opt implements MatchingLogic {
         return `Opt[${this.matcher.$id}]`;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
             return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
         }
 
-        const maybe = this.matcher.matchPrefix(is, context);
+        const maybe = this.matcher.matchPrefix(is);
         if (isSuccessfulMatch(maybe)) {
             if (this.pullUp) {
                 const f = this.pullUp + MATCH_INFO_SUFFIX;
@@ -73,13 +73,13 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         if (is.exhausted()) {
             return new MatchFailureReport(this.$id, is.offset, {});
         }
 
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is, {});
+            const m = matcher.matchPrefix(is);
             if (isSuccessfulMatch(m)) {
                 return m;
             }
@@ -107,7 +107,7 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
     }
 
     function conditionalMatch(is: InputState, context: {}): MatchPrefixResult {
-        const result = matcher.matchPrefix(is, context);
+        const result = matcher.matchPrefix(is);
         return (isSuccessfulMatch(result) && matchTest(result.match)) ?
             result :
             new MatchFailureReport(this.$id, is.offset, context);

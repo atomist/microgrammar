@@ -15,7 +15,7 @@ export class Span implements MatchingLogic {
     constructor(public characters: string) {
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         let currentIs = is;
         let matched = "";
         while (!currentIs.exhausted() && this.characters.indexOf(currentIs.peek(1)) > -1) {
@@ -23,7 +23,7 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-           matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs, context) ) :
+           matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs) ) :
             new MatchFailureReport(this.$id, is.offset, context);
     }
 }

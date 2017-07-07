@@ -10,14 +10,14 @@ describe("Span", () => {
     it("span no match when no single char", () => {
         const span = new Span("abcd");
         const is = inputStateFromString("friday 14");
-        const m = span.matchPrefix(is, {});
+        const m = span.matchPrefix(is);
         assert(!isSuccessfulMatch(m));
     });
 
     it("span match when first char matches", () => {
         const span = new Span("abcdef");
         const is = inputStateFromString("friday 14");
-        const m = span.matchPrefix(is, {});
+        const m = span.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        assert(mmmm.$offset === 0);
@@ -31,7 +31,7 @@ describe("Span", () => {
     it("span match when some characters match", () => {
         const span = new Span("rabcdefi1");
         const is = inputStateFromString("friday 14");
-        const m = span.matchPrefix(is, {});
+        const m = span.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        assert(mmmm.$offset === 0);

@@ -88,7 +88,7 @@ export class Concat implements MatchingLogic {
         return this.firstMatcher.requiredPrefix;
     }
 
-    public matchPrefix(initialInputState: InputState, whyAcceptOne: {}): MatchPrefixResult {
+    public matchPrefix(initialInputState: InputState): MatchPrefixResult {
         const context = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -100,7 +100,7 @@ export class Concat implements MatchingLogic {
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                const reportResult = step.matchPrefix(currentInputState, context);
+                const reportResult = step.matchPrefix(currentInputState);
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
@@ -108,11 +108,9 @@ export class Concat implements MatchingLogic {
                     matched += report.$matched;
                     if (reportResult.context) {
                         // Bind the nested context if necessary
-                       // console.log(`Binding ${step.$id} to object [${JSON.stringify(report)}]`)
-                        context[step.$id] = report;
+                        context[step.$id] = reportResult.context;
                     } else {
-                       // console.log(`Binding ${step.$id} to  value [${JSON.stringify(report.$value)}]`)
-
+                        // otherwise, give the context the matcher's value.
                         context[step.$id] = report.$value;
                     }
                 } else {
@@ -186,8 +184,8 @@ export class NamedMatcher implements Matcher {
     constructor(public name: string, public ml: MatchingLogic) {
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        return this.ml.matchPrefix(is, context) as PatternMatch;
+    public matchPrefix(is: InputState): MatchPrefixResult {
+        return this.ml.matchPrefix(is) as PatternMatch;
     }
 
     public canStartWith(char: string): boolean {

@@ -573,6 +573,7 @@ describe("StringGrammarTest", () => {
             {stringOrLa: StringGrammar.stringGrammar}).findMatches('"winter is coming"');
         const match = strings[0];
         if (isPatternMatch(match)) {
+            console.log("Thes match is " + JSON.stringify(match))
             const mmmm = match as any;
             assert(mmmm.stringOrLa.$matched === '"winter is coming"');
             assert(mmmm.$matched === '"winter is coming"');

@@ -24,7 +24,7 @@ describe("Integer matching", () => {
 
     it("test one digit", () => {
         const is = inputStateFromString("1");
-        const m = Integer.matchPrefix(is, {});
+        const m = Integer.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        const match = mmmm;
@@ -38,7 +38,7 @@ describe("Integer matching", () => {
 
     it("test multiple digits", () => {
         const is = inputStateFromString("105x");
-        const m = Integer.matchPrefix(is, {});
+        const m = Integer.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        const match = mmmm;

@@ -37,33 +37,33 @@ export class Break implements MatchingLogic {
     // tslint:disable-next-line:member-ordering
     public $id = `Break[${this.breakOn}]`;
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         if (is.exhausted()) {
-            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is, context));
+            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
         }
 
         let currentIs = is;
         let matched = "";
-        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, context);
+        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs);
         while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
-                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, context))) {
-                    return new MatchFailureReport(this.$id, is.offset, context);
+                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs))) {
+                    return new MatchFailureReport(this.$id, is.offset);
                 }
             }
             matched += currentIs.peek(1);
             currentIs = currentIs.advance();
             if (!currentIs.exhausted()) {
-                terminalMatch = this.terminateOn.matchPrefix(currentIs, context);
+                terminalMatch = this.terminateOn.matchPrefix(currentIs);
             }
         }
         // We have found the terminal if we get here
         if (this.consume && isSuccessfulMatch(terminalMatch)) {
             return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched + terminalMatch.match.$matched,
-                terminalMatch.$offset, terminalMatch.match.$matched, context));
+                terminalMatch.$offset, terminalMatch.match.$matched));
         }
-        return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched, context));
+        return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched));
     }
 }
 

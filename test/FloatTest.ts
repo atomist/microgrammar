@@ -10,7 +10,7 @@ describe("Float", () => {
 
     it("test one digit", () => {
         const is = inputStateFromString("1");
-        const m = Float.matchPrefix(is, {});
+        const m = Float.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
@@ -24,7 +24,7 @@ describe("Float", () => {
 
     it("test multiple digits", () => {
         const is = inputStateFromString("105x");
-        const m = Float.matchPrefix(is, {});
+        const m = Float.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
@@ -38,7 +38,7 @@ describe("Float", () => {
 
     it("test with decimal", () => {
         const is = inputStateFromString("105.25555xxx");
-        const m = Float.matchPrefix(is, {});
+        const m = Float.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
@@ -52,7 +52,7 @@ describe("Float", () => {
 
     it("test signed", () => {
         const is = inputStateFromString("-105.25555xxx");
-        const m = Float.matchPrefix(is, {});
+        const m = Float.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
@@ -66,7 +66,7 @@ describe("Float", () => {
 
     it("test no leading digit", () => {
         const is = inputStateFromString("-.25555xxx");
-        const m = Float.matchPrefix(is, {});
+        const m = Float.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;

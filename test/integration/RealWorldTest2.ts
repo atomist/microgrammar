@@ -39,7 +39,7 @@ describe("GrammarWithOnlyARep", () => {
     it("can handle rep", () => {
         const rep = new Rep(AnyAnnotation);
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
-        const match = rep.matchPrefix(inputStateFromString(src), {}) as PatternMatch;
+        const match = rep.matchPrefix(inputStateFromString(src)) as PatternMatch;
         if (isSuccessfulMatch(match)) {
                        const mmmm = match.match as any;
                        assert(mmmm.$matched.trim() === `@ChangeControlled @Donkey("24", name = "Eeyore")`);

@@ -54,7 +54,7 @@ export class Repetition implements MatchingLogic, Configurable {
             this.matcher.requiredPrefix;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
@@ -63,9 +63,7 @@ export class Repetition implements MatchingLogic, Configurable {
             currentInputState = eat.state;
             matched += eat.skipped;
 
-            const contextToUse = isConcat(this.matcher) ? {} : context;
-
-            const result = this.matcher.matchPrefix(currentInputState, contextToUse);
+            const result = this.matcher.matchPrefix(currentInputState);
             if (!isSuccessfulMatch(result)) {
                 break;
             } else {
@@ -83,7 +81,7 @@ export class Repetition implements MatchingLogic, Configurable {
                 const eaten = readyToMatch(currentInputState, this.config);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, context);
+                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState);
                 if (isSuccessfulMatch(sepMatchResult)) {
                     const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched);
@@ -104,9 +102,8 @@ export class Repetition implements MatchingLogic, Configurable {
             matchPrefixSuccess(new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
-                values,
-                context)) :
-            new MatchFailureReport(this.$id, is.offset, context);
+                values)) :
+            new MatchFailureReport(this.$id, is.offset, {});
     }
 }
 

@@ -13,11 +13,11 @@ export class Literal implements MatchingLogic {
     constructor(public literal: string) {
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) ) :
-            new MatchFailureReport(this.$id, is.offset, context,
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal) ) :
+            new MatchFailureReport(this.$id, is.offset, {},
                 `Did not match literal [${this.literal}]: saw [${peek}]`);
     }
 
@@ -59,7 +59,7 @@ export abstract class AbstractRegex implements MatchingLogic {
         this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         let results: RegExpExecArray;
         let lookAt: string;
         let charactersToSee = 0;
@@ -93,7 +93,7 @@ export abstract class AbstractRegex implements MatchingLogic {
                 is.offset,
                 this.toValue(matched)));
         } else {
-            return new MatchFailureReport(this.$id, is.offset, context,
+            return new MatchFailureReport(this.$id, is.offset, {},
                 `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
         }
     }

@@ -32,7 +32,7 @@ export interface MatchingLogic extends Term {
      * @param context context: What's already bound by other matchers,
      * and what this matcher should bind to if it wishes
      */
-    matchPrefix(is: InputState, context: {}): MatchPrefixResult;
+    matchPrefix(is: InputState): MatchPrefixResult;
 
     /**
      * Optimization method. Can a match start with this character?

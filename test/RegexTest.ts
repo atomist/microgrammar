@@ -13,7 +13,7 @@ describe("Regex", () => {
     it("match word letters", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
-        const m = regexp.matchPrefix(is, {});
+        const m = regexp.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        const match = mmmm;
@@ -27,7 +27,7 @@ describe("Regex", () => {
     it("match word letters using anchor that will be recognized", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
-        const m = regexp.matchPrefix(is, {});
+        const m = regexp.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        const match = mmmm;
@@ -52,7 +52,7 @@ describe("Regex", () => {
     it("failed match", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("14 friday");
-        const m = regexp.matchPrefix(is, {});
+        const m = regexp.matchPrefix(is);
         assert(!isSuccessfulMatch(m));
     });
 
@@ -61,7 +61,7 @@ describe("Regex", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("**friday 14");
         const withSkip = new Break(regexp, true);
-        const m = withSkip.matchPrefix(is, {});
+        const m = withSkip.matchPrefix(is);
         if (isSuccessfulMatch(m)) {
                        const mmmm = m.match as any;
                        const match = m as any as PatternMatch;

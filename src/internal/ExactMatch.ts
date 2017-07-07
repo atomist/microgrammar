@@ -13,7 +13,7 @@ export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStrea
         desired: matcher,
         trailingJunk: RestOfInput,
     });
-    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)), {});
+    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)));
 
     if (isSuccessfulMatch(result)) {
         const detyped = result.match as any;
