@@ -23,7 +23,7 @@ describe("stringification", () => {
         assert(stringified.length < 1500);
     });
 
-    it.skip("can JSON stringify gloriously nested microgrammar result", () => {
+    it("can JSON stringify gloriously nested microgrammar result", () => {
         const content = "<foo>";
         const mg = Microgrammar.fromDefinitions({
             $id: "elt",
@@ -38,12 +38,12 @@ describe("stringification", () => {
         // console.log("Result is " + JSON.stringify(result));
         assert(result.length === 1);
         const r0 = result[0] as any;
-        // for (const prop in r0) {
-        //     console.log(r0[prop]);
-        //     console.log(`Name is ${prop}`);
-        //     console.log(JSON.stringify(r0[prop]));
-        //
-        // }
+        for (const prop in r0) {
+            console.log(r0[prop]);
+            console.log(`Name is ${prop}`);
+            console.log(JSON.stringify(r0[prop]));
+
+        }
 
         const stringified = JSON.stringify(r0);
         assert(stringified.indexOf("$resultingInputState") === -1);

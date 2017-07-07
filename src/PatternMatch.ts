@@ -155,8 +155,6 @@ export class TreePatternMatch extends PatternMatch {
                 if (!(this as any)[$matchers[i].name]) {
                     (this as any)[$matchers[i].name] = value;
                 }
-                const mn = this.$value[$matchers[i].name] as MatchInfo;
-                mn.$match = $subMatches[i];
                 (this as any)[$matchers[i].name].$match = $subMatches[i];
             } else {
                 // We've got nowhere to put the matching information on a simple value,
