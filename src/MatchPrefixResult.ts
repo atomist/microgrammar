@@ -14,11 +14,4 @@ export interface MatchPrefixResult {
      */
     readonly $matcherId: string;
 
-    /**
-     * Context bound to the match. Context values are normally
-     * bound directly to the match itself, so callers don't
-     * usually need to use this.
-     */
-    readonly $context: {};
-
 }

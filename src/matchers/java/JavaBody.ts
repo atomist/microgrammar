@@ -1,13 +1,7 @@
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
 import { MatchPrefixResult } from "../../MatchPrefixResult";
-import {
-    isPatternMatch,
-    isTreePatternMatch,
-    MatchFailureReport,
-    TerminalPatternMatch,
-    TreePatternMatch,
-} from "../../PatternMatch";
+import { TerminalPatternMatch } from "../../PatternMatch";
 import { Concat } from "../Concat";
 
 import { inputStateFromString } from "../../internal/InputStateFactory";
@@ -80,30 +74,8 @@ class JavaBody implements MatchingLogic {
                 context);
         }
 
-        const innerMatch = this.inner.matchPrefix(inputStateFromString(matched), context);
-        if (isPatternMatch(innerMatch)) {
-            if (isTreePatternMatch(innerMatch)) {
-                // console.log("body has parts");
-                // Tree; take its bits
-                // TODO: test offsets and then adjust them
-                return new TreePatternMatch(
-                    this.$id,
-                    matched,
-                    is.offset,
-                    innerMatch.$matchers,
-                    (innerMatch as TreePatternMatch).$subMatches.map(m => m.addOffset(is.offset)),
-                    context);
-
-            }
-            return new TerminalPatternMatch(
-                this.$id,
-                matched,
-                is.offset,
-                matched,
-                context);
-        } else {
-            return new MatchFailureReport(this.$id, is.offset, innerMatch);
-        }
+        // We supply the offset to preserve it in this match
+        return this.inner.matchPrefix(inputStateFromString(matched, is.offset), context);
     }
 }
 

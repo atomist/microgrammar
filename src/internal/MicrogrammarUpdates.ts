@@ -63,7 +63,7 @@ export class MicrogrammarUpdates {
                             throw new Error(`Cannot set [${key}] on [${target}]: invalidated by parent change`);
                         }
                         cs.change(submatch, newValue);
-                        if (isTreePatternMatch(submatch) && submatch.$subMatches.length > 0) {
+                        if (isTreePatternMatch(submatch) && submatch.submatches() !== {}) {
                             // The caller has set the value of an entire property block.
                             // Invalidate the properties under it
                             for (const prop of Object.getOwnPropertyNames(target)) {

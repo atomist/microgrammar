@@ -114,7 +114,8 @@ export class Concat implements MatchingLogic {
                         context[step.$id] = report.$value;
                     }
                 } else {
-                    return new MatchFailureReport(this.$id, initialInputState.offset, context);
+                    return new MatchFailureReport(this.$id, initialInputState.offset, context,
+                        `Failed at step '${step.name}' due to ${(report as any).description}`);
                 }
             } else {
                 // It's a function taking the context.
@@ -140,7 +141,7 @@ export class Concat implements MatchingLogic {
 
 }
 
-export function isConcat(m: MatchingLogic): boolean {
+export function isConcat(m: MatchingLogic): m is Concat {
     return m && !!((m as Concat).matchSteps || isConcat((m as NamedMatcher).ml));
 }
 

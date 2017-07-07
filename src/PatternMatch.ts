@@ -14,12 +14,12 @@ export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport
 
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
-                       public readonly $context: {},
-                       private readonly cause?: MatchFailureReport) {
+                       $context: {},
+                       private readonly cause?: string | MatchFailureReport) {
     }
 
     get description(): string {
-        return `Match failed on ${this.$matcherId}`;
+        return `Match failed on ${this.$matcherId}: ${this.cause}`;
     }
 }
 
@@ -34,7 +34,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
      * scalar or an array, or a nested structure. May or not be the
      * same as $matched property.
      */
-    public $value: any;
+    public abstract $value: any;
 
     /**
      * Represents a match
@@ -46,7 +46,7 @@ export abstract class PatternMatch implements MatchPrefixResult {
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,
                 public readonly $offset: number,
-                public readonly $context: {}) {
+                $context: {}) {
         // Copy top level context properties
         // tslint:disable-next-line:forin
         for (const p in $context) {
@@ -54,15 +54,18 @@ export abstract class PatternMatch implements MatchPrefixResult {
                 const val = $context[p];
                 if (typeof val !== "function") {
                     this[p] = val;
-                    if (this.$value && typeof this.$value === "object") {
-                        this.$value[p] = val;
-                    }
                 }
             }
         }
     }
 
-    public abstract addOffset(additionalOffset: number): PatternMatch;
+    /**
+     * Return just the structure that was matched, throwing away offset and matcher information.
+     * This is useful if you want to store PatternMatches after you're done with their internal information.
+     */
+    public matchedStructure<T>(): T {
+        return justTheData(this);
+    }
 
 }
 
@@ -83,15 +86,6 @@ export class TerminalPatternMatch extends PatternMatch {
         super(matcherId, matched, offset, context);
     }
 
-    public addOffset(additionalOffset: number) {
-        return new TerminalPatternMatch(
-            this.$matcherId,
-            this.$matched,
-            this.$offset + additionalOffset,
-            this.$value,
-            this.$context);
-    }
-
 }
 
 /**
@@ -105,11 +99,6 @@ export class UndefinedPatternMatch extends PatternMatch {
                 offset: number) {
 
         super(matcherId, "", offset, {});
-    }
-
-    public addOffset(additionalOffset: number) {
-        return new UndefinedPatternMatch(
-            this.$matcherId, this.$offset + additionalOffset);
     }
 }
 
@@ -141,8 +130,8 @@ export class TreePatternMatch extends PatternMatch {
     constructor($matcherId: string,
                 $matched: string,
                 $offset: number,
-                public $matchers: Matcher[],
-                public $subMatches: PatternMatch[],
+                $matchers: Matcher[],
+                $subMatches: PatternMatch[],
                 context: {}) {
 
         super($matcherId, $matched, $offset, context);
@@ -155,8 +144,6 @@ export class TreePatternMatch extends PatternMatch {
                 if (!(this as any)[$matchers[i].name]) {
                     (this as any)[$matchers[i].name] = value;
                 }
-                const mn = this.$value[$matchers[i].name] as MatchInfo;
-                mn.$match = $subMatches[i];
                 (this as any)[$matchers[i].name].$match = $subMatches[i];
             } else {
                 // We've got nowhere to put the matching information on a simple value,
@@ -166,20 +153,17 @@ export class TreePatternMatch extends PatternMatch {
         }
     }
 
-    public addOffset(additionalOffset: number) {
-        return new TreePatternMatch(
-            this.$matcherId,
-            this.$matched,
-            this.$offset + additionalOffset,
-            this.$matchers,
-            this.$subMatches.map(m => m.addOffset(additionalOffset)),
-            context);
-    }
-
     public submatches() {
         const output = {};
-        for (let i = 0; i < this.$subMatches.length; i++) {
-            output[this.$matchers[i].name] = this.$subMatches[i];
+        for (const key of Object.getOwnPropertyNames(this)) {
+            if (key.charAt(0) !== "$") {
+                const value = this[key];
+                if (typeof value === "object") {
+                    output[key] = value.$match;
+                } else {
+                    output[key] = this.$value[key + MATCH_INFO_SUFFIX];
+                }
+            }
         }
         return output;
     }
@@ -187,7 +171,7 @@ export class TreePatternMatch extends PatternMatch {
 }
 
 export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
-    return mpr != null && (mpr as TreePatternMatch).$matchers !== undefined;
+    return mpr != null && (mpr as TreePatternMatch).submatches !== undefined;
 }
 
 /**
@@ -199,4 +183,21 @@ export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMa
  */
 export function isSpecialMember(name: string) {
     return name.indexOf("_") === 0;
+}
+
+function justTheData(match: object): any {
+    if (Array.isArray(match)) {
+        return match.map(m => justTheData(m));
+    }
+
+    if (typeof match !== "object") {
+        return match;
+    }
+    const output = {}; // it is not a const, I mutate it, but tslint won't let me declare otherwise :-(
+    for (const p in match) {
+        if (!(p.indexOf("_") === 0 || p.indexOf("$") === 0 || typeof match[p] === "function")) {
+            output[p] = justTheData(match[p]);
+        }
+    }
+    return output;
 }

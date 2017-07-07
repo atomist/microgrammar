@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { inputStateFromString } from "../../src/internal/InputStateFactory";
-import { Term } from "../../src/Matchers";
 import { Concat } from "../../src/matchers/Concat";
 import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
 import { Integer } from "../../src/Primitives";
@@ -27,15 +26,12 @@ describe("Concat", () => {
         const mg = new Concat({
             $id: "Foo",
             num: /[1-9][0-9]*/,
-        } as Term);
+        });
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}) as any;
-        expect(isPatternMatch(result)).to.equal(true);
-        // expect(result.$matched).to.equal(content);
-        expect(result.$matchers.length).to.equal(1);
-        // expect(result.$matchers[0].$value).to.equal(2);
-        // expect(result.$value).to.equal(2);
-        expect(result.num).to.equal("2");
+        assert(isPatternMatch(result));
+        assert(result.$matched === content);
+        assert(result.num === "2");
     });
 
     it("integer with single digit", () => {

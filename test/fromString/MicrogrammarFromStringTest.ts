@@ -9,7 +9,7 @@ import {
     VersionedArtifact,
 } from "../MavenGrammars";
 
-describe("MicrogrammarFromStringTest", () => {
+describe("MicrogrammarFromString", () => {
 
     it("literal", () => {
         const content = "foo ";

@@ -7,7 +7,7 @@ import { Integer, LowercaseBoolean } from "../src/Primitives";
 
 describe("ContextTest", () => {
 
-    it("binds calculation to context", () => {
+    it("binds calculation", () => {
         const cc = new Concat({
             a: Integer,
             b: Integer,
@@ -16,7 +16,7 @@ describe("ContextTest", () => {
         const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.b === 7);
-        assert(matched.$context.sum === 24 + 7);
+        assert(matched.sum === 24 + 7);
     });
 
     it("doesn't veto match based on false calculation", () => {
@@ -29,7 +29,7 @@ describe("ContextTest", () => {
         const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
         assert(matched.b === 7);
-        assert(matched.$context.sum === 24 + 7);
+        assert(matched.sum === 24 + 7);
     });
 
     it("binds calculation to returned value", () => {
@@ -52,7 +52,7 @@ describe("ContextTest", () => {
         });
         const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
-        assert(matched.$context.b === 7);
+        assert(matched.b === 7);
     });
 
     it("rewrites property using transformation", () => {
@@ -62,7 +62,7 @@ describe("ContextTest", () => {
         });
         const matched: any = cc.matchPrefix(inputStateFromString("24 7"), {});
         assert(matched.a === 24);
-        assert(matched.$context.b === 7);
+        assert(matched.b === 7);
     });
 
     it("use function to dictate match", () => {
@@ -89,7 +89,7 @@ describe("ContextTest", () => {
         });
         const matched = cc.matchPrefix(inputStateFromString("gary 7 35"), {});
         assert(isPatternMatch(matched));
-        assert((matched.$context as any).promoted === "gary");
+        assert((matched as any).promoted === "gary");
     });
 
     it("handles multiple bound matches in microgrammar", () => {
