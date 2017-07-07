@@ -557,42 +557,6 @@ class StringGrammar {
 
 }
 
-describe("StringGrammarTest", () => {
-
-    it("string found in alt", () => {
-        const strings = Microgrammar.fromDefinitions<any>(
-            {stringOrLa: new Alt(StringGrammar.stringGrammar, "la")}).findMatches('"winter is coming" la la la');
-        assert(isPatternMatch(strings[0]));
-        assert(strings[0].$matched === '"winter is coming"');
-        const match = strings[0].matchedStructure();
-        assert(match.stringOrLa.text, "winter is coming");
-    });
-
-    it("string found", () => {
-        const strings = Microgrammar.fromDefinitions<any>(
-            {stringOrLa: StringGrammar.stringGrammar}).findMatches('"winter is coming"');
-        const match = strings[0];
-        if (isPatternMatch(match)) {
-            console.log("Thes match is " + JSON.stringify(match))
-            const mmmm = match as any;
-            assert(mmmm.stringOrLa.$matched === '"winter is coming"');
-            assert(mmmm.$matched === '"winter is coming"');
-            assert(mmmm.stringOrLa.text, "winter is coming");
-
-        } else {
-            assert.fail("Didn't match");
-        }
-    });
-
-    it("string found with escaped quotes", () => {
-            const strings = StringGrammar.stringGrammar.findMatches("\"winter is \\\"coming\\\"\"  ");
-            const match = strings[0];
-            assert(match.$matched === "\"winter is \\\"coming\\\"\"");
-            assert(match.text === "winter is \\\"coming\\\"");
-        },
-    );
-});
-
 interface CatsDogsAndPigs {
     dogs: string[];
     cats: string[];
