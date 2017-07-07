@@ -1,4 +1,4 @@
-import { Matcher } from "./Matchers";
+import {Matcher} from "./Matchers";
 
 /**
  * Returned when we failed to match prefix
@@ -32,15 +32,11 @@ export abstract class PatternMatch {
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,
                 public readonly $offset: number,
-                $context: {}) {
+                $context?: {}) {
         // Copy top level context properties
-        // tslint:disable-next-line:forin
         for (const p in $context) {
-            if (!isSpecialMember(p)) {
-                const val = $context[p];
-                if (typeof val !== "function") {
-                    this[p] = val;
-                }
+            if (!isSpecialMember(p) && typeof $context[p] !== "function") {
+                this[p] = $context[p];
             }
         }
     }
@@ -68,7 +64,7 @@ export class TerminalPatternMatch extends PatternMatch {
                 matched: string,
                 offset: number,
                 public readonly $value: any,
-                context: {}) {
+                context: {} = {}) {
         super(matcherId, matched, offset, context);
     }
 

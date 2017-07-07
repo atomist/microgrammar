@@ -91,8 +91,7 @@ export abstract class AbstractRegex implements MatchingLogic {
                 this.$id,
                 matched,
                 is.offset,
-                this.toValue(matched),
-                context));
+                this.toValue(matched)));
         } else {
             return new MatchFailureReport(this.$id, is.offset, context,
                 `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
