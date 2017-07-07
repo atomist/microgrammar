@@ -2,9 +2,11 @@ import { Microgrammar } from "../../../src/Microgrammar";
 import { Alt } from "../../../src/Ops";
 
 import * as assert from "power-assert";
-import { yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
+import { inputStateFromString } from "../../../src/internal/InputStateFactory";
+import { RestOfLine, yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
+import { isPatternMatch, PatternMatch } from "../../../src/PatternMatch";
 
-describe("fluent builder", () => {
+describe("skip", () => {
 
     const desirable = Microgrammar.fromDefinitions({
         beast: new Alt("dog", "cat", "pig"),
@@ -23,6 +25,20 @@ describe("fluent builder", () => {
     it("yada yada is unacceptable", () => {
         const m = desirable.firstMatch("bad pig whatever the hell shoplifting spa and then happiness , perhaps") as any;
         assert(!m);
+    });
+
+    it("rest of line to end of line", () => {
+        const input = "The quick brown\nfox jumps over\nthe lazy dog";
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}) as PatternMatch;
+        assert(isPatternMatch(pm));
+        assert(pm.$matched === "The quick brown");
+    });
+
+    it("rest of line consumes remaining input", () => {
+        const input = "The quick brown fox jumps over the lazy dog";
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}) as PatternMatch;
+        assert(isPatternMatch(pm));
+        assert(pm.$matched === input);
     });
 
     // const depsGrammar = Microgrammar.fromDefinitions<VersionedArtifact>({

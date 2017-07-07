@@ -23,6 +23,12 @@ export const RestOfInput: MatchingLogic = {
 };
 
 /**
+ * Match the rest of the current line
+ * @type {Break}
+ */
+export const RestOfLine: MatchingLogic = new Break("\n");
+
+/**
  * Match a string until the given logic. Wraps Break.
  * Binds the content until the break.
  */
