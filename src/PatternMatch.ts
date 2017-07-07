@@ -15,11 +15,11 @@ export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
                        $context: {},
-                       private readonly cause?: MatchFailureReport) {
+                       private readonly cause?: string | MatchFailureReport) {
     }
 
     get description(): string {
-        return `Match failed on ${this.$matcherId}`;
+        return `Match failed on ${this.$matcherId}: ${this.cause}`;
     }
 }
 
@@ -62,8 +62,6 @@ export abstract class PatternMatch implements MatchPrefixResult {
         }
     }
 
-    public abstract addOffset(additionalOffset: number): PatternMatch;
-
 }
 
 export function isPatternMatch(mpr: MatchPrefixResult | DismatchReport): mpr is PatternMatch {
@@ -83,15 +81,6 @@ export class TerminalPatternMatch extends PatternMatch {
         super(matcherId, matched, offset, context);
     }
 
-    public addOffset(additionalOffset: number) {
-        return new TerminalPatternMatch(
-            this.$matcherId,
-            this.$matched,
-            this.$offset + additionalOffset,
-            this.$value,
-            {});
-    }
-
 }
 
 /**
@@ -105,11 +94,6 @@ export class UndefinedPatternMatch extends PatternMatch {
                 offset: number) {
 
         super(matcherId, "", offset, {});
-    }
-
-    public addOffset(additionalOffset: number) {
-        return new UndefinedPatternMatch(
-            this.$matcherId, this.$offset + additionalOffset);
     }
 }
 
@@ -162,16 +146,6 @@ export class TreePatternMatch extends PatternMatch {
                 this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
             }
         }
-    }
-
-    public addOffset(additionalOffset: number) {
-        return new TreePatternMatch(
-            this.$matcherId,
-            this.$matched,
-            this.$offset + additionalOffset,
-            this.$matchers,
-            this.$subMatches.map(m => m.addOffset(additionalOffset)),
-            context);
     }
 
     public submatches() {

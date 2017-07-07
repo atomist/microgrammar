@@ -14,9 +14,11 @@ export class Literal implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        return (is.peek(this.literal.length) === this.literal) ?
+        const peek = is.peek(this.literal.length);
+        return (peek === this.literal) ?
             new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
-            new MatchFailureReport(this.$id, is.offset, context);
+            new MatchFailureReport(this.$id, is.offset, context,
+                `Did not match literal [${this.literal}]: saw [${peek}]`);
     }
 
     public canStartWith(char: string): boolean {
@@ -46,8 +48,6 @@ export abstract class AbstractRegex implements MatchingLogic {
         return `Regex: ${this.regex.source}`;
     }
 
-    protected log = false;
-
     /**
      * Match a regular expression
      * @param regex JavaScript regex to match. Don't use an end anchor.
@@ -72,10 +72,6 @@ export abstract class AbstractRegex implements MatchingLogic {
             results = this.regex.exec(remainder);
         } while (results && results[0] === remainder && remainder.length === seen);
 
-        if (this.log) {
-            console.log(`AbstractRegex match for ${this.regex} in [${remainder}...] was [${results}]`);
-        }
-
         if (results && results[0]) {
             // Matched may not be the same as results[0]
             // If there's not an anchor, we may match before
@@ -88,7 +84,8 @@ export abstract class AbstractRegex implements MatchingLogic {
                 this.toValue(actualMatch),
                 context);
         } else {
-            return new MatchFailureReport(this.$id, is.offset, context);
+            return new MatchFailureReport(this.$id, is.offset, context,
+                `Did not match regex /${this.regex.source}/ in [${remainder}]`);
         }
     }
 
