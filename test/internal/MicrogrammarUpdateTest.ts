@@ -29,8 +29,8 @@ describe("MicrogrammarUpdateTest", () => {
         updater.second = "<newSecond>";
         assert(updater.newContent() === "<first><newSecond>");
         const cs = new ChangeSet(content);
-        assert(result[0].second.$value.name$match);
-        cs.change(result[0].second.$value.name$match, "newSecond");
+        assert(result[0].second.$valueMatches.name);
+        cs.change(result[0].second.$valueMatches.name, "newSecond");
         assert(cs.updated() === "<first><newSecond>");
     });
 

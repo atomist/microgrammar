@@ -19,7 +19,7 @@ describe("Positioning", () => {
             assert(m);
             assert(m.startElement);
             // console.log(JSON.stringify(m.startElement));
-            assert(m.$value.startElement$match);
+            assert(m.$valueMatches.startElement);
         });
     });
 });

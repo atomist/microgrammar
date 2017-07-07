@@ -309,7 +309,7 @@ describe("Microgrammar", () => {
         assert(r0.first.$matched === "<first>");
         assert(r0.second.name === "second");
         // Now access match for the name
-        const nameMatch = r0.second.$value.name$match as PatternMatch;
+        const nameMatch = r0.second.$valueMatches.name as PatternMatch;
 
         for (const p in r0.second) {
             console.log(`property ${p}:`)

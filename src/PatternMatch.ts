@@ -79,21 +79,15 @@ export class UndefinedPatternMatch extends PatternMatch {
 }
 
 /**
- * Suffix for properties parallel to string properties that we can't enrich,
- * as they aren't objects
- * @type {string}
- */
-export const MATCH_INFO_SUFFIX = "$match";
-
-/**
  * Represents a complex pattern match. Sets properties to expose structure.
- * In the case of string properties, where we can't add a $match, we expose a parallel
- * <propertyName>$match property with that information.
+ * In the case of string properties, where we can't add provide the whole PatternMatch,
+ * we store that in a parallel object $valueMatches
  */
 export class TreePatternMatch extends PatternMatch {
 
-    // JESS: can we put the matcher bits in a $valueMatchers
-    // and then not have a $value
+    // JESS: can we not have a $value
+
+    public readonly $valueMatches = {};
 
     public readonly $value;
 
@@ -103,9 +97,6 @@ export class TreePatternMatch extends PatternMatch {
                 $matchers: Matcher[],
                 $subMatches: PatternMatch[],
                 context: {}) {
-        // JESS: I think the context processing should be at this level
-        // only TreePatternMatches generate context
-
         super($matcherId, $matched, $offset);
         this.$value = {};
 
@@ -131,7 +122,7 @@ export class TreePatternMatch extends PatternMatch {
                     }
                     // We've got nowhere to put the matching information on a simple value,
                     // so create a parallel property on the parent with an out of band name
-                    this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
+                    this.$valueMatches[$matchers[i].name] = $subMatches[i];
                 }
             }
         }
@@ -145,7 +136,7 @@ export class TreePatternMatch extends PatternMatch {
                 if (isPatternMatch(value)) {
                     output[key] = value;
                 } else {
-                    output[key] = this.$value[key + MATCH_INFO_SUFFIX];
+                    output[key] = this.$valueMatches[key];
                 }
             }
         }
