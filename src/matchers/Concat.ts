@@ -101,13 +101,15 @@ export class Concat implements MatchingLogic {
                 matched += eat.skipped;
 
                 // If it's a concat, give it a fresh context
-                const contextToUse = isConcat(step) ? {} : context;
+                const s = step as any;
+                const contextToUse = isConcat(step) ||
+                    s.ml && s.ml.$id && s.ml.$id.indexOf("Alt") === 0  ? {} : context;
                 const report = step.matchPrefix(currentInputState, contextToUse);
                 if (isPatternMatch(report)) {
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
-                    if (contextToUse !== context) {
+                    if (contextToUse !== context && typeof report.$value === "object") {
                         // Bind the nested context if necessary
                         context[step.$id] = contextToUse;
                     } else {
@@ -205,13 +207,13 @@ export function isNamedMatcher(thing: MatchingLogic): thing is NamedMatcher {
  */
 class TransformingMatcher implements Matcher {
 
-    public readonly name = this.m.name;
+    public readonly name = this.ml.name;
 
-    constructor(public m: Matcher, private f: (val, ctx) => any) {
+    constructor(public ml: Matcher, private f: (val, ctx) => any) {
     }
 
     public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
-        const mpr = this.m.matchPrefix(is, context) as PatternMatch;
+        const mpr = this.ml.matchPrefix(is, context) as PatternMatch;
         if (isPatternMatch(mpr)) {
             const computed = this.f(mpr.$value, context);
             context[this.name] = mpr[this.name] = computed;
@@ -220,10 +222,10 @@ class TransformingMatcher implements Matcher {
     }
 
     public canStartWith(char: string): boolean {
-        return !this.m.canStartWith || this.m.canStartWith(char);
+        return !this.ml.canStartWith || this.ml.canStartWith(char);
     }
 
     get requiredPrefix(): string {
-        return this.m.requiredPrefix;
+        return this.ml.requiredPrefix;
     }
 }
