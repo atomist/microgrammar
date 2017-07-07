@@ -306,11 +306,20 @@ describe("Microgrammar", () => {
         const r0 = result[0] as any;
         assert(result[0].$matched === content);
         assert(r0.first.name === "first");
-        assert(r0.first.$match.$matched === "<first>");
+        assert(r0.first.$matched === "<first>");
         assert(r0.second.name === "second");
         // Now access match for the name
-        const nameMatch = r0.second.name$match as PatternMatch;
+        const nameMatch = r0.second.$value.name$match as PatternMatch;
+
+        for (const p in r0.second) {
+            console.log(`property ${p}:`)
+            console.log(`[${JSON.stringify(r0.second[p])}]`)
+        }
+
+
+        console.log(`yo [${JSON.stringify(r0.second)}]`)
         assert(nameMatch.$value === "second");
+        console.log("not yo")
         assert(nameMatch.$matched === nameMatch.$value);
         assert(nameMatch.$offset === "<first><".length);
     });
@@ -327,13 +336,12 @@ describe("Microgrammar", () => {
             second: new Opt(element),
         });
         const result = mg.findMatches(content);
-        // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
-        // expect(r0.$name).to.equal("element");
+        assert(isPatternMatch(r0));
         assert(r0.$matched === content);
-        assert(r0.first.$match);
-        assert(r0.first.$match.$matched === "<first>");
+        assert(r0.first);
+        assert(r0.first.$matched === "<first>");
         assert(r0.second === undefined);
     });
 
@@ -356,7 +364,7 @@ describe("Microgrammar", () => {
         const r0 = result[0] as any;
         expect(r0.$name).to.equal("element");
         expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
+        expect(r0.first.$matched).to.equal("<first>");
         expect(r0.first.name).to.equal("first");
         expect(r0.second.name).to.equal("second");
     });
@@ -555,8 +563,8 @@ describe("StringGrammarTest", () => {
         const strings = Microgrammar.fromDefinitions<any>(
             {stringOrLa: new Alt(StringGrammar.stringGrammar, "la")}).findMatches('"winter is coming" la la la');
         assert(isPatternMatch(strings[0]));
+        assert(strings[0].$matched === '"winter is coming"');
         const match = strings[0].matchedStructure();
-        assert(match.$matched === '"winter is coming"');
         assert(match.stringOrLa.text, "winter is coming");
     });
 
@@ -566,8 +574,8 @@ describe("StringGrammarTest", () => {
         const match = strings[0];
         if (isPatternMatch(match)) {
             const mmmm = match as any;
+            assert(mmmm.stringOrLa.$matched === '"winter is coming"');
             assert(mmmm.$matched === '"winter is coming"');
-            console.log(JSON.stringify(mmmm.stringOrLa));
             assert(mmmm.stringOrLa.text, "winter is coming");
 
         } else {

@@ -29,8 +29,8 @@ describe("MicrogrammarUpdateTest", () => {
         updater.second = "<newSecond>";
         assert(updater.newContent() === "<first><newSecond>");
         const cs = new ChangeSet(content);
-        assert(result[0].second.name$match);
-        cs.change(result[0].second.name$match, "newSecond");
+        assert(result[0].second.$value.name$match);
+        cs.change(result[0].second.$value.name$match, "newSecond");
         assert(cs.updated() === "<first><newSecond>");
     });
 
@@ -45,6 +45,7 @@ describe("MicrogrammarUpdateTest", () => {
             },
         });
         const line = "Jenny 46 Coonamble, Mosman";
+
         const result = person.findMatches(line) as any;
         const updater = Microgrammar.updatableMatch(result[0], line);
         updater.address.number = 45;

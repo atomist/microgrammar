@@ -78,9 +78,9 @@ describe("JavaBlock", () => {
                        const mmmm = m.match as any;
                        assert(mmmm.$matched === balanced);
                        assert(mmmm.block.left === "x");
-                       assert(mmmm.block.left$match.$offset === 2);
+                       assert(mmmm.block.$value.left$match.$offset === 2);
                        assert(mmmm.block.right === "y");
-                       assert(mmmm.block.right$match.$offset === 6);
+                       assert(mmmm.block.$value.right$match.$offset === 6);
 
                     } else {
                        assert.fail("Didn't match");

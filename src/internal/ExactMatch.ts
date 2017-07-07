@@ -13,18 +13,18 @@ export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStrea
         desired: matcher,
         trailingJunk: RestOfInput,
     });
-    const match = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)), {});
+    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)), {});
 
-    if (isSuccessfulMatch(match)) {
-        const detyped = match.match as any;
+    if (isSuccessfulMatch(result)) {
+        const detyped = result.match as any;
         if (detyped.trailingJunk !== "") {
             return {description:
                 `Not all input was consumed: Left over [${detyped.trailingJunk.$matched}]`};
         } else {
-            return detyped.desired.$match as (PatternMatch & T);
+            return detyped.desired as (PatternMatch & T);
         }
     }
-    return match as MatchFailureReport;
+    return result as MatchFailureReport;
 }
 
 function toInputStream(input: string | InputStream): InputStream {

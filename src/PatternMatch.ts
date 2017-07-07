@@ -52,7 +52,7 @@ export abstract class PatternMatch {
 }
 
 export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
-    return mpr != null && (mpr as PatternMatch).$matched !== undefined;
+    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$matched !== undefined;
 }
 
 /**
@@ -82,15 +82,6 @@ export class UndefinedPatternMatch extends PatternMatch {
 
         super(matcherId, "", offset, {});
     }
-}
-
-/**
- * Properties we add to a matched node
- */
-export interface MatchInfo {
-
-    $match: PatternMatch;
-
 }
 
 /**
@@ -126,7 +117,7 @@ export class TreePatternMatch extends PatternMatch {
                 if (!(this as any)[$matchers[i].name]) {
                     (this as any)[$matchers[i].name] = value;
                 }
-                (this as any)[$matchers[i].name].$match = $subMatches[i];
+             //   (this as any)[$matchers[i].name].$match = $subMatches[i];
             } else {
                 // We've got nowhere to put the matching information on a simple value,
                 // so create a parallel property on the parent with an out of band name
@@ -140,8 +131,8 @@ export class TreePatternMatch extends PatternMatch {
         for (const key of Object.getOwnPropertyNames(this)) {
             if (key.charAt(0) !== "$") {
                 const value = this[key];
-                if (typeof value === "object") {
-                    output[key] = value.$match;
+                if (isPatternMatch(value)) {
+                    output[key] = value;
                 } else {
                     output[key] = this.$value[key + MATCH_INFO_SUFFIX];
                 }

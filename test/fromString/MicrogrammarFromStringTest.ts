@@ -1,13 +1,15 @@
 import { expect } from "chai";
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
-import { PatternMatch } from "../../src/PatternMatch";
+import {isPatternMatch, PatternMatch} from "../../src/PatternMatch";
 import { RepSep } from "../../src/Rep";
 import { RealWorldPom } from "../Fixtures";
 import {
     ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, LEGAL_VALUE, PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "../MavenGrammars";
+
+import * as assert from "power-assert";
 
 describe("MicrogrammarFromString", () => {
 
@@ -171,15 +173,8 @@ describe("MicrogrammarFromString", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
-        expect(result[0].$matched).to.equal(content);
         expect(r0.first.name).to.equal("first");
-        expect(r0.first.$match.$matched).to.equal("<first>");
         expect(r0.second.name).to.equal("second");
-        // Now access match for the name
-        const nameMatch = r0.second.name$match as PatternMatch;
-        expect(nameMatch.$value).to.equal("second");
-        expect(nameMatch.$matched).to.equal(nameMatch.$value);
-        expect(nameMatch.$offset).to.equal("<first><".length);
     });
 
     it("1 XML elements via nested microgrammar with optional not present", () => {
@@ -194,11 +189,11 @@ describe("MicrogrammarFromString", () => {
             second: new Opt(element),
         });
         const result = mg.findMatches(content);
-        // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
+        assert(isPatternMatch(r0));
         expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
+        expect(r0.first.$matched).to.equal("<first>");
         expect(r0.second).to.equal(undefined);
     });
 
@@ -218,8 +213,6 @@ describe("MicrogrammarFromString", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
-        expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
         expect(r0.first.name).to.equal("first");
         expect(r0.second.name).to.equal("second");
     });

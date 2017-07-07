@@ -2,7 +2,7 @@ import { Config, DefaultConfig } from "../Config";
 import { InputState } from "../InputState";
 import { Matcher, MatchingLogic, Term } from "../Matchers";
 import {isSuccessfulMatch, MatchFailureReport, matchPrefixSuccess} from "../MatchPrefixResult";
-import {MatchPrefixResult, SuccessfulMatch} from "../MatchPrefixResult";
+import {MatchPrefixResult} from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
 import {  isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
@@ -27,6 +27,8 @@ function isMatchVeto(thing: MatchStep): thing is MatchVeto {
  */
 export type MatchStep = Matcher | MatchVeto | ContextChange;
 
+const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requiredPrefix"]
+
 /**
  * Represents a concatenation of multiple matchers. This is the normal
  * way we compose matches, although this class needn't be used explicitly,
@@ -43,9 +45,10 @@ export class Concat implements MatchingLogic {
     // for required prefix etc.
     private readonly firstMatcher: Matcher;
 
+
     constructor(public definitions: any, public config: Config = DefaultConfig) {
         for (const stepName in definitions) {
-            if (["$id", "matchPrefix", "canStartWith", "requiredPrefix"].indexOf(stepName) === -1) {
+            if (methodsOnEveryMatchingLogic.indexOf(stepName) === -1) {
                 const def = definitions[stepName];
                 if (def === undefined || def === null) {
                     throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
@@ -68,7 +71,7 @@ export class Concat implements MatchingLogic {
                 }
             }
         }
-        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0]     as Matcher;
+        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
     }
 
     get $id() {
@@ -85,18 +88,19 @@ export class Concat implements MatchingLogic {
         return this.firstMatcher.requiredPrefix;
     }
 
-    public matchPrefix(initialInputState: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(initialInputState: InputState, whyAcceptOne: {}): MatchPrefixResult {
+        const context = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
         let matched = "";
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
+                // JESS: pass the matcher in for requiredPrefix optimization?
                 const eat = readyToMatch(currentInputState, this.config);
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                // If it's a concat, give it a fresh context
-                const reportResult = step.matchPrefix(currentInputState, {});
+                const reportResult = step.matchPrefix(currentInputState, context);
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
@@ -104,8 +108,11 @@ export class Concat implements MatchingLogic {
                     matched += report.$matched;
                     if (reportResult.context) {
                         // Bind the nested context if necessary
-                        context[step.$id] = reportResult.context;
+                       // console.log(`Binding ${step.$id} to object [${JSON.stringify(report)}]`)
+                        context[step.$id] = report;
                     } else {
+                       // console.log(`Binding ${step.$id} to  value [${JSON.stringify(report.$value)}]`)
+
                         context[step.$id] = report.$value;
                     }
                 } else {
@@ -118,7 +125,8 @@ export class Concat implements MatchingLogic {
                 // we should stop matching.
                 if (isMatchVeto(step)) {
                     if (step.veto(context) === false) {
-                        return new MatchFailureReport(this.$id, initialInputState.offset, context);
+                        return new MatchFailureReport(this.$id, initialInputState.offset, context,
+                          `Match vetoed by ${step.$id}`);
                     }
                 } else {
                     context[step.$id] = step.alter(context);

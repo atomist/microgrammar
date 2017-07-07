@@ -79,7 +79,7 @@ export class Alt implements MatchingLogic {
         }
 
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is, context);
+            const m = matcher.matchPrefix(is, {});
             if (isSuccessfulMatch(m)) {
                 return m;
             }
