@@ -19,7 +19,7 @@ describe("When", () => {
         if (!matcher.matchPrefix) {
             throw new Error("Error: matcher.matchPrefix returned by when is undefined");
         }
-        const m = matcher.matchPrefix(is);
+        const m = matcher.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
 
@@ -32,7 +32,7 @@ describe("When", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const matcher = when(primitive, pm => false);
-        const m = matcher.matchPrefix(is);
+        const m = matcher.matchPrefix(is, {}, {});
         expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
@@ -40,7 +40,7 @@ describe("When", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
-        const m = hatesFoo.matchPrefix(is);
+        const m = hatesFoo.matchPrefix(is, {}, {});
         expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
@@ -48,7 +48,7 @@ describe("When", () => {
         const primitive = new RegExp(/[a-z]+/);
         const is = inputStateFromString("bar and this is a load of other stuff");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
-        const m = hatesFoo.matchPrefix(is);
+        const m = hatesFoo.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
 
@@ -61,7 +61,7 @@ describe("When", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        const m = requiresFoo.matchPrefix(is);
+        const m = requiresFoo.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
 
@@ -74,7 +74,7 @@ describe("When", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        const m = requiresFoo.matchPrefix(is);
+        const m = requiresFoo.matchPrefix(is, {}, {});
         expect(isSuccessfulMatch(m)).to.equal(false);
     });
 

@@ -29,7 +29,6 @@ export abstract class PatternMatch {
      * @param $matcherId id of the matcher that matched
      * @param $matched the actual string content
      * @param $offset offset from 0 in input
-     * @param $context context bound during the match
      */
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,

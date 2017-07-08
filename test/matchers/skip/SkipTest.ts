@@ -29,13 +29,13 @@ describe("Skip", () => {
 
     it("rest of line to end of line", () => {
         const input = "The quick brown\nfox jumps over\nthe lazy dog";
-        const pm = RestOfLine.matchPrefix(inputStateFromString(input));
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}, {});
         assert(isSuccessfulMatch(pm) && pm.$matched === "The quick brown");
     });
 
     it("rest of line consumes remaining input", () => {
         const input = "The quick brown fox jumps over the lazy dog";
-        const pm = RestOfLine.matchPrefix(inputStateFromString(input));
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}, {});
         assert(isSuccessfulMatch(pm) && pm.$matched === input);
     });
 

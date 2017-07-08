@@ -54,7 +54,7 @@ export class Repetition implements MatchingLogic, Configurable {
             this.matcher.requiredPrefix;
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
@@ -63,7 +63,7 @@ export class Repetition implements MatchingLogic, Configurable {
             currentInputState = eat.state;
             matched += eat.skipped;
 
-            const result = this.matcher.matchPrefix(currentInputState);
+            const result = this.matcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
             if (!isSuccessfulMatch(result)) {
                 break;
             } else {
@@ -81,7 +81,7 @@ export class Repetition implements MatchingLogic, Configurable {
                 const eaten = readyToMatch(currentInputState, this.config);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState);
+                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
                 if (isSuccessfulMatch(sepMatchResult)) {
                     const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched);

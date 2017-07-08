@@ -23,7 +23,6 @@ export class MicrogrammarUpdates {
                 this.$changeSet.change(match, newValue);
             },
         };
-        console.log("The top level match target is " + JSON.stringify(match));
         this.addMatchesAsProperties(updating, updating.$changeSet, match);
         return updating as (T & MatchUpdater);
     }
@@ -39,15 +38,12 @@ export class MicrogrammarUpdates {
             const submatches = match.submatches();
             // tslint:disable-next-line:forin
             for (const key in submatches) {
-                console.log(`Making property for ${key}`);
                 const submatch = submatches[key] as PatternMatch;
                 let initialValue;
                 if (isTreePatternMatch(submatch) && submatch.submatches() === {}) {
-                    console.log(" It's a tree with no submatches");
                     initialValue = submatch.$matched; // or $value ? they should both be the string value.
                     // this could also be derived from content + offset, which reduces memory consumption
                 } else {
-                    console.log(" adding nested properties" + JSON.stringify(submatch));
                     initialValue = {};
                     this.addMatchesAsProperties(initialValue, cs, submatch);
                 }
@@ -80,7 +76,7 @@ export class MicrogrammarUpdates {
                 });
             }
         } else {
-            console.log(`Not a tree pattern match: ${JSON.stringify(match)}`);
+            //console.log(`Not a tree pattern match: ${JSON.stringify(match)}`);
         }
     }
 }

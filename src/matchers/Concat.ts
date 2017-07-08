@@ -14,8 +14,8 @@ import { readyToMatch } from "../internal/Whitespace";
  */
 export type TermDef = Term | string | RegExp;
 
-export interface MatchVeto { $id: string; veto: ((ctx: {}) => boolean); }
-export interface ContextChange { $id: string; alter: ((ctx: {}) => void ); }
+export interface MatchVeto { $id: string; veto: ((ctx: {}, thisMatchContext: {}, parseContext: {}) => boolean); }
+export interface ContextComputation { $id: string; compute: ((ctx: {}) => any ); }
 
 function isMatchVeto(thing: MatchStep): thing is MatchVeto {
     return isSpecialMember(thing.$id);
@@ -25,7 +25,7 @@ function isMatchVeto(thing: MatchStep): thing is MatchVeto {
  * Represents a step during matching. Can be a matcher or a function,
  * that can work on the context and return a fresh value.
  */
-export type MatchStep = Matcher | MatchVeto | ContextChange;
+export type MatchStep = Matcher | MatchVeto | ContextComputation;
 
 const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requiredPrefix"];
 
@@ -61,7 +61,7 @@ export class Concat implements MatchingLogic {
                     if (isSpecialMember(stepName)) {
                         this.matchSteps.push({$id: stepName, veto: def});
                     } else {
-                        this.matchSteps.push({$id: stepName, alter: def});
+                        this.matchSteps.push({$id: stepName, compute: def});
                     }
                 } else {
                     // It's a normal matcher
@@ -87,7 +87,7 @@ export class Concat implements MatchingLogic {
         return this.firstMatcher.requiredPrefix;
     }
 
-    public matchPrefix(initialInputState: InputState): MatchPrefixResult {
+    public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         const context = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -98,7 +98,7 @@ export class Concat implements MatchingLogic {
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                const reportResult = step.matchPrefix(currentInputState);
+                const reportResult = step.matchPrefix(currentInputState, thisMatchContext, parseContext);
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
@@ -116,16 +116,16 @@ export class Concat implements MatchingLogic {
                         `Failed at step '${step.name}' due to ${(reportResult as any).description}`);
                 }
             } else {
-                // It's a function taking the context.
+                // It's a function taking the contexts.
                 // Bind its result to the context and see if
                 // we should stop matching.
                 if (isMatchVeto(step)) {
-                    if (step.veto(context) === false) {
+                    if (step.veto(context, thisMatchContext, parseContext) === false) {
                         return new MatchFailureReport(this.$id, initialInputState.offset, context,
                           `Match vetoed by ${step.$id}`);
                     }
                 } else {
-                    context[step.$id] = step.alter(context);
+                    context[step.$id] = step.compute(context);
                 }
             }
         }
@@ -182,8 +182,8 @@ export class NamedMatcher implements Matcher {
     constructor(public name: string, public ml: MatchingLogic) {
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
-        return this.ml.matchPrefix(is) as PatternMatch;
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        return this.ml.matchPrefix(is, thisMatchContext, parseContext) as PatternMatch;
     }
 
     public canStartWith(char: string): boolean {

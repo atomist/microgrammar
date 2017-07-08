@@ -31,7 +31,7 @@ class JavaBody implements MatchingLogic {
         }
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         const sm = new JavaContentStateMachine();
         let depth = 1;
         if (is.exhausted()) {
@@ -74,7 +74,7 @@ class JavaBody implements MatchingLogic {
         }
 
         // We supply the offset to preserve it in this match
-        return this.inner.matchPrefix(inputStateFromString(matched, is.offset));
+        return this.inner.matchPrefix(inputStateFromString(matched, is.offset), thisMatchContext, parseContext);
     }
 }
 

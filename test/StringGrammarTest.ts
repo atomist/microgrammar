@@ -17,19 +17,13 @@ describe("StringGrammarTest", () => {
             findMatches('"    winter is coming " la la la');
         const match = strings[0];
         assert(isPatternMatch(match));
-
-        // for (const k in match) {
-        //     console.log(`[${k}]=${match[k]}`);
-        // }
-
-        console.log("The string is " + match.theString);
         assert(match.$matched === '"    winter is coming "');
         assert(match.theString.text, "    winter is coming");
     });
 
     it("not broken without concat", () => {
         const result = new Alt(StringGrammar.stringGrammar, "la").
-        matchPrefix(inputStateFromString('"    winter is coming " la la la'));
+        matchPrefix(inputStateFromString('"    winter is coming " la la la'), {}, {});
         if (isSuccessfulMatch(result)) {
             const match = result.match;
             if (isPatternMatch(match)) {

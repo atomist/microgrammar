@@ -38,25 +38,25 @@ export class Break implements MatchingLogic {
     // tslint:disable-next-line:member-ordering
     public $id = `Break[${this.breakOn}]`;
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
         }
 
         let currentIs = is;
         let matched = "";
-        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs);
+        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
         while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
-                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs))) {
+                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
                     return new MatchFailureReport(this.$id, is.offset);
                 }
             }
             matched += currentIs.peek(1);
             currentIs = currentIs.advance();
             if (!currentIs.exhausted()) {
-                terminalMatch = this.terminateOn.matchPrefix(currentIs);
+                terminalMatch = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
             }
         }
         // We have found the terminal if we get here

@@ -14,7 +14,7 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7")) as SuccessfulMatch).match;
+        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.sum === 24 + 7);
@@ -27,7 +27,7 @@ describe("ContextTest", () => {
             willBeFalse: ctx => typeof ctx.a === "string",
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7")) as SuccessfulMatch).match;
+        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.sum === 24 + 7);
@@ -39,7 +39,7 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7")) as SuccessfulMatch).match;
+        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
         assert(matched.a === 24);
         assert(matched.b === 7);
         assert(matched.sum === 24 + 7);
@@ -53,7 +53,7 @@ describe("ContextTest", () => {
                 ctx.b = parseInt(ctx.b, 10);
             },
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7")) as SuccessfulMatch).match;
+        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
         assert(matched.a === 24);
         assert(matched.b === 7);
     });
@@ -64,7 +64,7 @@ describe("ContextTest", () => {
             stringB: /[0-9]+/,
             b: ctx => parseInt(ctx.stringB, 10),
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7")) as SuccessfulMatch).match;
+        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
         assert(matched.a === 24);
         assert(matched.b === 7);
     });
@@ -78,9 +78,9 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = cc.matchPrefix(inputStateFromString("true 7 35"));
+        const matched = cc.matchPrefix(inputStateFromString("true 7 35"), {}, {});
         assert(isSuccessfulMatch(matched));
-        const matched2 = cc.matchPrefix(inputStateFromString("false 7 35"));
+        const matched2 = cc.matchPrefix(inputStateFromString("false 7 35"), {}, {});
         assert(!isSuccessfulMatch(matched2));
     });
 
@@ -95,7 +95,7 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = (cc.matchPrefix(inputStateFromString("gary 7 35")) as SuccessfulMatch).match;
+        const matched = (cc.matchPrefix(inputStateFromString("gary 7 35"), {}, {}) as SuccessfulMatch).match;
         assert((matched as any).promoted === "gary");
     });
 

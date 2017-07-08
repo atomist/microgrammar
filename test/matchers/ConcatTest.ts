@@ -16,7 +16,7 @@ describe("Concat", () => {
             name: "foo",
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is);
+        const result = mg.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(result)) {
             expect((result.match as any).name).to.equal("foo");
             assert(result.$matched === "foo");
@@ -32,7 +32,7 @@ describe("Concat", () => {
             num: /[1-9][0-9]*/,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmm = result.match as any;
             assert(mmm.$matched === content);
@@ -46,7 +46,7 @@ describe("Concat", () => {
             num: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             // expect(mmmm.$matched).to.equal(content);
@@ -67,7 +67,7 @@ describe("Concat", () => {
             num: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             expect(mmmm.$matched).to.equal(content);
@@ -86,7 +86,7 @@ describe("Concat", () => {
             days: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             expect(mmmm.$matched).to.equal(content);
@@ -108,7 +108,7 @@ describe("Concat", () => {
         });
         const content = "Lizzy+Katrina";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             assert(mmmm.name === "Lizzy");
@@ -129,7 +129,7 @@ describe("Concat", () => {
         });
         const content = "Lizzy+Katrina,Terri";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             assert(mmmm.names[0], "Lizzy");
@@ -152,7 +152,7 @@ describe("Concat", () => {
         });
         const content = "Jardine vs Bradman,Woodfull";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             assert(mmmm.gentlemen.names[0], "Jardine");
@@ -172,7 +172,7 @@ describe("Concat", () => {
         });
         const content = "Jardine vs Bradman,Woodfull";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             assert(mmmm.gentlemen[0], "Jardine");
@@ -200,7 +200,7 @@ describe("Concat", () => {
         });
         const content = "Jardine(bat),Wyatt(bat) vs Bradman(bat,bowl),Woodfull(bat,keep)";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as any;
+        const result = mg.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             assert(mmmm.gentlemen.names[0].name, "Jardine");
@@ -224,7 +224,7 @@ describe("Concat", () => {
             hobbies: new RepSep(/[a-z]+/, ","),
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is) as PatternMatch;
+        const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
             const r = mmmm as any;

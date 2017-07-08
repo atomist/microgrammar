@@ -27,12 +27,14 @@ export interface MatchingLogic extends Term {
 
     /**
      * Core matching method. Can we match at the present point in the
-     * given InputState
+     * given InputState? Context arguments may be used by matchers that
+     * require knowledge of current match or global context.
      * @param is input state
-     * @param context context: What's already bound by other matchers,
-     * and what this matcher should bind to if it wishes
+     * @param thisMatchContext context for this match, beginning from the top level and
+     * passed into nested matchers
+     * @param parseContext context for the whole parsing operation we're in: e.g. parsing a file
      */
-    matchPrefix(is: InputState): MatchPrefixResult;
+    matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult;
 
     /**
      * Optimization method. Can a match start with this character?

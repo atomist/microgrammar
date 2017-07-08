@@ -88,12 +88,14 @@ export class Microgrammar<T> implements Term {
      * @param input
      * @param stopAfterMatch() function that can cause matching to stop after a given match.
      * Often used to stop after one.
+     * @param parseContext context for the whole parsing operation
      * @return {PatternMatch[]}
      */
     public findMatches(input: string | InputStream,
+                       parseContext?: {},
                        stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch).withConfig(this.config);
-        lm.consume(input);
+        lm.consume(input, parseContext);
         return lm.matches as Array<T & PatternMatch>;
     }
 
@@ -113,10 +115,11 @@ export class Microgrammar<T> implements Term {
      * This style of usage is more like a traditional parser,
      * building an AST for a whole file.
      * @param input
+     * @param parseContext context for the whole parsing operation
      * @return {PatternMatch&T}
      */
-    public exactMatch(input: string | InputStream): PatternMatch & T | DismatchReport {
-      return exactMatch<T>(this.matcher, input);
+    public exactMatch(input: string | InputStream, parseContext = {}): PatternMatch & T | DismatchReport {
+      return exactMatch<T>(this.matcher, input, parseContext);
     }
 
 }
@@ -158,8 +161,9 @@ export abstract class MatchingMachine {
     /**
      * Stream-oriented matching. The observer can match in parallel with the main matcher.
      * @param input
+     * @param parseContext context for the whole parsing operation
      */
-    public consume(input: string | InputStream): void {
+    public consume(input: string | InputStream, parseContext = {}): void {
         const omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
 
         let currentMatcher: MatchingLogic = this.matcher;
@@ -175,7 +179,7 @@ export abstract class MatchingMachine {
 
             const previousIs = currentInputState;
             const tryMatch =
-                currentMatcher.matchPrefix(currentInputState);
+                currentMatcher.matchPrefix(currentInputState, {}, parseContext);
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
@@ -200,7 +204,7 @@ export abstract class MatchingMachine {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }
                 } else {
-                    const observerMatch = this.observer.matchPrefix(previousIs);
+                    const observerMatch = this.observer.matchPrefix(previousIs, {}, parseContext);
                     if (isSuccessfulMatch(observerMatch)) {
                         currentMatcher = toMatchingLogic(this.observeMatch(observerMatch.match));
                     }

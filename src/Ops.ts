@@ -32,13 +32,13 @@ export class Opt implements MatchingLogic {
         return `Opt[${this.matcher.$id}]`;
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
             return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
         }
 
-        const maybe = this.matcher.matchPrefix(is);
+        const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
         if (isSuccessfulMatch(maybe)) {
             return maybe;
         }
@@ -63,13 +63,13 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             return new MatchFailureReport(this.$id, is.offset, {});
         }
 
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is);
+            const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
             if (isSuccessfulMatch(m)) {
                 return m;
             }
@@ -96,8 +96,8 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
         }
     }
 
-    function conditionalMatch(is: InputState, context: {}): MatchPrefixResult {
-        const result = matcher.matchPrefix(is);
+    function conditionalMatch(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
         return (isSuccessfulMatch(result) && matchTest(result.match)) ?
             result :
             new MatchFailureReport(this.$id, is.offset, context);

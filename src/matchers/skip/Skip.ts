@@ -30,11 +30,18 @@ export const RestOfInput: MatchingLogic = {
 export const RestOfLine: MatchingLogic = new Break("\n");
 
 /**
- * Match a string until the given logic. Wraps Break.
+ * Match a string until the given matcher. Wraps Break.
  * Binds the content until the break.
  */
 export function takeUntil(what): MatchingLogic {
     return new Break(what);
+}
+
+/**
+ * Skip all content until the given matcher. Bind its match
+ */
+export function skipTo(what): MatchingLogic {
+    return new Break(what, true);
 }
 
 /**
