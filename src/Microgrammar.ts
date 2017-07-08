@@ -37,6 +37,7 @@ export class Updatable<T> {
 }
 
 /**
+ * Central class for microgrammar usage.
  * Represents a microgrammar that we can use to match input
  * in a string or stream.
  * Modifications are tracked and we can get an updated string

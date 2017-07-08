@@ -9,6 +9,24 @@ import {  PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 import { readyToMatch } from "./internal/Whitespace";
 
 /**
+ * Match zero or more of these
+ * @param o matcher
+ * @return {Rep1}
+ */
+export function zeroOrMore(o: any): Repetition {
+    return new Rep(o);
+}
+
+/**
+ * Match at least one of these
+ * @param o matcher
+ * @return {Rep1}
+ */
+export function atLeastOne(o: any): Repetition {
+    return new Rep1(o);
+}
+
+/**
  * Handle repetition, with or without a separator.
  * Prefer subclasses for simplicity and clarity.
  * By default, match zero or more times without a separator

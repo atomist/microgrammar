@@ -3,13 +3,11 @@ import { Microgrammar } from "../../../src/Microgrammar";
 import { PatternMatch } from "../../../src/PatternMatch";
 import { Regex } from "../../../src/Primitives";
 
-import { Break } from "../../../src/matchers/snobol/Break";
-
 import { inputStateFromString } from "../../../src/internal/InputStateFactory";
 
 import * as assert from "power-assert";
-import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 import { RestOfInput } from "../../../src/matchers/skip/Skip";
+import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 
 describe("JavaBlock", () => {
 
