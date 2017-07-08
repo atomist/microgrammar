@@ -1,9 +1,9 @@
-import {expect} from "chai";
-import {inputStateFromString} from "../src/internal/InputStateFactory";
-import {isSuccessfulMatch} from "../src/MatchPrefixResult";
-import {when} from "../src/Ops";
+import { expect } from "chai";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
+import { when } from "../src/Ops";
 
-import {Literal} from "../src/Primitives";
+import { Literal } from "../src/Primitives";
 
 import * as assert from "power-assert";
 
@@ -51,7 +51,6 @@ describe("When", () => {
         const m = hatesFoo.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
         } else {
             assert.fail("Didn't match");
         }

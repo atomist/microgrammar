@@ -1,8 +1,7 @@
-import {expect} from "chai";
-import {inputStateFromString} from "../src/internal/InputStateFactory";
-import {isSuccessfulMatch} from "../src/MatchPrefixResult";
-import {PatternMatch} from "../src/PatternMatch";
-import {Float} from "../src/Primitives";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
+import { PatternMatch } from "../src/PatternMatch";
+import { Float } from "../src/Primitives";
 
 import * as assert from "power-assert";
 
@@ -14,9 +13,8 @@ describe("Float", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
-            expect(match.$matched).to.equal("1");
-            expect(match.$value).to.equal(1.0);
-
+            assert(match.$matched === "1");
+            assert(match.$value === 1.0);
         } else {
             assert.fail("Didn't match");
         }
@@ -28,9 +26,8 @@ describe("Float", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
-            expect(match.$matched).to.equal("105");
-            expect(match.$value).to.equal(105.0);
-
+            assert(match.$matched === "105");
+            assert(match.$value === 105.0);
         } else {
             assert.fail("Didn't match");
         }
@@ -42,9 +39,8 @@ describe("Float", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
-            expect(match.$matched).to.equal("105.25555");
-            expect(match.$value).to.equal(105.25555);
-
+            assert(match.$matched === "105.25555");
+            assert(match.$value === 105.25555);
         } else {
             assert.fail("Didn't match");
         }
@@ -56,9 +52,8 @@ describe("Float", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
-            expect(match.$matched).to.equal("-105.25555");
-            expect(match.$value).to.equal(-105.25555);
-
+            assert(match.$matched === "-105.25555");
+            assert(match.$value === -105.25555);
         } else {
             assert.fail("Didn't match");
         }
@@ -70,9 +65,8 @@ describe("Float", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             const match = mmmm as PatternMatch;
-            expect(match.$matched).to.equal("-.25555");
-            expect(match.$value).to.equal(-0.25555);
-
+            assert(match.$matched === "-.25555");
+            assert(match.$value === -0.25555);
         } else {
             assert.fail("Didn't match");
         }

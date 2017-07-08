@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import {Microgrammar} from "../../src/Microgrammar";
+import { Microgrammar } from "../../src/Microgrammar";
 
 function XmlElement() {
     return Microgrammar.fromString("<${name}>", {

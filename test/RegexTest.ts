@@ -19,7 +19,6 @@ describe("Regex", () => {
             const match = mmmm;
             assert(match.$matched === "friday");
             assert(mmmm.$offset === 0);
-
         } else {
             assert.fail("Didn't match");
         }
@@ -33,7 +32,6 @@ describe("Regex", () => {
             const match = mmmm;
             assert(match.$matched === "friday");
             assert(mmmm.$offset === 0);
-
         } else {
             assert.fail("Didn't match");
         }
@@ -63,7 +61,6 @@ describe("Regex", () => {
         const withSkip = new Break(regexp, true);
         const m = withSkip.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
             const match = m as any as PatternMatch;
             assert(match.$matched === "**friday");
             assert(match.$offset === 2);

@@ -30,7 +30,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             // expect(is.peek(2)).to.equal(mmmm.$resultingInputState.peek(2));
-
         } else {
             assert.fail("Didn't match");
         }
@@ -49,7 +48,6 @@ describe("Rep", () => {
         const m = rep.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
         } else {
             assert.fail("Didn't match");
         }
@@ -61,7 +59,6 @@ describe("Rep", () => {
         const m = rep.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
         } else {
             assert.fail("Didn't match");
         }
@@ -76,7 +73,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert((mmmm).$matched === toMatch);
-
         } else {
             assert.fail("Didn't match");
         }
@@ -91,7 +87,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert((mmmm).$matched === "And");
-
         } else {
             assert.fail("Didn't match");
         }
@@ -115,7 +110,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert((mmmm).$matched === toMatch);
-
         } else {
             assert.fail("Didn't match");
         }
@@ -130,7 +124,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert((mmmm).$matched === toMatch);
-
         } else {
             assert.fail("Didn't match");
         }
@@ -144,7 +137,6 @@ describe("Rep", () => {
         const m = rep.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
         } else {
             assert.fail("Didn't match");
         }
@@ -171,7 +163,6 @@ describe("Rep", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert(mmmm.$value.length === 3);
-
         } else {
             assert.fail("Didn't match");
         }

@@ -1,11 +1,14 @@
 import { expect } from "chai";
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
-import {isPatternMatch, PatternMatch} from "../../src/PatternMatch";
+import { isPatternMatch } from "../../src/PatternMatch";
 import { RepSep } from "../../src/Rep";
 import { RealWorldPom } from "../Fixtures";
 import {
-    ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, LEGAL_VALUE, PLUGIN_GRAMMAR,
+    ALL_PLUGIN_GRAMMAR,
+    ARTIFACT_VERSION_GRAMMAR,
+    LEGAL_VALUE,
+    PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "../MavenGrammars";
 

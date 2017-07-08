@@ -1,4 +1,3 @@
-import { expect } from "chai";
 
 import { InputStream } from "../../src/spi/InputStream";
 import { DEPENDENCY_GRAMMAR } from "../MavenGrammars";
@@ -17,18 +16,18 @@ describe("InputState", () => {
 
     it("remainder is all", () => {
         const is = inputStateFromString("foo bar");
-        expect(is.peek(10)).equals("foo bar");
+        assert(is.peek(10) === "foo bar");
     });
 
     it("remainder is correct after advance", () => {
         const is = inputStateFromString("foo bar").advance();
         // expect(is.content).equals("foo bar");
-        expect(is.peek(1000)).equals("oo bar");
+        assert(is.peek(1000) === "oo bar");
     });
 
     it("remainder is correct after attempt advance past end", () => {
         const is = inputStateFromString("f").advance();
-        expect(is.peek(10)).equals("");
+        assert(is.peek(10) === "");
     });
 
     it("peek is correct after read", () => {
@@ -82,14 +81,14 @@ describe("InputState", () => {
 
     it("read ahead does not dirty parent", () => {
         const stream = new ReleasingStringInputStream("the quick brown fox jumps over the lazy dog");
-        expect(stream.offset).to.equal(0);
+        assert(stream.offset === 0);
         const state0 = inputStateFromStream(stream);
         const state1 = state0.advance();
-        expect(state1.offset).to.equal(1);
+        assert(state1.offset === 1);
         const state2 = state1.advance();
         const state3 = state2.advance().advance();
-        expect(state3.consume("quick").peek(" brown".length)).to.equal(" brown");
-        expect(state0.offset).to.equal(0);
+        assert(state3.consume("quick").peek(" brown".length) === " brown");
+        assert(state0.offset === 0);
         // This isn't valid as this state is stale
         // expect(state0.peek("the quick brown".length)).to.equal("the quick brown");
     });
@@ -135,7 +134,7 @@ describe("InputState", () => {
         for (const s of [easyMatch, requiresBacktracking, requiresMoreBacktracking]) {
             const input = new ReleasingStringInputStream(s);
             const pm = complexGrammar.firstMatch(input);
-            expect(pm.version).to.equal("0.1.1");
+            assert(pm.version === "0.1.1");
         }
     });
 

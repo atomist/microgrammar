@@ -1,12 +1,12 @@
 import "mocha";
-import {inputStateFromString} from "../src/internal/InputStateFactory";
-import {Microgrammar} from "../src/Microgrammar";
-import {Alt} from "../src/Ops";
-import {isPatternMatch} from "../src/PatternMatch";
-import {Rep} from "../src/Rep";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { Microgrammar } from "../src/Microgrammar";
+import { Alt } from "../src/Ops";
+import { isPatternMatch } from "../src/PatternMatch";
+import { Rep } from "../src/Rep";
 
 import * as assert from "power-assert";
-import {isSuccessfulMatch} from "../src/MatchPrefixResult";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 
 describe("StringGrammarTest", () => {
 

@@ -1,6 +1,5 @@
 import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/java/JavaBody";
 import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
-import { PatternMatch } from "../../src/PatternMatch";
 
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";

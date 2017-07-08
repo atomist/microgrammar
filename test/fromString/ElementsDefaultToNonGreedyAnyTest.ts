@@ -1,7 +1,6 @@
-import {isSuccessfulMatch} from "../../src/MatchPrefixResult";
+import { Microgrammar } from "../../src/Microgrammar";
+import { isPatternMatch } from "../../src/PatternMatch";
 import assert = require("power-assert");
-import {Microgrammar} from "../../src/Microgrammar";
-import {isPatternMatch} from "../../src/PatternMatch";
 
 describe("Elements default to non-greedy any", () => {
 
@@ -25,7 +24,6 @@ describe("Elements default to non-greedy any", () => {
             const mmmm = result as any;
             assert(mmmm.fruit === "banana");
             assert(mmmm.drink === "juice");
-
         } else {
             assert.fail("Didn't match");
         }
@@ -47,24 +45,21 @@ describe("Elements default to non-greedy any", () => {
         if (isPatternMatch(result)) {
             const mmmm = result as any;
             assert(mmmm.fruit.trim() === "banana");
-
         } else {
             assert.fail("Didn't match");
         }
     });
 
-    it.skip("trims whitespace from the captured text",
-        () => {
-            const content = "->   banana   <- ";
-            const mg = Microgrammar.fromString("-> ${fruit} <-");
-            const result: any = mg.exactMatch(content);
-            if (isPatternMatch(result)) {
-                const mmmm = result as any;
-                assert(mmmm.fruit === "banana");
-
-            } else {
-                assert.fail("Didn't match");
-            }
-        });
+    it.skip("trims whitespace from the captured text", () => {
+        const content = "->   banana   <- ";
+        const mg = Microgrammar.fromString("-> ${fruit} <-");
+        const result: any = mg.exactMatch(content);
+        if (isPatternMatch(result)) {
+            const mmmm = result as any;
+            assert(mmmm.fruit === "banana");
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
 });
