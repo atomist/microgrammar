@@ -1,8 +1,8 @@
-import {InputState} from "../../InputState";
-import {MatchingLogic} from "../../Matchers";
-import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "../../MatchPrefixResult";
-import {TerminalPatternMatch} from "../../PatternMatch";
-import {toMatchingLogic} from "../Concat";
+import { InputState } from "../../InputState";
+import { MatchingLogic } from "../../Matchers";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
+import { TerminalPatternMatch } from "../../PatternMatch";
+import { toMatchingLogic } from "../Concat";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm

@@ -1,4 +1,4 @@
-import {Matcher} from "./Matchers";
+import { Matcher } from "./Matchers";
 
 /**
  * Returned when we failed to match prefix

@@ -6,7 +6,7 @@ import { MatchingLogic } from "../../Matchers";
 import { Break } from "../snobol/Break";
 
 import { InputState } from "../../InputState";
-import {matchPrefixSuccess} from "../../MatchPrefixResult";
+import { matchPrefixSuccess } from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**

@@ -1,10 +1,9 @@
 import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
-import { MatchingLogic} from "./Matchers";
-import { isConcat, toMatchingLogic } from "./matchers/Concat";
-import { isSuccessfulMatch } from "./MatchPrefixResult";
-import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
-import {  PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+import { MatchingLogic } from "./Matchers";
+import { toMatchingLogic } from "./matchers/Concat";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 
 import { readyToMatch } from "./internal/Whitespace";
 

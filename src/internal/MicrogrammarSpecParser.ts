@@ -1,12 +1,12 @@
-import {Config, DefaultConfig} from "../Config";
-import {MatchingLogic} from "../Matchers";
-import {Concat, toMatchingLogic} from "../matchers/Concat";
-import {Literal} from "../Primitives";
+import { Config, DefaultConfig } from "../Config";
+import { MatchingLogic } from "../Matchers";
+import { Concat, toMatchingLogic } from "../matchers/Concat";
+import { Literal } from "../Primitives";
 
-import {Break} from "../matchers/snobol/Break";
-import {isPatternMatch} from "../PatternMatch";
-import {exactMatch} from "./ExactMatch";
-import {MicrogrammarSpec, specGrammar} from "./SpecGrammar";
+import { Break } from "../matchers/snobol/Break";
+import { isPatternMatch } from "../PatternMatch";
+import { exactMatch } from "./ExactMatch";
+import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
 
 /**
  * Parses microgrammars expressed as strings.

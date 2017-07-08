@@ -1,8 +1,8 @@
-import {InputState} from "./InputState";
-import {MatchingLogic} from "./Matchers";
-import {toMatchingLogic} from "./matchers/Concat";
-import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
-import {UndefinedPatternMatch} from "./PatternMatch";
+import { InputState } from "./InputState";
+import { MatchingLogic } from "./Matchers";
+import { toMatchingLogic } from "./matchers/Concat";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { UndefinedPatternMatch } from "./PatternMatch";
 
 /**
  * Optional match on the given matcher

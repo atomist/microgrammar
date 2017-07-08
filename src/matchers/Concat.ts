@@ -1,10 +1,9 @@
 import { Config, DefaultConfig } from "../Config";
 import { InputState } from "../InputState";
 import { Matcher, MatchingLogic, Term } from "../Matchers";
-import {isSuccessfulMatch, MatchFailureReport, matchPrefixSuccess} from "../MatchPrefixResult";
-import {MatchPrefixResult} from "../MatchPrefixResult";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
-import {  isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
+import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
 
 import { readyToMatch } from "../internal/Whitespace";

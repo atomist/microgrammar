@@ -1,4 +1,4 @@
-import {PatternMatch} from "./PatternMatch";
+import { PatternMatch } from "./PatternMatch";
 
 /**
  * Result of attempting to match a pattern: MatchFailureReport or SuccessfulMatch.
