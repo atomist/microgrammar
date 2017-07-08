@@ -2,9 +2,11 @@ import { Microgrammar } from "../../../src/Microgrammar";
 import { Alt } from "../../../src/Ops";
 
 import * as assert from "power-assert";
-import { yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
+import { inputStateFromString } from "../../../src/internal/InputStateFactory";
+import { RestOfLine, yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
+import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 
-describe("fluent builder", () => {
+describe("Skip", () => {
 
     const desirable = Microgrammar.fromDefinitions({
         beast: new Alt("dog", "cat", "pig"),
@@ -25,21 +27,16 @@ describe("fluent builder", () => {
         assert(!m);
     });
 
-    // const depsGrammar = Microgrammar.fromDefinitions<VersionedArtifact>({
-    //     _startElt: yadaYadaThenThisButNotThat("<dependency>", "<dependencyManagement>"),
-    //         ...GAV_CONCAT,
-    //     _bind: ctx => {
-    //         console.log("GAV = " + JSON.stringify(ctx))
-    //         return ctx.dependency = asVersionedArtifact(ctx.tags);
-    //     }
-    // });
-    //
-    // it("handles XML path", () => {
-    //     const pom = POM_WITH_DEPENDENCY_MANAGEMENT;
-    //
-    //     const deps = depsGrammar.findMatches(pom);
-    //     assert(deps.length === 1);
-    //     assert(deps[0].group === "com.foo.bar");
-    // });
+    it("rest of line to end of line", () => {
+        const input = "The quick brown\nfox jumps over\nthe lazy dog";
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input));
+        assert(isSuccessfulMatch(pm) && pm.$matched === "The quick brown");
+    });
+
+    it("rest of line consumes remaining input", () => {
+        const input = "The quick brown fox jumps over the lazy dog";
+        const pm = RestOfLine.matchPrefix(inputStateFromString(input));
+        assert(isSuccessfulMatch(pm) && pm.$matched === input);
+    });
 
 });

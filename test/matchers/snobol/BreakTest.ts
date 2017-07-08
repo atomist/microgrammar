@@ -1,7 +1,7 @@
 import {Term} from "../../../src/Matchers";
 import {Concat} from "../../../src/matchers/Concat";
 import {PatternMatch} from "../../../src/PatternMatch";
-import {Regex} from "../../../src/Primitives";
+import { Integer, Regex } from "../../../src/Primitives";
 
 import {Break} from "../../../src/matchers/snobol/Break";
 
@@ -93,6 +93,15 @@ describe("Break", () => {
         } else {
             assert.fail("Didn't match");
         }
+    });
+
+    it("break and consume uses value", () => {
+        const b = new Break(Integer, true);
+        const is = inputStateFromString("friday 14");
+        const m = b.matchPrefix(is) as any;
+        assert(isSuccessfulMatch(m));
+        assert(m.$matched === "friday 14");
+        assert(m.$value === 14);
     });
 
     it("break matches nothing as it comes immediately", () => {

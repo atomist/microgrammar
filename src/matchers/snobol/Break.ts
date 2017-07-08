@@ -16,6 +16,7 @@ import {toMatchingLogic} from "../Concat";
 export class Break implements MatchingLogic {
 
     public terminateOn: MatchingLogic;
+
     private badMatcher: MatchingLogic;
 
     /**
@@ -61,7 +62,7 @@ export class Break implements MatchingLogic {
         // We have found the terminal if we get here
         if (this.consume && isSuccessfulMatch(terminalMatch)) {
             return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched + terminalMatch.match.$matched,
-                terminalMatch.$offset, terminalMatch.match.$matched));
+                terminalMatch.$offset, terminalMatch.match.$value));
         }
         return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched));
     }
