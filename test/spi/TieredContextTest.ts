@@ -51,7 +51,7 @@ describe("Per match context", () => {
     it("should be available within nested object and communicate back", () => {
         const mg = Microgrammar.fromDefinitions<{ name: string, zip: string }>({
             name: /[A-Z][a-z]+/,
-            _add: (_, matchContext) => matchContext.something = "magic",
+            _addToMatchContext: (_, matchContext) => matchContext.something = "magic",
             address: {
                 zip: skipTo(/[0-9]{5}/),
                 _verify: (_, matchContext) => {
@@ -66,10 +66,7 @@ describe("Per match context", () => {
         });
 
         const input = "Sandy:12345, Candice,94131   Terri:12345 Ahmed:64321";
-        const glob = {
-            zips: [],
-        };
-        const matches = mg.findMatches(input, glob);
+        const matches = mg.findMatches(input);
         assert(matches.length === 4);
     });
 

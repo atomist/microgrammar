@@ -76,7 +76,7 @@ export class MicrogrammarUpdates {
                 });
             }
         } else {
-            //console.log(`Not a tree pattern match: ${JSON.stringify(match)}`);
+            // console.log(`Not a tree pattern match: ${JSON.stringify(match)}`);
         }
     }
 }

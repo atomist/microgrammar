@@ -1,7 +1,6 @@
-
 import { JavaBlock, javaBlockContaining } from "../../../src/matchers/java/JavaBody";
 import { Microgrammar } from "../../../src/Microgrammar";
-import {  PatternMatch } from "../../../src/PatternMatch";
+import { PatternMatch } from "../../../src/PatternMatch";
 import { Regex } from "../../../src/Primitives";
 
 import { Break } from "../../../src/matchers/snobol/Break";
@@ -9,7 +8,8 @@ import { Break } from "../../../src/matchers/snobol/Break";
 import { inputStateFromString } from "../../../src/internal/InputStateFactory";
 
 import * as assert from "power-assert";
-import {isSuccessfulMatch} from "../../../src/MatchPrefixResult";
+import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
+import { RestOfInput } from "../../../src/matchers/skip/Skip";
 
 describe("JavaBlock", () => {
 
@@ -46,23 +46,20 @@ describe("JavaBlock", () => {
         shouldNotMatch("{  ");
     });
 
-    // TODO need to implement this
-    it("should ignore { in multiline comments", () => {
-        // console.log("TODO: ignore { in multiline comments")
-    });
+    it("should ignore { in multiline comments");
 
     it("should match till balance", () => {
         const balanced = "{  x = y; { }  2; }";
         const is = inputStateFromString(balanced + "// this is a comment }");
         const m = JavaBlock.matchPrefix(is, {}, {}) as PatternMatch;
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
-                       assert(mmmm.$matched === balanced);
+            const mmmm = m.match as any;
+            assert(mmmm.$matched === balanced);
 
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   });
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
     it("should match inner structure", () => {
         const balanced = "{ x = y; }";
@@ -71,33 +68,32 @@ describe("JavaBlock", () => {
             left: new Regex(/[a-z]+/),
             equals: "=",
             right: "y",
-            _whatever: new Break("//////"),
+            _whatever: RestOfInput,
         });
         const m: any = javaBlockContaining(inner.matcher).matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
-                       assert(mmmm.$matched === balanced);
-                       assert(mmmm.block.left === "x");
-                       assert(mmmm.block.$valueMatches.left.$offset === 2);
-                       assert(mmmm.block.right === "y");
-                       assert(mmmm.block.$valueMatches.right.$offset === 6);
+            const mmmm = m.match as any;
+            assert(mmmm.$matched === balanced);
+            assert(mmmm.block.left === "x");
+            assert(mmmm.block.$valueMatches.left.$offset === 2);
+            assert(mmmm.block.right === "y");
+            assert(mmmm.block.$valueMatches.right.$offset === 6);
 
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   });
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
     function match(what: string) {
         const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefix(is, {}, {}) as PatternMatch;
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
-                       assert(mmmm.$matched === what);
-
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   }
+            const mmmm = m.match as any;
+            assert(mmmm.$matched === what);
+        } else {
+            assert.fail("Didn't match");
+        }
+    }
 
     function shouldNotMatch(what: string) {
         const is = inputStateFromString(what);

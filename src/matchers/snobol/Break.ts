@@ -28,15 +28,28 @@ export class Break implements MatchingLogic {
      * @param butNot pattern we don't want to see before the desired determinal match.
      * If we see this pattern before, the match breaks.
      */
-    constructor(private breakOn: any, private consume: boolean = false, butNot?: any) {
+    constructor(breakOn: any, private consume: boolean = false, butNot?: any) {
         this.terminateOn = toMatchingLogic(breakOn);
         if (butNot) {
             this.badMatcher = toMatchingLogic(butNot);
         }
     }
 
-    // tslint:disable-next-line:member-ordering
-    public $id = `Break[${this.breakOn}]`;
+    get $id() {
+        return `Break[${this.terminateOn}]`;
+    }
+
+    public canStartWith(char: string): boolean {
+        return (this.consume && !this.badMatcher && this.terminateOn.canStartWith) ?
+            this.terminateOn.canStartWith(char) :
+            true;
+    }
+
+    get requiredPrefix() {
+        return (this.consume && !this.badMatcher) ?
+            this.terminateOn.requiredPrefix :
+            undefined;
+    }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
