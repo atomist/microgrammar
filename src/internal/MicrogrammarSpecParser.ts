@@ -1,12 +1,12 @@
-import {Config, DefaultConfig} from "../Config";
-import {MatchingLogic} from "../Matchers";
-import {Concat, toMatchingLogic} from "../matchers/Concat";
-import {Literal} from "../Primitives";
+import { MatchingLogic } from "../Matchers";
+import { Concat, toMatchingLogic } from "../matchers/Concat";
+import { Literal } from "../Primitives";
 
-import {Break} from "../matchers/snobol/Break";
-import {isPatternMatch} from "../PatternMatch";
-import {exactMatch} from "./ExactMatch";
-import {MicrogrammarSpec, specGrammar} from "./SpecGrammar";
+import { WhiteSpaceHandler } from "../Config";
+import { Break } from "../matchers/snobol/Break";
+import { isPatternMatch } from "../PatternMatch";
+import { exactMatch } from "./ExactMatch";
+import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
 
 /**
  * Parses microgrammars expressed as strings.
@@ -15,36 +15,38 @@ export class MicrogrammarSpecParser {
 
     private anonFieldCount = 0;
 
-    public fromString(spec: string, elements: object = {}, config: Config = DefaultConfig): Concat {
-
+    public fromString(spec: string, elements: object = {}): Concat {
         const mpr = exactMatch<MicrogrammarSpec>(specGrammar, spec);
         if (!isPatternMatch(mpr)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
         }
         const match = mpr as MicrogrammarSpec;
-
-        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match, config);
-
+        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,
+            (elements as WhiteSpaceHandler).$consumeWhiteSpaceBetweenTokens !== false);
         const matcherSequence2 = this.populateSpecifiedElements(elements, matcherSequence1);
-
         const matcherSequence3 = this.inferUnspecifiedElements(matcherSequence2);
-
         const definitions = this.definitionsFromSpecs(spec, matcherSequence3);
-
-        return new Concat(definitions, config);
+        const concat = new Concat(definitions);
+        // Copy config to Concat
+        for (const key in elements) {
+            if (key.charAt(0) === "$") {
+                concat[key] = elements[key];
+            }
+        }
+        return concat;
     }
 
-    private definitionSpecsFromMicrogrammarSpec(match: MicrogrammarSpec, config: Config): DefinitionSpec[] {
+    private definitionSpecsFromMicrogrammarSpec(match: MicrogrammarSpec, consumeWhiteSpaceBetweenTokens: boolean): DefinitionSpec[] {
         // flatMap would work better here
         const matcherSequence1: DefinitionSpec[] = [];
         match.these.forEach(
             t => {
                 if (t.literal.length > 0) {
-                    matcherSequence1.push({anonymous: this.matcherForLiteral(t.literal, config)});
+                    matcherSequence1.push({anonymous: this.matcherForLiteral(t.literal, consumeWhiteSpaceBetweenTokens)});
                 }
                 matcherSequence1.push({reference: t.element.elementName});
             });
-        matcherSequence1.push({anonymous: this.matcherForLiteral(match.trailing, config)});
+        matcherSequence1.push({anonymous: this.matcherForLiteral(match.trailing, consumeWhiteSpaceBetweenTokens)});
         return matcherSequence1;
     }
 
@@ -100,8 +102,8 @@ export class MicrogrammarSpecParser {
         return definitions;
     }
 
-    private matcherForLiteral(literal: string, config: Config) {
-        if (!config.consumeWhiteSpaceBetweenTokens) {
+    private matcherForLiteral(literal: string, consumeWhiteSpaceBetweenTokens: boolean) {
+        if (!consumeWhiteSpaceBetweenTokens) {
             return new Literal(literal);
         }
         // TODO why, if we don't put this in, does it fail?

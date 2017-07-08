@@ -3,7 +3,7 @@ import "mocha";
 import * as assert from "power-assert";
 import { Microgrammar } from "../src/Microgrammar";
 
-describe("stringification", () => {
+describe("stringification and matchedStructure", () => {
 
     it("can JSON stringify microgrammar result", () => {
         const content = "<foo>";

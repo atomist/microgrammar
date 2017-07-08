@@ -1,7 +1,7 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
-import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "./MatchPrefixResult";
-import {  TerminalPatternMatch } from "./PatternMatch";
+import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
  * Match a literal string

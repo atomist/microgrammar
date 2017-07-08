@@ -1,8 +1,8 @@
-import {InputState} from "../../InputState";
-import {MatchingLogic} from "../../Matchers";
-import {isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "../../MatchPrefixResult";
-import {TerminalPatternMatch} from "../../PatternMatch";
-import {toMatchingLogic} from "../Concat";
+import { InputState } from "../../InputState";
+import { MatchingLogic } from "../../Matchers";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
+import { TerminalPatternMatch } from "../../PatternMatch";
+import { toMatchingLogic } from "../Concat";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -28,35 +28,48 @@ export class Break implements MatchingLogic {
      * @param butNot pattern we don't want to see before the desired determinal match.
      * If we see this pattern before, the match breaks.
      */
-    constructor(private breakOn: any, private consume: boolean = false, butNot?: any) {
+    constructor(breakOn: any, private consume: boolean = false, butNot?: any) {
         this.terminateOn = toMatchingLogic(breakOn);
         if (butNot) {
             this.badMatcher = toMatchingLogic(butNot);
         }
     }
 
-    // tslint:disable-next-line:member-ordering
-    public $id = `Break[${this.breakOn}]`;
+    get $id() {
+        return `Break[${this.terminateOn}]`;
+    }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public canStartWith(char: string): boolean {
+        return (this.consume && !this.badMatcher && this.terminateOn.canStartWith) ?
+            this.terminateOn.canStartWith(char) :
+            true;
+    }
+
+    get requiredPrefix() {
+        return (this.consume && !this.badMatcher) ?
+            this.terminateOn.requiredPrefix :
+            undefined;
+    }
+
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
         }
 
         let currentIs = is;
         let matched = "";
-        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs);
+        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
         while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
-                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs))) {
+                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
                     return new MatchFailureReport(this.$id, is.offset);
                 }
             }
             matched += currentIs.peek(1);
             currentIs = currentIs.advance();
             if (!currentIs.exhausted()) {
-                terminalMatch = this.terminateOn.matchPrefix(currentIs);
+                terminalMatch = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
             }
         }
         // We have found the terminal if we get here

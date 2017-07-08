@@ -1,6 +1,6 @@
 import { InputState } from "../../InputState";
 import { MatchingLogic } from "../../Matchers";
-import {MatchFailureReport, MatchPrefixResult, matchPrefixSuccess} from "../../MatchPrefixResult";
+import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
@@ -15,7 +15,7 @@ export class Span implements MatchingLogic {
     constructor(public characters: string) {
     }
 
-    public matchPrefix(is: InputState): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         let currentIs = is;
         let matched = "";
         while (!currentIs.exhausted() && this.characters.indexOf(currentIs.peek(1)) > -1) {

@@ -1,20 +1,20 @@
-import {expect} from "chai";
+import { expect } from "chai";
+import { fail } from "power-assert";
 import * as assert from "power-assert";
-import {MatchingLogic, Term} from "../src/Matchers";
-import {isSuccessfulMatch} from "../src/MatchPrefixResult";
-import {MatchingMachine, Microgrammar} from "../src/Microgrammar";
-import {Alt, Opt} from "../src/Ops";
-import {isPatternMatch, PatternMatch} from "../src/PatternMatch";
-import {Rep, Rep1Sep, RepSep} from "../src/Rep";
-import {RealWorldPom} from "./Fixtures";
+import { WhiteSpaceSensitive } from "../src/Config";
+import { MatchingLogic, Term } from "../src/Matchers";
+import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
+import { Alt, Opt } from "../src/Ops";
+import { isPatternMatch, PatternMatch } from "../src/PatternMatch";
+import { Rep, Rep1Sep, RepSep } from "../src/Rep";
+import { RealWorldPom } from "./Fixtures";
 import {
-    ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, DEPENDENCY_GRAMMAR, PLUGIN_GRAMMAR,
+    ALL_PLUGIN_GRAMMAR,
+    ARTIFACT_VERSION_GRAMMAR,
+    DEPENDENCY_GRAMMAR,
+    PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "./MavenGrammars";
-
-import {fail} from "power-assert";
-import {JavaParenthesizedExpression} from "../src/matchers/java/JavaBody";
-import {JAVA_IDENTIFIER} from "./matchers/java/JavaBlockMicrogrammarTest";
 
 describe("Microgrammar", () => {
 
@@ -42,8 +42,8 @@ describe("Microgrammar", () => {
         });
         const result = validMg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
-        expect(result[0].$matched).to.equal("foo");
+        assert(result.length === 1);
+        assert(result[0].$matched === "foo");
     });
 
     it("prevents invalid call to function", () => {
@@ -59,97 +59,27 @@ describe("Microgrammar", () => {
         }
     });
 
-    it("parse all content: File matches", () => {
-        const content = "public void thing(int i);";
-        const mg = Microgrammar.fromDefinitions<{ name: string }>({
-            _p: "public",
-            type: JAVA_IDENTIFIER,
-            name: JAVA_IDENTIFIER,
-            params: JavaParenthesizedExpression,
-            _semi: ";",
-        });
-        const result = mg.exactMatch(content);
-        if (isPatternMatch(result)) {
-            assert(result);
-            assert(result.$matched === content);
-            assert(result.name === "thing");
-        } else {
-            fail();
-        }
-    });
-
-    it("parse all content: pattern match recognized in output", () => {
-        const content = "public void";
-        const mg = Microgrammar.fromDefinitions<any>({
-            _p: "public",
-            type: JAVA_IDENTIFIER,
-        });
-        const result = mg.exactMatch(content);
-        assert(isPatternMatch(result));
-    });
-
-    it("parse all content: dismatch report recognized in output", () => {
-        const content = "not-matchy void";
-        const mg = Microgrammar.fromDefinitions<{ type: string }>({
-            _p: "public",
-            type: JAVA_IDENTIFIER,
-        });
-        const result = mg.exactMatch(content);
-        assert(!isPatternMatch(result));
-        if (!isPatternMatch(result)) {
-            assert(result.description !== undefined);
-        }
-    });
-
-    it("parse all content: Fail due to irrelevant content after match", () => {
-        const content = "public void thing(int i); // and this is irrelevant crap";
-        const mg = Microgrammar.fromDefinitions<any>({
-            _p: "public",
-            type: JAVA_IDENTIFIER,
-            name: JAVA_IDENTIFIER,
-            params: JavaParenthesizedExpression,
-            _semi: ";",
-        });
-        const result = mg.exactMatch(content);
-        assert(!isSuccessfulMatch(result));
-    });
-
-    it("parse all content: Fail due to irrelevant content before match", () => {
-        const content = "// and this is irrelevant crap\npublic void thing(int i);";
-        const mg = Microgrammar.fromDefinitions<any>({
-            _p: "public",
-            type: JAVA_IDENTIFIER,
-            name: JAVA_IDENTIFIER,
-            params: JavaParenthesizedExpression,
-            _semi: ";",
-        });
-        const result = mg.exactMatch(content);
-        assert(!isSuccessfulMatch(result));
-    });
-
     it("XML element", () => {
         const content = "<foo>";
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
             lx: "<",
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
+        assert(result.length === 1);
         const r0 = result[0] as any;
-        expect(r0.name).to.equal("foo");
+        assert(r0.name === "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
     function testTwoXmlElements(content: string, first: string, second: string) {
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
-            lx: "<",
+            _lx: "<",
             name: /[a-zA-Z0-9]+/,
-            rx: ">",
-        } as Term);
+            _rx: ">",
+        });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(2);
@@ -192,15 +122,15 @@ describe("Microgrammar", () => {
     it("2 XML elements via nested microgrammar", () => {
         const content = "<first><second>";
         const element = {
-            lx: "<",
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
         };
         const mg = Microgrammar.fromDefinitions({
             $id: "elt",
             first: element,
             second: element,
-        } as Term);
+        });
         const result = mg.findMatches(content);
         // console.log("xxx Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
@@ -212,31 +142,26 @@ describe("Microgrammar", () => {
     it("2 elements: whitespace insensitive", () => {
         const content = "<first> notxml";
         const mg = Microgrammar.fromDefinitions({
-            $id: "element",
-            lx: "<",
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
             notxml: "notxml",
-        } as Term, {
-            consumeWhiteSpaceBetweenTokens: true,
         });
         const result = mg.findMatches(content);
-        expect(result.length).to.equal(1);
+        assert(result.length === 1);
     });
 
     it("2 elements: whitespace sensitive", () => {
         const content = "<first> notxml";
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
-            lx: "<",
+            ...WhiteSpaceSensitive,
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
             notxml: "notxml",
-        } as Term, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
-        expect(result.length).to.equal(0);
+        assert(result.length === 0);
     });
 
     it("stop after match with arrow function", () => {
@@ -250,7 +175,7 @@ describe("Microgrammar", () => {
         expect(result.length).to.equal(2);
         expect(result[0].name).to.equal("Emmanuel");
         expect(result[1].name).to.equal("Marine");
-        const result2 = mg.findMatches("Greg Tony", pm => true);
+        const result2 = mg.findMatches("Greg Tony", {}, pm => true);
         expect(result2.length).to.equal(1);
         expect(result2[0].name).to.equal("Greg");
         const result3 = mg.firstMatch("Bill George");
@@ -534,7 +459,7 @@ describe("Microgrammar", () => {
 class StringGrammar {
 
     public static readonly stringTextPattern =
-        new Rep(new Alt("\\\"", /[^"]/)).withConfig({consumeWhiteSpaceBetweenTokens: false}); // (?:\\"|[^"])*/;
+        new Rep(new Alt("\\\"", /[^"]/)); // (?:\\"|[^"])*/;
 
     public static readonly stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
         foo: ctx => {
@@ -545,12 +470,10 @@ class StringGrammar {
             console.log("1");
         },
         charArray: StringGrammar.stringTextPattern,
-
         foo3: ctx => {
             console.log(`3 + [${JSON.stringify(ctx.charArray)})]`);
         },
         _p2: '"',
-
         foo4: ctx => {
             console.log("4");
         },

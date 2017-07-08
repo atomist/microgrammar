@@ -1,12 +1,12 @@
 import "mocha";
-import {inputStateFromString} from "../src/internal/InputStateFactory";
-import {Microgrammar} from "../src/Microgrammar";
-import {Alt} from "../src/Ops";
-import {isPatternMatch} from "../src/PatternMatch";
-import {Rep} from "../src/Rep";
+import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { Microgrammar } from "../src/Microgrammar";
+import { Alt } from "../src/Ops";
+import { isPatternMatch } from "../src/PatternMatch";
+import { Rep } from "../src/Rep";
 
 import * as assert from "power-assert";
-import {isSuccessfulMatch} from "../src/MatchPrefixResult";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 
 describe("StringGrammarTest", () => {
 
@@ -17,19 +17,13 @@ describe("StringGrammarTest", () => {
             findMatches('"    winter is coming " la la la');
         const match = strings[0];
         assert(isPatternMatch(match));
-
-        // for (const k in match) {
-        //     console.log(`[${k}]=${match[k]}`);
-        // }
-
-        console.log("The string is " + match.theString);
         assert(match.$matched === '"    winter is coming "');
         assert(match.theString.text, "    winter is coming");
     });
 
     it("not broken without concat", () => {
         const result = new Alt(StringGrammar.stringGrammar, "la").
-        matchPrefix(inputStateFromString('"    winter is coming " la la la'));
+        matchPrefix(inputStateFromString('"    winter is coming " la la la'), {}, {});
         if (isSuccessfulMatch(result)) {
             const match = result.match;
             if (isPatternMatch(match)) {
@@ -47,7 +41,7 @@ describe("StringGrammarTest", () => {
 class StringGrammar {
 
     public static readonly stringTextPattern = new Rep(new Alt("\\\"", /^[^"]/))
-        .withConfig({consumeWhiteSpaceBetweenTokens: false});
+        .consumeWhiteSpace(false);
 
     public static readonly stringGrammar: Microgrammar<any> =
         Microgrammar.fromDefinitions<any>({
