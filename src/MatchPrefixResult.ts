@@ -1,7 +1,7 @@
 import {PatternMatch} from "./PatternMatch";
+
 /**
- * Pattern match. Holds user properties, with user-defined names,
- * and Atomist pattern match properties with a $ prefix.
+ * Result of attempting to match a pattern: MatchFailureReport or SuccessfulMatch.
  */
 export interface MatchPrefixResult {
 
@@ -11,13 +11,13 @@ export interface MatchPrefixResult {
     readonly $offset: number;
 
     /**
-     * Id of the matcher that made the match
+     * Id of the matcher that attempted the match
      */
     readonly $matcherId: string;
 
 }
 
-export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport {
+export class MatchFailureReport implements MatchPrefixResult {
 
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
@@ -31,10 +31,12 @@ export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport
 }
 
 /**
+ * Holds a PatternMatch in the event of success.
  * If this contains a context, then the parent matcher can use that to populate its own;
  * otherwise, it can use the value of the match
  */
 export class SuccessfulMatch implements MatchPrefixResult {
+
     public constructor(public readonly match: PatternMatch,
                        public readonly context?: {} ) {
         if (match === undefined) {

@@ -10,7 +10,9 @@ export interface DismatchReport {
 }
 
 /**
- * Represents a successful match.
+ * Represents a successful match. Contains microgrammar information
+ * in fields with names beginning with $ and any user-defined fields.
+ * To ensure this separation works cleanly, not bind user data to fields beginning with $.
  */
 export abstract class PatternMatch {
 
@@ -53,7 +55,7 @@ export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is Patte
  */
 export class TerminalPatternMatch extends PatternMatch {
 
-    public terminalness = true;
+    public readonly terminalness = true;
 
     constructor(matcherId: string,
                 matched: string,
