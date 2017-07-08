@@ -79,7 +79,7 @@ describe("Rep", () => {
     });
 
     it("rep does not match several times when not ignoring whitespace", () => {
-        const rep = new Rep(/[a-zA-Z]+/).withConfig({consumeWhiteSpaceBetweenTokens: false});
+        const rep = new Rep(/[a-zA-Z]+/).consumeWhiteSpace(false);
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);

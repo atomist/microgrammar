@@ -1,16 +1,16 @@
-import {Term} from "../../../src/Matchers";
-import {Concat} from "../../../src/matchers/Concat";
-import {PatternMatch} from "../../../src/PatternMatch";
+import { Concat } from "../../../src/matchers/Concat";
+import { PatternMatch } from "../../../src/PatternMatch";
 import { Integer, Regex } from "../../../src/Primitives";
 
-import {Break} from "../../../src/matchers/snobol/Break";
+import { Break } from "../../../src/matchers/snobol/Break";
 
-import {inputStateFromString} from "../../../src/internal/InputStateFactory";
-import {Span} from "../../../src/matchers/snobol/Span";
-import {Alt} from "../../../src/Ops";
+import { inputStateFromString } from "../../../src/internal/InputStateFactory";
+import { Span } from "../../../src/matchers/snobol/Span";
+import { Alt } from "../../../src/Ops";
 
 import * as assert from "power-assert";
-import {isSuccessfulMatch} from "../../../src/MatchPrefixResult";
+import { WhiteSpaceSensitive } from "../../../src/Config";
+import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 
 describe("Break", () => {
 
@@ -42,14 +42,17 @@ describe("Break", () => {
 
     it("break matches a complicated matcher", () => {
         const b = new Break(
-            new Concat({$id: "yeah", _start: "${", name: new Regex(/[a-z]+/), _end: "}"} as Term,
-                {consumeWhiteSpaceBetweenTokens: false}));
+            new Concat({
+                ...WhiteSpaceSensitive,
+                _start: "${",
+                name: new Regex(/[a-z]+/),
+                _end: "}",
+            }));
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert((mmmm).$matched === "HEY YOU ");
-
         } else {
             assert.fail("Didn't match");
         }

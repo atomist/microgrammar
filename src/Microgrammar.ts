@@ -1,4 +1,3 @@
-import { Config, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
 import { Concat, toMatchingLogic } from "./matchers/Concat";
@@ -66,22 +65,21 @@ export class Microgrammar<T> implements Term {
         return new Updatable<T>(matches, content);
     }
 
-    public static fromDefinitions<T>(definitions: {}, config: Config = DefaultConfig): Microgrammar<T> {
-        return new Microgrammar<T>(new Concat(definitions, config), config);
+    public static fromDefinitions<T>(definitions: {}): Microgrammar<T> {
+        return new Microgrammar<T>(new Concat(definitions));
     }
 
     public static fromString<T>(spec: string,
-                                components: object = {},
-                                config: Config = DefaultConfig): Microgrammar<T> {
+                                components: object = {}): Microgrammar<T> {
         return new Microgrammar<T>(
-             new MicrogrammarSpecParser().fromString(spec, components, config), config);
+             new MicrogrammarSpecParser().fromString(spec, components));
     }
 
     public $id;
 
     public definitions = this.matcher.definitions;
 
-    constructor(public matcher: Concat, private config: Config = DefaultConfig) {
+    constructor(public matcher: Concat) {
     }
 
     /**
@@ -95,7 +93,7 @@ export class Microgrammar<T> implements Term {
     public findMatches(input: string | InputStream,
                        parseContext?: {},
                        stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
-        const lm = new LazyMatcher(this.matcher, stopAfterMatch).withConfig(this.config);
+        const lm = new LazyMatcher(this.matcher, stopAfterMatch);
         lm.consume(input, parseContext);
         return lm.matches as Array<T & PatternMatch>;
     }
@@ -136,8 +134,6 @@ export class Microgrammar<T> implements Term {
  */
 export abstract class MatchingMachine {
 
-    protected config: Config = DefaultConfig;
-
     protected matcher: MatchingLogic;
 
     protected observer: MatchingLogic;
@@ -152,11 +148,6 @@ export abstract class MatchingMachine {
         if (o) {
             this.observer = toMatchingLogic(o);
         }
-    }
-
-    public withConfig(config: Config): this {
-        this.config = config;
-        return this;
     }
 
     /**
@@ -174,7 +165,7 @@ export abstract class MatchingMachine {
         let currentInputState: InputState = new DefaultInputState(stateManager);
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
-                this.config,
+                (this.matcher as any).$consumeWhiteSpaceBetweenTokens === true,
                 currentMatcher,
                 this.observer).state;
 

@@ -1,17 +1,24 @@
+
 /**
- * Configuration for a grammar or configurable matcher
+ * Config properties. Mix these into Concats or make other matchers
+ * implement the relevant interfaces.
  */
-export interface Config {
 
-    consumeWhiteSpaceBetweenTokens: boolean;
+/**
+ * Implemented by matchers with configurable whitespace handling.
+ */
+export interface WhiteSpaceHandler {
+
+    $consumeWhiteSpaceBetweenTokens: boolean;
 
 }
 
-export const DefaultConfig: Config = {
-    consumeWhiteSpaceBetweenTokens: true,
+/**
+ * Object literals that provide concats can bring this in
+ * via a spread to get white space sensitivity
+ * @type {{consumeWhiteSpaceBetweenTokens: boolean}}
+ */
+export const WhiteSpaceSensitive: WhiteSpaceHandler = {
+
+    $consumeWhiteSpaceBetweenTokens: false,
 };
-
-export interface Configurable {
-
-    withConfig(config: Config): this;
-}

@@ -1,6 +1,7 @@
 import { expect } from "chai";
-import * as assert from "power-assert";
 import { fail } from "power-assert";
+import * as assert from "power-assert";
+import { WhiteSpaceSensitive } from "../src/Config";
 import { MatchingLogic, Term } from "../src/Matchers";
 import { MatchingMachine, Microgrammar } from "../src/Microgrammar";
 import { Alt, Opt } from "../src/Ops";
@@ -41,8 +42,8 @@ describe("Microgrammar", () => {
         });
         const result = validMg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
-        expect(result[0].$matched).to.equal("foo");
+        assert(result.length === 1);
+        assert(result[0].$matched === "foo");
     });
 
     it("prevents invalid call to function", () => {
@@ -61,26 +62,24 @@ describe("Microgrammar", () => {
     it("XML element", () => {
         const content = "<foo>";
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
             lx: "<",
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        expect(result.length).to.equal(1);
+        assert(result.length === 1);
         const r0 = result[0] as any;
-        expect(r0.name).to.equal("foo");
+        assert(r0.name === "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
     function testTwoXmlElements(content: string, first: string, second: string) {
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
-            lx: "<",
+            _lx: "<",
             name: /[a-zA-Z0-9]+/,
-            rx: ">",
-        } as Term);
+            _rx: ">",
+        });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(2);
@@ -123,15 +122,15 @@ describe("Microgrammar", () => {
     it("2 XML elements via nested microgrammar", () => {
         const content = "<first><second>";
         const element = {
-            lx: "<",
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
         };
         const mg = Microgrammar.fromDefinitions({
             $id: "elt",
             first: element,
             second: element,
-        } as Term);
+        });
         const result = mg.findMatches(content);
         // console.log("xxx Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
@@ -143,31 +142,26 @@ describe("Microgrammar", () => {
     it("2 elements: whitespace insensitive", () => {
         const content = "<first> notxml";
         const mg = Microgrammar.fromDefinitions({
-            $id: "element",
-            lx: "<",
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
             notxml: "notxml",
-        } as Term, {
-            consumeWhiteSpaceBetweenTokens: true,
         });
         const result = mg.findMatches(content);
-        expect(result.length).to.equal(1);
+        assert(result.length === 1);
     });
 
     it("2 elements: whitespace sensitive", () => {
         const content = "<first> notxml";
         const mg = Microgrammar.fromDefinitions({
-            $id: "elt",
-            lx: "<",
+            ...WhiteSpaceSensitive,
+            _lx: "<",
             namex: /[a-zA-Z0-9]+/,
-            rx: ">",
+            _rx: ">",
             notxml: "notxml",
-        } as Term, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
-        expect(result.length).to.equal(0);
+        assert(result.length === 0);
     });
 
     it("stop after match with arrow function", () => {
@@ -465,7 +459,7 @@ describe("Microgrammar", () => {
 class StringGrammar {
 
     public static readonly stringTextPattern =
-        new Rep(new Alt("\\\"", /[^"]/)).withConfig({consumeWhiteSpaceBetweenTokens: false}); // (?:\\"|[^"])*/;
+        new Rep(new Alt("\\\"", /[^"]/)); // (?:\\"|[^"])*/;
 
     public static readonly stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
         foo: ctx => {
@@ -476,12 +470,10 @@ class StringGrammar {
             console.log("1");
         },
         charArray: StringGrammar.stringTextPattern,
-
         foo3: ctx => {
             console.log(`3 + [${JSON.stringify(ctx.charArray)})]`);
         },
         _p2: '"',
-
         foo4: ctx => {
             console.log("4");
         },

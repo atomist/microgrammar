@@ -1,10 +1,10 @@
-import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
 import { PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 
+import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
 
 /**
@@ -30,16 +30,13 @@ export function atLeastOne(o: any): Repetition {
  * Prefer subclasses for simplicity and clarity.
  * By default, match zero or more times without a separator
  */
-export class Repetition implements MatchingLogic, Configurable {
+export class Repetition implements MatchingLogic, WhiteSpaceHandler {
+
+    public $consumeWhiteSpaceBetweenTokens = true;
 
     private matcher: MatchingLogic;
 
     private sepMatcher: MatchingLogic;
-
-    private config: Config = DefaultConfig;
-
-    // tslint:disable-next-line:member-ordering
-    public $id = `Rep[${this.matcher}:min=${this.min},sep=[${this.sep}]`;
 
     /**
      * Generic rep support. Normally use subclasses.
@@ -54,8 +51,12 @@ export class Repetition implements MatchingLogic, Configurable {
         }
     }
 
-    public withConfig(config: Config): this {
-        this.config = config;
+    get $id() {
+        return `Rep[${this.matcher}:min=${this.min},sep=[${this.sep}]`;
+    }
+
+    public consumeWhiteSpace(consumeWhiteSpaceBetweenTokens: boolean): this {
+        this.$consumeWhiteSpaceBetweenTokens = consumeWhiteSpaceBetweenTokens;
         return this;
     }
 
@@ -76,7 +77,7 @@ export class Repetition implements MatchingLogic, Configurable {
         const matches: PatternMatch[] = [];
         let matched = "";
         while (!currentInputState.exhausted()) {
-            const eat = readyToMatch(currentInputState, this.config);
+            const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
             currentInputState = eat.state;
             matched += eat.skipped;
 
@@ -95,7 +96,7 @@ export class Repetition implements MatchingLogic, Configurable {
             }
 
             if (this.sepMatcher) {
-                const eaten = readyToMatch(currentInputState, this.config);
+                const eaten = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
                 const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);

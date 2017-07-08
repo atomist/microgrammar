@@ -41,7 +41,7 @@ describe("StringGrammarTest", () => {
 class StringGrammar {
 
     public static readonly stringTextPattern = new Rep(new Alt("\\\"", /^[^"]/))
-        .withConfig({consumeWhiteSpaceBetweenTokens: false});
+        .consumeWhiteSpace(false);
 
     public static readonly stringGrammar: Microgrammar<any> =
         Microgrammar.fromDefinitions<any>({

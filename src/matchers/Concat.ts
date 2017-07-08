@@ -1,4 +1,3 @@
-import { Config, DefaultConfig } from "../Config";
 import { InputState } from "../InputState";
 import { Matcher, MatchingLogic, Term } from "../Matchers";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
@@ -6,6 +5,7 @@ import { Microgrammar } from "../Microgrammar";
 import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
 
+import { WhiteSpaceHandler } from "../Config";
 import { readyToMatch } from "../internal/Whitespace";
 
 /**
@@ -36,7 +36,9 @@ const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requ
  * Users should only create Concats directly in the unusual case where they need
  * to control whitespace handling in a unique way for that particular Concat.
  */
-export class Concat implements MatchingLogic {
+export class Concat implements MatchingLogic, WhiteSpaceHandler {
+
+    public $consumeWhiteSpaceBetweenTokens: boolean = true;
 
     public readonly matchSteps: MatchStep[] = [];
 
@@ -44,14 +46,17 @@ export class Concat implements MatchingLogic {
     // for required prefix etc.
     private readonly firstMatcher: Matcher;
 
-    constructor(public definitions: any, public config: Config = DefaultConfig) {
+    constructor(public definitions: any) {
         for (const stepName in definitions) {
             if (methodsOnEveryMatchingLogic.indexOf(stepName) === -1) {
                 const def = definitions[stepName];
                 if (def === undefined || def === null) {
                     throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
                 }
-                if (typeof def === "function") {
+                if (stepName.charAt(0) === "$") {
+                    // It's a config property. Copy it over.
+                    this[stepName] = def;
+                } else if (typeof def === "function") {
                     // It's a calculation function
                     if (def.length === 0) {
                         // A no arg function is invalid
@@ -93,7 +98,7 @@ export class Concat implements MatchingLogic {
         let matched = "";
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
-                const eat = readyToMatch(currentInputState, this.config);
+                const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
                 currentInputState = eat.state;
                 matched += eat.skipped;
 

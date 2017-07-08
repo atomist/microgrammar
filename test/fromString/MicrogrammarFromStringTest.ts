@@ -13,6 +13,7 @@ import {
 } from "../MavenGrammars";
 
 import * as assert from "power-assert";
+import { WhiteSpaceSensitive } from "../../src/Config";
 
 describe("MicrogrammarFromString", () => {
 
@@ -101,8 +102,6 @@ describe("MicrogrammarFromString", () => {
         const content = "<first>notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: true,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
@@ -112,9 +111,8 @@ describe("MicrogrammarFromString", () => {
     it("2 elements: whitespace sensitive: match", () => {
         const content = "<first>  notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
+            ...WhiteSpaceSensitive,
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
@@ -123,9 +121,8 @@ describe("MicrogrammarFromString", () => {
     it("2 elements: whitespace sensitive: no match", () => {
         const content = "<first>  notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
+            ...WhiteSpaceSensitive,
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
@@ -135,8 +132,6 @@ describe("MicrogrammarFromString", () => {
         const content = "<first>\n\tnotxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}>\n\tnotxml", {
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
