@@ -5,8 +5,9 @@ import { Microgrammar } from "../Microgrammar";
 import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
 import { Literal, Regex } from "../Primitives";
 
-import { WhiteSpaceHandler } from "../Config";
+import { SkipCapable, WhiteSpaceHandler } from "../Config";
 import { readyToMatch } from "../internal/Whitespace";
+import { Break } from "./snobol/Break";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -36,9 +37,11 @@ const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requ
  * Users should only create Concats directly in the unusual case where they need
  * to control whitespace handling in a unique way for that particular Concat.
  */
-export class Concat implements MatchingLogic, WhiteSpaceHandler {
+export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
 
     public $consumeWhiteSpaceBetweenTokens: boolean = true;
+
+    public $skipGaps = false;
 
     public readonly matchSteps: MatchStep[] = [];
 
@@ -69,7 +72,10 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler {
                     }
                 } else {
                     // It's a normal matcher
-                    const named = new NamedMatcher(stepName, toMatchingLogic(def));
+                    const m = toMatchingLogic(def);
+                    // If we are skipping gaps, skip between productions
+                    const named = new NamedMatcher(stepName,
+                        this.$skipGaps === true ? new Break(m, true) : m);
                     this.matchSteps.push(named);
                 }
             }

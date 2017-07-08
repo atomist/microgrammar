@@ -1,12 +1,14 @@
-import {expect} from "chai";
-import {inputStateFromString} from "../../src/internal/InputStateFactory";
-import {Concat} from "../../src/matchers/Concat";
-import {isSuccessfulMatch} from "../../src/MatchPrefixResult";
-import {PatternMatch} from "../../src/PatternMatch";
-import {Integer} from "../../src/Primitives";
-import {Rep1Sep, RepSep} from "../../src/Rep";
+import { expect } from "chai";
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { Concat } from "../../src/matchers/Concat";
+import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
+import { PatternMatch } from "../../src/PatternMatch";
+import { Integer } from "../../src/Primitives";
+import { Rep1Sep, RepSep } from "../../src/Rep";
 
 import * as assert from "power-assert";
+import { fail } from "power-assert";
+import { Skipper } from "../../src/Config";
 
 describe("Concat", () => {
 
@@ -257,6 +259,51 @@ describe("Concat", () => {
             assert(e.message.indexOf("Step [opening] is null") !== -1);
             return true;
         });
+    });
+
+    it("does not skip", () => {
+        const content = "tom:49";
+        const mg = new Concat({
+            name: /[a-z]+/,
+            age: Integer,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        assert(!isSuccessfulMatch(result));
+    });
+
+    it("skips: simple", () => {
+        const content = "tom:49";
+        const mg = new Concat({
+            ...Skipper,
+            name: /[a-z]+/,
+            age: Integer,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        assert(isSuccessfulMatch(result));
+    });
+
+    it("skips: more complex", () => {
+        const content = "Katrina and this is a whole bunch of junk the Waves were a band in the 80s in England and this is junk";
+        const mg = new Concat({
+            ...Skipper,
+            lead: /[A-Z][a-z]+/,
+            band: /[A-Z][a-z]+/,
+            decade: Integer,
+            country: /[A-Z][a-z]+/,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(result)) {
+            const r = result.match as any;
+            assert(r.lead === "Katrina");
+            assert(r.band === "Waves");
+            assert(r.decade === 80);
+            assert(r.country === "England");
+        } else {
+            fail("Match expected");
+        }
     });
 
 });

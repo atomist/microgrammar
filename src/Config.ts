@@ -22,3 +22,21 @@ export const WhiteSpaceSensitive: WhiteSpaceHandler = {
 
     $consumeWhiteSpaceBetweenTokens: false,
 };
+
+export interface SkipCapable {
+
+    /**
+     * Should we skip between productions?
+     */
+    $skipGaps: boolean;
+}
+
+/**
+ * Skip between productions.
+ * @type {{$skipGaps: boolean}}
+ */
+export const Skipper: SkipCapable = {
+
+    $skipGaps: true,
+
+};
