@@ -38,7 +38,7 @@ export class MatchFailureReport implements MatchPrefixResult {
 export class SuccessfulMatch implements MatchPrefixResult {
 
     public constructor(public readonly match: PatternMatch,
-                       public readonly context?: {} ) {
+                       public readonly capturedStructure?: {} ) {
         if (match === undefined) {
             throw new Error("You can't be successful with an undefined match");
         }

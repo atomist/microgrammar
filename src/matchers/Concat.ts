@@ -98,7 +98,7 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
     }
 
     public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        const context = {};
+        const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
         let matched = "";
@@ -114,15 +114,15 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
                     matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched);
                     matched += report.$matched;
-                    if (reportResult.context) {
-                        // Bind the nested context if necessary
-                        context[step.$id] = reportResult.context;
+                    if (reportResult.capturedStructure) {
+                        // Bind the nested structure if necessary
+                        bindingTarget[step.$id] = reportResult.capturedStructure;
                     } else {
-                        // otherwise, give the context the matcher's value.
-                        context[step.$id] = report.$value;
+                        // otherwise, save the matcher's value.
+                        bindingTarget[step.$id] = report.$value;
                     }
                 } else {
-                    return new MatchFailureReport(this.$id, initialInputState.offset, context,
+                    return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
                         `Failed at step '${step.name}' due to ${(reportResult as any).description}`);
                 }
             } else {
@@ -130,12 +130,12 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
                 // Bind its result to the context and see if
                 // we should stop matching.
                 if (isMatchVeto(step)) {
-                    if (step.veto(context, thisMatchContext, parseContext) === false) {
-                        return new MatchFailureReport(this.$id, initialInputState.offset, context,
+                    if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
+                        return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
                           `Match vetoed by ${step.$id}`);
                     }
                 } else {
-                    context[step.$id] = step.compute(context);
+                    bindingTarget[step.$id] = step.compute(bindingTarget);
                 }
             }
         }
@@ -145,7 +145,7 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
             initialInputState.offset,
             this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
             matches,
-            context), context);
+            bindingTarget), bindingTarget);
     }
 
 }
