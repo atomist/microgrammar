@@ -144,4 +144,33 @@ describe("ContextTest", () => {
         assert(matches[1].nested.shouty === "ELIZABETH");
     });
 
+    it("can change previously bound match", () => {
+        const cc = Microgrammar.fromDefinitions({
+            name: /[a-z]+/,
+            b: Integer,
+            c: Integer,
+            _undo: ctx => ctx.name = "marmaduke",
+        });
+        const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+        assert(matches.length === 2);
+        assert(matches[0].name === "marmaduke");
+    });
+
+    // TODO this seems to be really strange behavior, but we can work around it for now in users
+    it.skip("can undefine previously bound match", () => {
+        const cc = Microgrammar.fromDefinitions({
+            name: /[a-z]+/,
+            b: Integer,
+            c: Integer,
+            _undo: ctx => {
+                assert(ctx.name);
+                ctx.name = undefined;
+                assert(!ctx.name);
+            },
+        });
+        const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
+        assert(matches.length === 2);
+        assert(matches[0].name === undefined);
+    });
+
 });

@@ -90,7 +90,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                      `I do not think this grammar means what you think it means`);
                 }
-                currentInputState = currentInputState.consume(match.$matched);
+                currentInputState = currentInputState.consume(match.$matched, `Rep matched [${match.$matched}]`);
                 matches.push(match);
                 matched += match.$matched;
             }
@@ -102,7 +102,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                 const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
                 if (isSuccessfulMatch(sepMatchResult)) {
                     const sepMatch = sepMatchResult.match;
-                    currentInputState = currentInputState.consume(sepMatch.$matched);
+                    currentInputState = currentInputState.consume(sepMatch.$matched, `Rep separator [${sepMatch.$matched}]`);
                     matched += (sepMatch as PatternMatch).$matched;
                 } else {
                     break;

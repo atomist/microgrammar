@@ -10,7 +10,7 @@ describe("InputState", () => {
     it("cannot consume", () => {
         const is = inputStateFromString("foo bar");
         assert.throws(
-            () => is.consume("xxxx"),
+            () => is.consume("xxxx", ""),
         );
     });
 
@@ -33,7 +33,7 @@ describe("InputState", () => {
     it("peek is correct after read", () => {
         const is = inputStateFromString("0123456789");
         assert(is.peek(1) === "0");
-        const at3 = is.consume("012");
+        const at3 = is.consume("012", "");
         assert(is.peek(1) === "0");
         assert (at3.peek(2) === "34");
         const at4 = at3.advance();
@@ -73,9 +73,9 @@ describe("InputState", () => {
     function withBuffer(bufSize: number, extraContent: string = "") {
         let is = inputStateFromString("0123456789" + extraContent);
         assert(is.peek(7) === "0123456");
-        is = is.consume("01");
-        assert(is.peek(3) === "234");
-        is = is.consume("234567");
+        is = is.consume("01", "");
+        assert(is.peek(3) === "234", "");
+        is = is.consume("234567", "");
         assert(is.peek(1) === "8");
     }
 
@@ -87,7 +87,7 @@ describe("InputState", () => {
         assert(state1.offset === 1);
         const state2 = state1.advance();
         const state3 = state2.advance().advance();
-        assert(state3.consume("quick").peek(" brown".length) === " brown");
+        assert(state3.consume("quick", "").peek(" brown".length) === " brown");
         assert(state0.offset === 0);
         // This isn't valid as this state is stale
         // expect(state0.peek("the quick brown".length)).to.equal("the quick brown");

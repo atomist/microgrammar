@@ -70,4 +70,20 @@ describe("flatten", () => {
         });
     });
 
+    it("consume correctly from object optional", () => {
+        const struct = {
+            _bang: "!",
+            name: /[a-z]+/,
+            _c: "*",
+        };
+        const g = Microgrammar.fromDefinitions({
+            a: flatten(optional(struct)),
+        });
+        const m = g.findMatches("!possum* !dinosaur*") as any;
+        assert(m[0].a === "possum");
+        assert(m.length === 2);
+        assert(m[0].a === "possum");
+        assert(m[1].a === "dinosaur");
+    });
+
 });

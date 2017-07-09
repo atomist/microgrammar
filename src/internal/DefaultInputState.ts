@@ -46,11 +46,13 @@ export class DefaultInputState implements InputState {
     /**
      * Consume the given string if our input begins with it. Otherwise fail
      * @param s string that we must find
+     * @param message activity we're performing
      * @return {InputState}
      */
-    public consume(s: string): InputState {
-        if (this.ism.get(this.offset, s.length) !== s) {
-            throw new Error(`Illegal call to InputState.consume: Cannot consume [${s}] from XXXX`);
+    public consume(s: string, message: string): InputState {
+        const actual = this.ism.get(this.offset, s.length);
+        if (actual !== s) {
+            throw new Error(`Invalid call to InputState.consume: Cannot consume [${s}] from [${actual}]. Log: ${message}`);
         }
         return new DefaultInputState(this.ism, this.offset + s.length);
     }

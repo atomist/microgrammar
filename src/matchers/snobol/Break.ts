@@ -36,7 +36,7 @@ export class Break implements MatchingLogic {
     }
 
     get $id() {
-        return `Break[${this.terminateOn}]`;
+        return `Break[${this.terminateOn.$id}]`;
     }
 
     public canStartWith(char: string): boolean {

@@ -16,9 +16,10 @@ export interface InputState {
     /**
      * Consume the given string if our input begins with it. Otherwise fail
      * @param s string that we must find
+     * @param message description of what we're doing to help in diagnosing problems
      * @return {InputState}
      */
-    consume(s: string): InputState;
+    consume(s: string, message: string): InputState;
 
     /**
      * Advance one character in the input

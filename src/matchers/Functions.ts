@@ -1,7 +1,7 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { isSuccessfulMatch, MatchPrefixResult, matchPrefixSuccess, SuccessfulMatch } from "../MatchPrefixResult";
-import { isTreePatternMatch } from "../PatternMatch";
+import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
 /**
@@ -28,7 +28,10 @@ class FlatteningMatcher implements MatchingLogic {
                     throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
                 }
                 const onlyPropertyName = propNames[0];
-                return matchPrefixSuccess(r.match.$valueMatches[onlyPropertyName]);
+                const relevantSubMatch = r.match.$valueMatches[onlyPropertyName];
+                // TODO how do we update this?
+                const match = new TerminalPatternMatch(r.$matcherId, r.$matched, r.$offset, relevantSubMatch.$value);
+                return matchPrefixSuccess(match);
             } else {
                 return r;
             }

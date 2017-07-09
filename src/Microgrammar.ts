@@ -180,7 +180,8 @@ export abstract class MatchingMachine {
                 // Enrich with the name
                 (match as any).$name = match.$matcherId;
                 currentMatcher = toMatchingLogic(this.onMatch(match));
-                currentInputState = currentInputState.consume(match.$matched);
+                currentInputState = currentInputState.consume(match.$matched,
+                    `Microgrammar after match on [${match.$matched} from [${match.$matcherId}]`);
             } else {
                 // We didn't match. Discard the current input character and try again
                 if (!currentInputState.exhausted()) {

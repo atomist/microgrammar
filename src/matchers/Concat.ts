@@ -112,7 +112,8 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
-                    currentInputState = currentInputState.consume(report.$matched);
+                    currentInputState = currentInputState.consume(report.$matched,
+                        `Concat step [${reportResult.$matcherId}] matched ${reportResult.$matched}`);
                     matched += report.$matched;
                     if (reportResult.capturedStructure) {
                         // Bind the nested structure if necessary
@@ -127,8 +128,7 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
                 }
             } else {
                 // It's a function taking the contexts.
-                // Bind its result to the context and see if
-                // we should stop matching.
+                // See if we should stop matching.
                 if (isMatchVeto(step)) {
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
                         return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
@@ -150,10 +150,6 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
 
 }
 
-export function isConcat(m: MatchingLogic): m is Concat {
-    return m && !!((m as Concat).matchSteps || isConcat((m as NamedMatcher).ml));
-}
-
 function isMatcher(s: MatchStep): s is Matcher {
     return (s as Matcher).matchPrefix !== undefined;
 }
@@ -161,7 +157,6 @@ function isMatcher(s: MatchStep): s is Matcher {
 /**
  * Turns a JSON element such as name: "literal" into a matcher.
  * Return undefined if the object is undefined or null
- * @param name of the created matcher
  * @param o object to attempt to make into a matcher
  * @returns {any}
  */

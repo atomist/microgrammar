@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.0...HEAD
+
+## [0.5.0] - 2017-07-09
+
+[0.4.1]: https://github.com/atomist/microgrammar/compare/0.5.0...0.4.1
+
+Config and context overhaul release
 
 ### Added
 
@@ -20,10 +26,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   **Breaking** Configuration properties are now added to definition literals 
     directly
--   **Breaking** `Regex` now adds a start anchor if none is specified.
+-   **Breaking** `Regex` now adds a start anchor if none is specified
 -   **Breaking** `Concat` moved to `matchers` directory as it should not be
-used directly by end users in most cases.
-
+used directly by end users in most cases
+-   Matches should now support JSON stringification with circularity
 
 ## [0.4.1] - 2017-07-04
 
