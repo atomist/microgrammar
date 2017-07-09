@@ -54,8 +54,6 @@ export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is Patte
  */
 export class TerminalPatternMatch extends PatternMatch {
 
-    public readonly terminalness = true;
-
     constructor(matcherId: string,
                 matched: string,
                 offset: number,
@@ -74,7 +72,6 @@ export class UndefinedPatternMatch extends PatternMatch {
 
     constructor(matcherId: string,
                 offset: number) {
-
         super(matcherId, "", offset);
     }
 }
@@ -92,28 +89,28 @@ export class TreePatternMatch extends PatternMatch {
 
     public readonly $value;
 
-    constructor($matcherId: string,
-                $matched: string,
-                $offset: number,
-                $matchers: Matcher[],
-                $subMatches: PatternMatch[],
-                context: {}) {
-        super($matcherId, $matched, $offset);
+    constructor(matcherId: string,
+                matched: string,
+                offset: number,
+                matchers: Matcher[],
+                subMatches: PatternMatch[],
+                capturedStructure: {}) {
+        super(matcherId, matched, offset);
         this.$value = {};
 
         // Copy top level context properties
-        for (const p in context) {
-            if (!isSpecialMember(p) && typeof context[p] !== "function") {
-                this[p] = context[p];
+        for (const p in capturedStructure) {
+            if (!isSpecialMember(p) && typeof capturedStructure[p] !== "function") {
+                this[p] = capturedStructure[p];
             }
         }
 
-        for (let i = 0; i < $subMatches.length; i++) {
-            const match = $subMatches[i];
-            const name = $matchers[i].name;
+        for (let i = 0; i < subMatches.length; i++) {
+            const match = subMatches[i];
+            const name = matchers[i].name;
             if (!isSpecialMember(name)) {
-                const value = $subMatches[i].$value;
-                this.$value[$matchers[i].name] = value;
+                const value = subMatches[i].$value;
+                this.$value[matchers[i].name] = value;
                 if (isTreePatternMatch(match)) {
                     this[name] = match;
                 } else {
@@ -123,7 +120,7 @@ export class TreePatternMatch extends PatternMatch {
                     }
                     // We've got nowhere to put the matching information on a simple value,
                     // so create a parallel property on the parent with an out of band name
-                    this.$valueMatches[$matchers[i].name] = $subMatches[i];
+                    this.$valueMatches[matchers[i].name] = subMatches[i];
                 }
             }
         }

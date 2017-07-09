@@ -21,7 +21,7 @@ export class MatchFailureReport implements MatchPrefixResult {
 
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
-                       $context?: {},
+                       capturedStructure?: {},
                        private readonly cause?: string | MatchFailureReport) {
     }
 
