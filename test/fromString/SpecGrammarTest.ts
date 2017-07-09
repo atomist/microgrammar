@@ -1,7 +1,7 @@
 import assert = require("power-assert");
 import { exactMatch } from "../../src/internal/ExactMatch";
 import { MicrogrammarSpec, specGrammar } from "../../src/internal/SpecGrammar";
-import { isPatternMatch } from "../../src/PatternMatch";
+import {isPatternMatch} from "../../src/PatternMatch";
 
 describe("SpecGrammar", () => {
 
@@ -10,16 +10,13 @@ describe("SpecGrammar", () => {
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar, microgrammarSpecString);
         if (isPatternMatch(specMatch)) {
             assert(specMatch.these.length === 1);
-            const json = JSON.stringify(specMatch.matchedStructure());
-            assert(json ===
-                JSON.stringify({
+            assert.deepEqual(specMatch.matchedStructure(),
+               {
                     these: [{
-                        elementName: "fruit", // TODO: this doesn't belong here. Is it a bug in concat?
                         literal: "->", element: {elementName: "fruit"},
                     }]
                     , trailing: "<-",
-                }),
-                json);
+                });
         } else {
             assert.fail();
         }

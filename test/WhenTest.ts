@@ -1,8 +1,11 @@
 import { expect } from "chai";
 import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import { when } from "../src/Ops";
-import { isPatternMatch } from "../src/PatternMatch";
+
 import { Literal } from "../src/Primitives";
+
+import * as assert from "power-assert";
 
 describe("When", () => {
 
@@ -16,48 +19,62 @@ describe("When", () => {
         if (!matcher.matchPrefix) {
             throw new Error("Error: matcher.matchPrefix returned by when is undefined");
         }
-        const m = matcher.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        const m = matcher.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("when false should not match", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const matcher = when(primitive, pm => false);
-        const m = matcher.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        const m = matcher.matchPrefix(is, {}, {});
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("ability to veto content", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
-        const m = hatesFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        const m = hatesFoo.matchPrefix(is, {}, {});
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("ability to veto content: not vetoed", () => {
         const primitive = new RegExp(/[a-z]+/);
         const is = inputStateFromString("bar and this is a load of other stuff");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
-        const m = hatesFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        const m = hatesFoo.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("ability to require content: match", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        const m = requiresFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(true);
+        const m = requiresFoo.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("ability to require content: no match", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        const m = requiresFoo.matchPrefix(is);
-        expect(isPatternMatch(m)).to.equal(false);
+        const m = requiresFoo.matchPrefix(is, {}, {});
+        expect(isSuccessfulMatch(m)).to.equal(false);
     });
 
     it("preserves properties", () => {

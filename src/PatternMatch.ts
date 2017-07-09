@@ -1,5 +1,4 @@
 import { Matcher } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
 
 /**
  * Returned when we failed to match prefix
@@ -10,23 +9,12 @@ export interface DismatchReport {
     description: string;
 }
 
-export class MatchFailureReport implements MatchPrefixResult, MatchFailureReport {
-
-    public constructor(public readonly $matcherId: string,
-                       public readonly $offset: number,
-                       $context: {},
-                       private readonly cause?: string | MatchFailureReport) {
-    }
-
-    get description(): string {
-        return `Match failed on ${this.$matcherId}: ${this.cause}`;
-    }
-}
-
 /**
- * Represents a successful match.
+ * Represents a successful match. Contains microgrammar information
+ * in fields with names beginning with $ and any user-defined fields.
+ * To ensure this separation works cleanly, not bind user data to fields beginning with $.
  */
-export abstract class PatternMatch implements MatchPrefixResult {
+export abstract class PatternMatch {
 
     /**
      * Value extracted from matcher.
@@ -41,22 +29,10 @@ export abstract class PatternMatch implements MatchPrefixResult {
      * @param $matcherId id of the matcher that matched
      * @param $matched the actual string content
      * @param $offset offset from 0 in input
-     * @param $context context bound during the match
      */
     constructor(public readonly $matcherId: string,
                 public readonly $matched: string,
-                public readonly $offset: number,
-                $context: {}) {
-        // Copy top level context properties
-        // tslint:disable-next-line:forin
-        for (const p in $context) {
-            if (!isSpecialMember(p)) {
-                const val = $context[p];
-                if (typeof val !== "function") {
-                    this[p] = val;
-                }
-            }
-        }
+                public readonly $offset: number) {
     }
 
     /**
@@ -69,8 +45,8 @@ export abstract class PatternMatch implements MatchPrefixResult {
 
 }
 
-export function isPatternMatch(mpr: MatchPrefixResult | DismatchReport): mpr is PatternMatch {
-    return mpr != null && (mpr as PatternMatch).$matched !== undefined;
+export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
+    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$matched !== undefined;
 }
 
 /**
@@ -78,12 +54,13 @@ export function isPatternMatch(mpr: MatchPrefixResult | DismatchReport): mpr is 
  */
 export class TerminalPatternMatch extends PatternMatch {
 
+    public readonly terminalness = true;
+
     constructor(matcherId: string,
                 matched: string,
                 offset: number,
-                public readonly $value: any,
-                context: {}) {
-        super(matcherId, matched, offset, context);
+                public readonly $value: any) {
+        super(matcherId, matched, offset);
     }
 
 }
@@ -98,32 +75,20 @@ export class UndefinedPatternMatch extends PatternMatch {
     constructor(matcherId: string,
                 offset: number) {
 
-        super(matcherId, "", offset, {});
+        super(matcherId, "", offset);
     }
 }
 
 /**
- * Properties we add to a matched node
- */
-export interface MatchInfo {
-
-    $match: PatternMatch;
-
-}
-
-/**
- * Suffix for properties parallel to string properties that we can't enrich,
- * as they aren't objects
- * @type {string}
- */
-export const MATCH_INFO_SUFFIX = "$match";
-
-/**
  * Represents a complex pattern match. Sets properties to expose structure.
- * In the case of string properties, where we can't add a $match, we expose a parallel
- * <propertyName>$match property with that information.
+ * In the case of string properties, where we can't add provide the whole PatternMatch,
+ * we store that in a parallel object $valueMatches
  */
 export class TreePatternMatch extends PatternMatch {
+
+    // JESS: can we not have a $value
+
+    public readonly $valueMatches = {};
 
     public readonly $value;
 
@@ -133,22 +98,33 @@ export class TreePatternMatch extends PatternMatch {
                 $matchers: Matcher[],
                 $subMatches: PatternMatch[],
                 context: {}) {
-
-        super($matcherId, $matched, $offset, context);
+        super($matcherId, $matched, $offset);
         this.$value = {};
 
+        // Copy top level context properties
+        for (const p in context) {
+            if (!isSpecialMember(p) && typeof context[p] !== "function") {
+                this[p] = context[p];
+            }
+        }
+
         for (let i = 0; i < $subMatches.length; i++) {
-            const value = $subMatches[i].$value;
-            this.$value[$matchers[i].name] = value;
-            if (typeof value === "object") {
-                if (!(this as any)[$matchers[i].name]) {
-                    (this as any)[$matchers[i].name] = value;
+            const match = $subMatches[i];
+            const name = $matchers[i].name;
+            if (!isSpecialMember(name)) {
+                const value = $subMatches[i].$value;
+                this.$value[$matchers[i].name] = value;
+                if (isTreePatternMatch(match)) {
+                    this[name] = match;
+                } else {
+                    // if the context defined it already, let that stand
+                    if (this[name] === undefined) {
+                        this[name] = value;
+                    }
+                    // We've got nowhere to put the matching information on a simple value,
+                    // so create a parallel property on the parent with an out of band name
+                    this.$valueMatches[$matchers[i].name] = $subMatches[i];
                 }
-                (this as any)[$matchers[i].name].$match = $subMatches[i];
-            } else {
-                // We've got nowhere to put the matching information on a simple value,
-                // so create a parallel property on the parent with an out of band name
-                this.$value[$matchers[i].name + MATCH_INFO_SUFFIX] = $subMatches[i];
             }
         }
     }
@@ -158,10 +134,10 @@ export class TreePatternMatch extends PatternMatch {
         for (const key of Object.getOwnPropertyNames(this)) {
             if (key.charAt(0) !== "$") {
                 const value = this[key];
-                if (typeof value === "object") {
-                    output[key] = value.$match;
+                if (isPatternMatch(value)) {
+                    output[key] = value;
                 } else {
-                    output[key] = this.$value[key + MATCH_INFO_SUFFIX];
+                    output[key] = this.$valueMatches[key];
                 }
             }
         }
@@ -170,8 +146,8 @@ export class TreePatternMatch extends PatternMatch {
 
 }
 
-export function isTreePatternMatch(mpr: MatchPrefixResult): mpr is TreePatternMatch {
-    return mpr != null && (mpr as TreePatternMatch).submatches !== undefined;
+export function isTreePatternMatch(om: PatternMatch): om is TreePatternMatch {
+    return om != null && (om as TreePatternMatch).submatches !== undefined;
 }
 
 /**

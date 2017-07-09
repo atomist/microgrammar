@@ -1,24 +1,23 @@
 import { InputState, Skipped } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 
-import { Config, DefaultConfig } from "../Config";
-
 /**
  * Prepare to match. Skip whitespace if appropriate. Skip irrelevant content if
  * we have a matcher we're preparing for.
  * @param is current input state
- * @param config config, which tells us whether we should skipWhile whitespace
+ * @param consumeWhiteSpaceBetweenTokens should we skipWhile whitespace
  * @param matchers matchers we want to match. If there are multiple matchers,
  * we calculate the longest common prefix (if known). Undefined array
  * elements are ignored, after the first matcher.
  * If there is a definite prefix, we can skipWhile content.
  */
-export function readyToMatch(is: InputState, config: Config = DefaultConfig,
+export function readyToMatch(is: InputState,
+                             consumeWhiteSpaceBetweenTokens: boolean,
                              ...matchers: MatchingLogic[]): Skipped {
     const lookFor = commonPrefix(matchers);
     if (lookFor) {
         return is.skipTo(lookFor);
-    } else if (config.consumeWhiteSpaceBetweenTokens) {
+    } else if (consumeWhiteSpaceBetweenTokens) {
         return is.skipWhile(c => c.trim() === "", 1); // || m && m.canStartWith && !m.canStartWith(c));
     } else {
         return { skipped: "", state: is };

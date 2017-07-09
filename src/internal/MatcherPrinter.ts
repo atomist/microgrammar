@@ -1,8 +1,8 @@
-import {Matcher, MatchingLogic} from "../Matchers";
-import {Concat, isNamedMatcher, MatchStep} from "../matchers/Concat";
+import { Matcher, MatchingLogic } from "../Matchers";
+import { Concat, isNamedMatcher, MatchStep } from "../matchers/Concat";
+import { isBreak } from "../matchers/snobol/Break";
+import { isLiteral } from "../Primitives";
 import Match = Chai.Match;
-import {isBreak} from "../matchers/snobol/Break";
-import {isLiteral} from "../Primitives";
 
 /**
  * Print a matcher structure

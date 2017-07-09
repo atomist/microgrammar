@@ -1,0 +1,60 @@
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+
+---
+kind: "operation"
+client: "com.atomist:rug"
+version: "1.0.1-JESS"
+editor:
+  name: "ModifyTests"
+  group: "local"
+  artifact: "microgrammar"
+  version: "0.1.0"
+

@@ -1,17 +1,10 @@
-import { Term } from "../src/Matchers";
 import { Microgrammar } from "../src/Microgrammar";
-import { PatternMatch } from "../src/PatternMatch";
 import { Rep } from "../src/Rep";
 import { ALL_DEPENDENCY_GRAMMAR, VersionedArtifact } from "./MavenGrammars";
 
 import assert = require("power-assert");
 
 describe("Positioning", () => {
-    // let subject: Calculator;
-    //
-    // beforeEach(() => {
-    //     subject = new Calculator();
-    // });
 
     describe("should get position of pattern", () => {
         it("should do it", () => {
@@ -19,7 +12,7 @@ describe("Positioning", () => {
             assert(m);
             assert(m.startElement);
             // console.log(JSON.stringify(m.startElement));
-            assert(m.$value.startElement$match);
+            assert(m.$valueMatches.startElement);
         });
     });
 });
@@ -29,7 +22,7 @@ const DEPENDENCY_MANAGEMENT_GRAMMAR =
         startElement: "<dependencyManagement>",
         _deps: "<dependencies>",
         dependencies: new Rep(ALL_DEPENDENCY_GRAMMAR),
-    } as Term);
+    });
 
 const PomWithDependencyManagement =
     `<?xml version="1.0" encoding="UTF-8"?>

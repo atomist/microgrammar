@@ -1,5 +1,4 @@
 import assert = require("power-assert");
-import { expect } from "chai";
 
 import { MatchingLogic } from "../src/Matchers";
 import { MatchingMachine } from "../src/Microgrammar";
@@ -38,7 +37,7 @@ describe("MatchingMachine", () => {
         const mm = new SaveEverySecondMatch();
         mm.consume(input);
         const result = mm.matches.map(m => m.$matched);
-        expect(result).to.deep.equals(["Nicolas", "Emmanuel"]);
+        assert.deepEqual(result, ["Nicolas", "Emmanuel"]);
     });
 
     it("save first word then numbers only", () => {
@@ -65,7 +64,7 @@ describe("MatchingMachine", () => {
         const mm = new SaveWordAndNumbers();
         mm.consume(input);
         const result = mm.matches.map(m => m.$matched);
-        expect(result).to.deep.equal(["Nicolas", "1234"]);
+        assert.deepEqual(result, ["Nicolas", "1234"]);
     });
 
     const pyClass = {
@@ -221,7 +220,8 @@ export class XmlTracker extends MatchingMachine {
         return this.matcher;
     }
 
-    protected observeMatch(pm: { name: string, slash }) {
+    protected observeMatch(patternMatch) {
+        const pm: { name: string, slash } = patternMatch as any;
         if (pm.slash) {
             this.elementStack.pop();
             if (pm.name === "dependency") {

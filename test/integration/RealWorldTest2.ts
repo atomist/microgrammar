@@ -1,5 +1,5 @@
 import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/java/JavaBody";
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
 
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
@@ -38,9 +38,14 @@ describe("GrammarWithOnlyARep", () => {
     it("can handle rep", () => {
         const rep = new Rep(AnyAnnotation);
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
-        const match = rep.matchPrefix(inputStateFromString(src), {}) as PatternMatch;
-        assert(isPatternMatch(match));
-        assert(match.$matched.trim() === `@ChangeControlled @Donkey("24", name = "Eeyore")`);
+        const match = rep.matchPrefix(inputStateFromString(src), {}, {});
+        if (isSuccessfulMatch(match)) {
+            const mmmm = match.match as any;
+            assert(mmmm.$matched.trim() === `@ChangeControlled @Donkey("24", name = "Eeyore")`);
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("match valid annotations with trailing junk", () => {

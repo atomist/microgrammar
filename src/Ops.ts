@@ -1,8 +1,8 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPatternMatch } from "./PatternMatch";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { UndefinedPatternMatch } from "./PatternMatch";
 
 /**
  * Optional match on the given matcher
@@ -11,8 +11,8 @@ import { isPatternMatch, MATCH_INFO_SUFFIX, MatchFailureReport, UndefinedPattern
  * parent if specified
  * @return {Opt}
  */
-export function optional(o: any, pullUp?: string): MatchingLogic {
-    return new Opt(o, pullUp);
+export function optional(o: any): MatchingLogic {
+    return new Opt(o);
 }
 
 export class Opt implements MatchingLogic {
@@ -24,7 +24,7 @@ export class Opt implements MatchingLogic {
      * @param o matching logic
      * @param pullUp property to pull up if we want one
      */
-    constructor(o: any, private pullUp?: string) {
+    constructor(o: any) {
         this.matcher = toMatchingLogic(o);
     }
 
@@ -32,25 +32,17 @@ export class Opt implements MatchingLogic {
         return `Opt[${this.matcher.$id}]`;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
-            return new UndefinedPatternMatch(this.$id, is.offset);
+            return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
         }
 
-        const maybe = this.matcher.matchPrefix(is, context);
-        if (isPatternMatch(maybe)) {
-            if (this.pullUp) {
-                const f = this.pullUp + MATCH_INFO_SUFFIX;
-                const field = maybe.$value[f];
-                if (!field) {
-                    throw new Error(`Cannot pull up field ${f} in ${maybe}`);
-                }
-                maybe.$value = field.$value;
-            }
+        const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
+        if (isSuccessfulMatch(maybe)) {
             return maybe;
         }
-        return new UndefinedPatternMatch(this.$id, is.offset);
+        return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
     }
 }
 
@@ -71,14 +63,14 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         if (is.exhausted()) {
             return new MatchFailureReport(this.$id, is.offset, {});
         }
 
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is, context);
-            if (isPatternMatch(m)) {
+            const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
+            if (isSuccessfulMatch(m)) {
                 return m;
             }
         }
@@ -104,10 +96,10 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
         }
     }
 
-    function conditionalMatch(is: InputState, context: {}): MatchPrefixResult {
-        const match = matcher.matchPrefix(is, context);
-        return (isPatternMatch(match) && matchTest(match)) ?
-            match :
+    function conditionalMatch(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
+        return (isSuccessfulMatch(result) && matchTest(result.match)) ?
+            result :
             new MatchFailureReport(this.$id, is.offset, context);
     }
 

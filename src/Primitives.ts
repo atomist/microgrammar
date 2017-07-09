@@ -1,7 +1,7 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { MatchFailureReport, TerminalPatternMatch } from "./PatternMatch";
+import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
  * Match a literal string
@@ -13,11 +13,11 @@ export class Literal implements MatchingLogic {
     constructor(public literal: string) {
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal, context) :
-            new MatchFailureReport(this.$id, is.offset, context,
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal) ) :
+            new MatchFailureReport(this.$id, is.offset, {},
                 `Did not match literal [${this.literal}]: saw [${peek}]`);
     }
 
@@ -59,33 +59,41 @@ export abstract class AbstractRegex implements MatchingLogic {
         this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState): MatchPrefixResult {
         let results: RegExpExecArray;
-        let remainder: string;
-        let seen = 0;
+        let lookAt: string;
+        let charactersToSee = 0;
+
+        function theRegexMatchedSomething(): boolean {
+            return !!results && !!results[0];
+        }
+
+        function matchedEverythingWeLookedAt(): boolean {
+            return results[0] === lookAt;
+        }
+
+        function thereIsMoreToRead(): boolean {
+            return lookAt.length === charactersToSee;
+        }
 
         // Keep asking for more input if we have matched all of the input in
         // our lookahead buffer
         do {
-            seen += this.lookahead;
-            remainder = is.peek(seen);
-            results = this.regex.exec(remainder);
-        } while (results && results[0] === remainder && remainder.length === seen);
+            charactersToSee += this.lookahead;
+            lookAt = is.peek(charactersToSee);
+            results = this.regex.exec(lookAt);
+        } while (theRegexMatchedSomething() && matchedEverythingWeLookedAt() && thereIsMoreToRead());
 
-        if (results && results[0]) {
-            // Matched may not be the same as results[0]
-            // If there's not an anchor, we may match before
-            const actualMatch = results[0];
-            const matched = remainder.substring(0, remainder.indexOf(actualMatch)) + actualMatch;
-            return new TerminalPatternMatch(
+        if (theRegexMatchedSomething()) {
+            const matched = results[0];
+            return matchPrefixSuccess(new TerminalPatternMatch(
                 this.$id,
                 matched,
                 is.offset,
-                this.toValue(actualMatch),
-                context);
+                this.toValue(matched)));
         } else {
-            return new MatchFailureReport(this.$id, is.offset, context,
-                `Did not match regex /${this.regex.source}/ in [${remainder}]`);
+            return new MatchFailureReport(this.$id, is.offset, {},
+                `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
         }
     }
 

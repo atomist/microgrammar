@@ -1,11 +1,14 @@
 import { expect } from "chai";
 import { inputStateFromString } from "../../src/internal/InputStateFactory";
 import { Concat } from "../../src/matchers/Concat";
-import { isPatternMatch, PatternMatch } from "../../src/PatternMatch";
+import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
+import { PatternMatch } from "../../src/PatternMatch";
 import { Integer } from "../../src/Primitives";
 import { Rep1Sep, RepSep } from "../../src/Rep";
 
 import * as assert from "power-assert";
+import { fail } from "power-assert";
+import { Skipper } from "../../src/Config";
 
 describe("Concat", () => {
 
@@ -15,10 +18,13 @@ describe("Concat", () => {
             name: "foo",
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        expect(isPatternMatch(result)).to.equal(true);
-        expect(result.$matched).to.equal("foo");
-        expect(result.name).to.equal("foo");
+        const result = mg.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(result)) {
+            expect((result.match as any).name).to.equal("foo");
+            assert(result.$matched === "foo");
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("single digit with regex", () => {
@@ -28,10 +34,12 @@ describe("Concat", () => {
             num: /[1-9][0-9]*/,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.$matched === content);
-        assert(result.num === "2");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmm = result.match as any;
+            assert(mmm.$matched === content);
+            assert(mmm.num === "2");
+        }
     });
 
     it("integer with single digit", () => {
@@ -40,14 +48,19 @@ describe("Concat", () => {
             num: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        expect(isPatternMatch(result)).to.equal(true);
-        // expect(result.$matched).to.equal(content);
-        // expect(result.$matchers.length).to.equal(1);
-        // console.log(JSON.stringify(result.$matchers[0]))
-        // expect(result.$matchers[0].$value).to.equal(2);
-        // expect(result.$value).to.equal(2);
-        expect(result.num).to.equal(2);
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            // expect(mmmm.$matched).to.equal(content);
+            // expect(mmmm.$matchers.length).to.equal(1);
+            // console.log(JSON.stringify(mmmm.$matchers[0]))
+            // expect(mmmm.$matchers[0].$value).to.equal(2);
+            // expect(mmmm.$value).to.equal(2);
+            expect(mmmm.num).to.equal(2);
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("integer with multiple digits", () => {
@@ -56,10 +69,15 @@ describe("Concat", () => {
             num: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        expect(isPatternMatch(result)).to.equal(true);
-        expect(result.$matched).to.equal(content);
-        expect(result.num).to.equal(24);
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            expect(mmmm.$matched).to.equal(content);
+            expect(mmmm.num).to.equal(24);
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("integers", () => {
@@ -70,11 +88,16 @@ describe("Concat", () => {
             days: Integer,
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        expect(isPatternMatch(result)).to.equal(true);
-        expect(result.$matched).to.equal(content);
-        expect(result.hours).to.equal(24);
-        expect(result.days).to.equal(7);
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            expect(mmmm.$matched).to.equal(content);
+            expect(mmmm.hours).to.equal(24);
+            expect(mmmm.days).to.equal(7);
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("respects nesting without name collisions", () => {
@@ -87,10 +110,15 @@ describe("Concat", () => {
         });
         const content = "Lizzy+Katrina";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.name === "Lizzy");
-        assert(result.spouse.name === "Katrina");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            assert(mmmm.name === "Lizzy");
+            assert(mmmm.spouse.name === "Katrina");
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("respects nesting without name collisions using nested rep", () => {
@@ -103,11 +131,16 @@ describe("Concat", () => {
         });
         const content = "Lizzy+Katrina,Terri";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.names[0], "Lizzy");
-        assert(result.spouse.names[0] === "Katrina");
-        assert(result.spouse.names[1] === "Terri");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            assert(mmmm.names[0], "Lizzy");
+            assert(mmmm.spouse.names[0] === "Katrina");
+            assert(mmmm.spouse.names[1] === "Terri");
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("respects nesting without name collisions using parallel reps within concats", () => {
@@ -121,11 +154,16 @@ describe("Concat", () => {
         });
         const content = "Jardine vs Bradman,Woodfull";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.gentlemen.names[0], "Jardine");
-        assert(result.players.names[0] === "Bradman");
-        assert(result.players.names[1] === "Woodfull");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            assert(mmmm.gentlemen.names[0], "Jardine");
+            assert(mmmm.players.names[0] === "Bradman");
+            assert(mmmm.players.names[1] === "Woodfull");
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("respects nesting without name collisions using parallel reps without concats", () => {
@@ -136,18 +174,23 @@ describe("Concat", () => {
         });
         const content = "Jardine vs Bradman,Woodfull";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.gentlemen[0], "Jardine");
-        assert(result.players[0] === "Bradman");
-        assert(result.players[1] === "Woodfull");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            assert(mmmm.gentlemen[0], "Jardine");
+            assert(mmmm.players[0] === "Bradman");
+            assert(mmmm.players[1] === "Woodfull");
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("repsep of concat", () => {
         const nameList = {
             names: new Rep1Sep({
                 name: /[A-Za-z]+/,
-                lp : "(",
+                lp: "(",
                 plays: new Rep1Sep(/[a-z]+/, ","),
                 rp: ")",
             }, ","),
@@ -159,15 +202,20 @@ describe("Concat", () => {
         });
         const content = "Jardine(bat),Wyatt(bat) vs Bradman(bat,bowl),Woodfull(bat,keep)";
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as any;
-        assert(isPatternMatch(result));
-        assert(result.gentlemen.names[0].name, "Jardine");
-        assert(result.players.names[0].name === "Bradman");
-        assert(result.players.names[1].name === "Woodfull");
-        assert(result.players.names[1].plays[0] = "bat");
-        // Don't pollute higher level namespace
-        assert(result.name === undefined);
-        assert(result.gentlemen.name === undefined, "Don't pollute parent namespace");
+        const result = mg.matchPrefix(is, {}, {}) as any;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            assert(mmmm.gentlemen.names[0].name, "Jardine");
+            assert(mmmm.players.names[0].name === "Bradman");
+            assert(mmmm.players.names[1].name === "Woodfull");
+            assert(mmmm.players.names[1].plays[0] = "bat");
+            // Don't pollute higher level namespace
+            assert(mmmm.name === undefined);
+            assert(mmmm.gentlemen.name === undefined, "Don't pollute parent namespace");
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("rep array structure", () => {
@@ -178,12 +226,17 @@ describe("Concat", () => {
             hobbies: new RepSep(/[a-z]+/, ","),
         });
         const is = inputStateFromString(content);
-        const result = mg.matchPrefix(is, {}) as PatternMatch;
-        expect(isPatternMatch(result)).to.equal(true);
-        const r = result as any;
-        expect(r.name).to.equal("Donald");
-        expect(r.delim).to.equal(":");
-        expect(r.hobbies).to.have.members(["golf", "tweeting"]);
+        const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
+        if (isSuccessfulMatch(result)) {
+            const mmmm = result.match as any;
+            const r = mmmm as any;
+            expect(r.name).to.equal("Donald");
+            expect(r.delim).to.equal(":");
+            expect(r.hobbies).to.have.members(["golf", "tweeting"]);
+
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("does not allow undefined matcher field steps", () => {
@@ -206,6 +259,51 @@ describe("Concat", () => {
             assert(e.message.indexOf("Step [opening] is null") !== -1);
             return true;
         });
+    });
+
+    it("does not skip", () => {
+        const content = "tom:49";
+        const mg = new Concat({
+            name: /[a-z]+/,
+            age: Integer,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        assert(!isSuccessfulMatch(result));
+    });
+
+    it("skips: simple", () => {
+        const content = "tom:49";
+        const mg = new Concat({
+            ...Skipper,
+            name: /[a-z]+/,
+            age: Integer,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        assert(isSuccessfulMatch(result));
+    });
+
+    it("skips: more complex", () => {
+        const content = "Katrina and this is a whole bunch of junk the Waves were a band in the 80s in England and this is junk";
+        const mg = new Concat({
+            ...Skipper,
+            lead: /[A-Z][a-z]+/,
+            band: /[A-Z][a-z]+/,
+            decade: Integer,
+            country: /[A-Z][a-z]+/,
+        });
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(result)) {
+            const r = result.match as any;
+            assert(r.lead === "Katrina");
+            assert(r.band === "Waves");
+            assert(r.decade === 80);
+            assert(r.country === "England");
+        } else {
+            fail("Match expected");
+        }
     });
 
 });

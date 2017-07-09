@@ -6,34 +6,42 @@ import { MatchingLogic } from "../../Matchers";
 import { Break } from "../snobol/Break";
 
 import { InputState } from "../../InputState";
+import { matchPrefixSuccess } from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
  * Match the rest of the input.
- * @type {{$id: string; matchPrefix: ((is:InputState, context:{})=>TerminalPatternMatch)}}
+ * @type {{$id: string; matchPrefix: ((is:InputState)}}
  */
 export const RestOfInput: MatchingLogic = {
 
     $id: "RestOfInput",
 
-    matchPrefix(is: InputState, context: {}) {
+    matchPrefix(is: InputState) {
         const consumed = is.skipWhile(s => true, 1);
-        return new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped, context);
+        return matchPrefixSuccess(
+            new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped));
     },
 };
 
 /**
  * Match the rest of the current line
- * @type {Break}
  */
 export const RestOfLine: MatchingLogic = new Break("\n");
 
 /**
- * Match a string until the given logic. Wraps Break.
+ * Match a string until the given matcher. Wraps Break.
  * Binds the content until the break.
  */
 export function takeUntil(what): MatchingLogic {
     return new Break(what);
+}
+
+/**
+ * Skip all content until the given matcher. Bind its match
+ */
+export function skipTo(what): MatchingLogic {
+    return new Break(what, true);
 }
 
 /**

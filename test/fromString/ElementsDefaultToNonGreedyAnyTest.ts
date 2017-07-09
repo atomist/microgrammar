@@ -1,6 +1,6 @@
+import { Microgrammar } from "../../src/Microgrammar";
+import { isPatternMatch } from "../../src/PatternMatch";
 import assert = require("power-assert");
-import {Microgrammar} from "../../src/Microgrammar";
-import {isPatternMatch} from "../../src/PatternMatch";
 
 describe("Elements default to non-greedy any", () => {
 
@@ -8,17 +8,25 @@ describe("Elements default to non-greedy any", () => {
         const content = "->banana<- ";
         const mg = Microgrammar.fromString("->${fruit}<-");
         const result: any = mg.exactMatch(content);
-        assert(isPatternMatch(result));
-        assert(result.fruit === "banana");
+        if (isPatternMatch(result)) {
+            const mmmm = result as any;
+            assert(mmmm.fruit === "banana");
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("multiple undefined elements are fine if they're separated by a literal", () => {
         const content = "preamble content ->banana<-juice! and more...";
         const mg = Microgrammar.fromString<{ fruit: string, drink: string }>("->${fruit}<-${drink}!");
         const result: any = mg.firstMatch(content);
-        assert(isPatternMatch(result));
-        assert(result.fruit === "banana");
-        assert(result.drink === "juice");
+        if (isPatternMatch(result)) {
+            const mmmm = result as any;
+            assert(mmmm.fruit === "banana");
+            assert(mmmm.drink === "juice");
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
     it("multiple undefined elements are fine if they're separated by a defined element", () => {
@@ -34,17 +42,24 @@ describe("Elements default to non-greedy any", () => {
         const content = "->   banana   <- ";
         const mg = Microgrammar.fromString("-> ${fruit} <-");
         const result: any = mg.exactMatch(content);
-        assert(isPatternMatch(result));
-        assert(result.fruit.trim() === "banana");
+        if (isPatternMatch(result)) {
+            const mmmm = result as any;
+            assert(mmmm.fruit.trim() === "banana");
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
-    it.skip("trims whitespace from the captured text",
-        () => {
+    it.skip("trims whitespace from the captured text", () => {
         const content = "->   banana   <- ";
         const mg = Microgrammar.fromString("-> ${fruit} <-");
         const result: any = mg.exactMatch(content);
-        assert(isPatternMatch(result));
-        assert(result.fruit === "banana");
+        if (isPatternMatch(result)) {
+            const mmmm = result as any;
+            assert(mmmm.fruit === "banana");
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
 });

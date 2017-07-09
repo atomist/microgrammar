@@ -1,13 +1,19 @@
 import { expect } from "chai";
 import { Microgrammar } from "../../src/Microgrammar";
 import { Opt } from "../../src/Ops";
-import { PatternMatch } from "../../src/PatternMatch";
+import { isPatternMatch } from "../../src/PatternMatch";
 import { RepSep } from "../../src/Rep";
 import { RealWorldPom } from "../Fixtures";
 import {
-    ALL_PLUGIN_GRAMMAR, ARTIFACT_VERSION_GRAMMAR, LEGAL_VALUE, PLUGIN_GRAMMAR,
+    ALL_PLUGIN_GRAMMAR,
+    ARTIFACT_VERSION_GRAMMAR,
+    LEGAL_VALUE,
+    PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "../MavenGrammars";
+
+import * as assert from "power-assert";
+import { WhiteSpaceSensitive } from "../../src/Config";
 
 describe("MicrogrammarFromString", () => {
 
@@ -96,8 +102,6 @@ describe("MicrogrammarFromString", () => {
         const content = "<first>notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: true,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
@@ -107,9 +111,8 @@ describe("MicrogrammarFromString", () => {
     it("2 elements: whitespace sensitive: match", () => {
         const content = "<first>  notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
+            ...WhiteSpaceSensitive,
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
@@ -118,9 +121,8 @@ describe("MicrogrammarFromString", () => {
     it("2 elements: whitespace sensitive: no match", () => {
         const content = "<first>  notxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}> notxml", {
+            ...WhiteSpaceSensitive,
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(0);
@@ -130,8 +132,6 @@ describe("MicrogrammarFromString", () => {
         const content = "<first>\n\tnotxml";
         const mg = Microgrammar.fromString<{ namex: string[] }>("<${namex}>\n\tnotxml", {
             namex: /[a-zA-Z0-9]+/,
-        }, {
-            consumeWhiteSpaceBetweenTokens: false,
         });
         const result = mg.findMatches(content);
         expect(result.length).to.equal(1);
@@ -148,7 +148,7 @@ describe("MicrogrammarFromString", () => {
         expect(result.length).to.equal(2);
         expect(result[0].name).to.equal("Greg");
         expect(result[1].name).to.equal("Tony");
-        const result2 = mg.findMatches("David Theresa", pm => true);
+        const result2 = mg.findMatches("David Theresa", {}, pm => true);
         expect(result2.length).to.equal(1);
         expect(result2[0].name).to.equal("David");
         const result3 = mg.firstMatch("Gough Malcolm");
@@ -171,15 +171,8 @@ describe("MicrogrammarFromString", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
-        expect(result[0].$matched).to.equal(content);
         expect(r0.first.name).to.equal("first");
-        expect(r0.first.$match.$matched).to.equal("<first>");
         expect(r0.second.name).to.equal("second");
-        // Now access match for the name
-        const nameMatch = r0.second.name$match as PatternMatch;
-        expect(nameMatch.$value).to.equal("second");
-        expect(nameMatch.$matched).to.equal(nameMatch.$value);
-        expect(nameMatch.$offset).to.equal("<first><".length);
     });
 
     it("1 XML elements via nested microgrammar with optional not present", () => {
@@ -194,11 +187,11 @@ describe("MicrogrammarFromString", () => {
             second: new Opt(element),
         });
         const result = mg.findMatches(content);
-        // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
+        assert(isPatternMatch(r0));
         expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
+        expect(r0.first.$matched).to.equal("<first>");
         expect(r0.second).to.equal(undefined);
     });
 
@@ -218,8 +211,6 @@ describe("MicrogrammarFromString", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
         const r0 = result[0] as any;
-        expect(r0.$matched).to.equal(content);
-        expect(r0.first.$match.$matched).to.equal("<first>");
         expect(r0.first.name).to.equal("first");
         expect(r0.second.name).to.equal("second");
     });

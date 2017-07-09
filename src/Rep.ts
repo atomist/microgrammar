@@ -1,27 +1,42 @@
-import { Config, Configurable, DefaultConfig } from "./Config";
 import { InputState } from "./InputState";
-import { MatchingLogic} from "./Matchers";
-import { isConcat, toMatchingLogic } from "./matchers/Concat";
-import { MatchPrefixResult } from "./MatchPrefixResult";
-import { isPatternMatch, MatchFailureReport, PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+import { MatchingLogic } from "./Matchers";
+import { toMatchingLogic } from "./matchers/Concat";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
+import { PatternMatch, TerminalPatternMatch } from "./PatternMatch";
 
+import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
+
+/**
+ * Match zero or more of these
+ * @param o matcher
+ * @return {Rep1}
+ */
+export function zeroOrMore(o: any): Repetition {
+    return new Rep(o);
+}
+
+/**
+ * Match at least one of these
+ * @param o matcher
+ * @return {Rep1}
+ */
+export function atLeastOne(o: any): Repetition {
+    return new Rep1(o);
+}
 
 /**
  * Handle repetition, with or without a separator.
  * Prefer subclasses for simplicity and clarity.
  * By default, match zero or more times without a separator
  */
-export class Repetition implements MatchingLogic, Configurable {
+export class Repetition implements MatchingLogic, WhiteSpaceHandler {
+
+    public $consumeWhiteSpaceBetweenTokens = true;
 
     private matcher: MatchingLogic;
 
     private sepMatcher: MatchingLogic;
-
-    private config: Config = DefaultConfig;
-
-    // tslint:disable-next-line:member-ordering
-    public $id = `Rep[${this.matcher}:min=${this.min},sep=[${this.sep}]`;
 
     /**
      * Generic rep support. Normally use subclasses.
@@ -36,8 +51,12 @@ export class Repetition implements MatchingLogic, Configurable {
         }
     }
 
-    public withConfig(config: Config): this {
-        this.config = config;
+    get $id() {
+        return `Rep[${this.matcher}:min=${this.min},sep=[${this.sep}]`;
+    }
+
+    public consumeWhiteSpace(consumeWhiteSpaceBetweenTokens: boolean): this {
+        this.$consumeWhiteSpaceBetweenTokens = consumeWhiteSpaceBetweenTokens;
         return this;
     }
 
@@ -53,21 +72,20 @@ export class Repetition implements MatchingLogic, Configurable {
             this.matcher.requiredPrefix;
     }
 
-    public matchPrefix(is: InputState, context: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
         while (!currentInputState.exhausted()) {
-            const eat = readyToMatch(currentInputState, this.config);
+            const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
             currentInputState = eat.state;
             matched += eat.skipped;
 
-            const contextToUse = isConcat(this.matcher) ? {} : context;
-
-            const match = this.matcher.matchPrefix(currentInputState, contextToUse);
-            if (!isPatternMatch(match)) {
+            const result = this.matcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
+            if (!isSuccessfulMatch(result)) {
                 break;
             } else {
+                const match = result.match;
                 if (match.$matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                      `I do not think this grammar means what you think it means`);
@@ -78,11 +96,12 @@ export class Repetition implements MatchingLogic, Configurable {
             }
 
             if (this.sepMatcher) {
-                const eaten = readyToMatch(currentInputState, this.config);
+                const eaten = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatch = this.sepMatcher.matchPrefix(currentInputState, context);
-                if (isPatternMatch(sepMatch)) {
+                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
+                if (isSuccessfulMatch(sepMatchResult)) {
+                    const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched);
                     matched += (sepMatch as PatternMatch).$matched;
                 } else {
@@ -98,12 +117,11 @@ export class Repetition implements MatchingLogic, Configurable {
         );
 
         return (matches.length >= this.min) ?
-            new TerminalPatternMatch(this.$id,
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
-                values,
-                context) :
-            new MatchFailureReport(this.$id, is.offset, context);
+                values)) :
+            new MatchFailureReport(this.$id, is.offset, {});
     }
 }
 
