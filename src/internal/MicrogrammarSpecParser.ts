@@ -3,8 +3,8 @@ import { Concat, toMatchingLogic } from "../matchers/Concat";
 import { Literal } from "../Primitives";
 
 import { WhiteSpaceHandler } from "../Config";
-import { Break } from "../matchers/snobol/Break";
 import { isPatternMatch } from "../PatternMatch";
+import { Break } from "./Break";
 import { exactMatch } from "./ExactMatch";
 import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
 

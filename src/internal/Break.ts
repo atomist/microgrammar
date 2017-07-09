@@ -1,12 +1,12 @@
-import { InputState } from "../../InputState";
-import { MatchingLogic } from "../../Matchers";
-import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
-import { TerminalPatternMatch } from "../../PatternMatch";
-import { toMatchingLogic } from "../Concat";
+import { InputState } from "../InputState";
+import { MatchingLogic } from "../Matchers";
+import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
+import { TerminalPatternMatch } from "../PatternMatch";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
- * In SNOBOL
+ * In SNOBOL.
+ * Used internally in Concat. Also exposed to end users in Skip functions.
  * BREAK(S) matches "up to but not including" any character in S.
  * The string matched must always be followed in the subject by a character in S.
  * Unlike SPAN and NOTANY, BREAK will match the null string.
@@ -15,24 +15,18 @@ import { toMatchingLogic } from "../Concat";
  */
 export class Break implements MatchingLogic {
 
-    public terminateOn: MatchingLogic;
-
-    private badMatcher: MatchingLogic;
-
     /**
      * Consume input until (or until and including) the terminal match
-     * @param breakOn desired terminal match
+     * @param terminateOn desired terminal match
      * @param consume default false. Whether to consume the terminal match. If this is set to true,
      * the value of the match will be the match of the terminal pattern. Otherwise it will the preceding,
      * skipped content.
-     * @param butNot pattern we don't want to see before the desired determinal match.
+     * @param badMatcher pattern we don't want to see before the desired determinal match.
      * If we see this pattern before, the match breaks.
      */
-    constructor(breakOn: any, private consume: boolean = false, butNot?: any) {
-        this.terminateOn = toMatchingLogic(breakOn);
-        if (butNot) {
-            this.badMatcher = toMatchingLogic(butNot);
-        }
+    constructor(public terminateOn: MatchingLogic,
+                private consume: boolean = false,
+                private badMatcher?: MatchingLogic) {
     }
 
     get $id() {

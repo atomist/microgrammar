@@ -2,16 +2,17 @@
  * Convenient operations to skip over input
  */
 
+import { Break } from "../../internal/Break";
 import { MatchingLogic } from "../../Matchers";
-import { Break } from "../snobol/Break";
 
 import { InputState } from "../../InputState";
 import { matchPrefixSuccess } from "../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../PatternMatch";
+import { Literal } from "../../Primitives";
+import { toMatchingLogic } from "../Concat";
 
 /**
  * Match the rest of the input.
- * @type {{$id: string; matchPrefix: ((is:InputState)}}
  */
 export const RestOfInput: MatchingLogic = {
 
@@ -27,21 +28,21 @@ export const RestOfInput: MatchingLogic = {
 /**
  * Match the rest of the current line
  */
-export const RestOfLine: MatchingLogic = new Break("\n");
+export const RestOfLine: MatchingLogic = new Break(new Literal("\n"));
 
 /**
  * Match a string until the given matcher. Wraps Break.
  * Binds the content until the break.
  */
 export function takeUntil(what): MatchingLogic {
-    return new Break(what);
+    return new Break(toMatchingLogic(what));
 }
 
 /**
  * Skip all content until the given matcher. Bind its match
  */
 export function skipTo(what): MatchingLogic {
-    return new Break(what, true);
+    return new Break(toMatchingLogic(what), true);
 }
 
 /**
@@ -50,7 +51,7 @@ export function skipTo(what): MatchingLogic {
  * @param b match we don't want.
  */
 export function yadaYadaThenThisButNotThat(a, b): MatchingLogic {
-    return new Break(a, true, b);
+    return new Break(toMatchingLogic(a), true, toMatchingLogic(b));
 }
 
 /**
@@ -59,5 +60,5 @@ export function yadaYadaThenThisButNotThat(a, b): MatchingLogic {
  * @returns {Break}
  */
 export function yadaYadaThen(a): MatchingLogic {
-    return new Break(a, true);
+    return new Break(toMatchingLogic(a), true);
 }

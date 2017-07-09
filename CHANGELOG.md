@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.1...HEAD
+
+## [0.5.1] - 2017-07-09
+
+Bug fix - remove cycle
+
+### Changed
+
+-   **Breaking** `Break` is now for internal use, to avoid cycle with `Concat`. 
+    Use functions in `Skip` to achieve `Break` behavior.
 
 ## [0.5.0] - 2017-07-09
-
-[0.4.1]: https://github.com/atomist/microgrammar/compare/0.5.0...0.4.1
 
 Config and context overhaul release
 

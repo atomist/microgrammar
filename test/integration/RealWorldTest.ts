@@ -3,9 +3,10 @@ import { Microgrammar } from "../../src/Microgrammar";
 import { Alt, Opt } from "../../src/Ops";
 import { RepSep } from "../../src/Rep";
 
-import { Break } from "../../src/matchers/snobol/Break";
+import { Break } from "../../src/internal/Break";
 
 import * as assert from "power-assert";
+import { takeUntil } from "../../src/matchers/skip/Skip";
 
 describe("Real world usage", () => {
 
@@ -123,7 +124,7 @@ export class AnnotationGrammar {
     public readonly stringText = Microgrammar.
     fromDefinitions({
         _p1: '"',
-        text: new Break('"'),
+        text: takeUntil('"'),
         _p2: '"',
         $id: "stringText",
     });

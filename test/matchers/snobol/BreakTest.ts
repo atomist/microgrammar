@@ -1,8 +1,8 @@
 import { Concat } from "../../../src/matchers/Concat";
 import { PatternMatch } from "../../../src/PatternMatch";
-import { Integer, Regex } from "../../../src/Primitives";
+import { Integer, Literal, Regex } from "../../../src/Primitives";
 
-import { Break } from "../../../src/matchers/snobol/Break";
+import { Break } from "../../../src/internal/Break";
 
 import { inputStateFromString } from "../../../src/internal/InputStateFactory";
 import { Span } from "../../../src/matchers/snobol/Span";
@@ -15,7 +15,7 @@ import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 describe("Break", () => {
 
     it("break matches exhausted", () => {
-        const b = new Break("14");
+        const b = new Break(new Literal("14"));
         const is = inputStateFromString("");
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
@@ -59,7 +59,7 @@ describe("Break", () => {
     });
 
     it("break matches", () => {
-        const b = new Break("14");
+        const b = new Break(new Literal("14"));
         const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
@@ -85,7 +85,7 @@ describe("Break", () => {
     });
 
     it("break matches and consumes", () => {
-        const b = new Break("14", true);
+        const b = new Break(new Literal("14"), true);
         const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {}, {}) as any;
         if (isSuccessfulMatch(m)) {
@@ -108,7 +108,7 @@ describe("Break", () => {
     });
 
     it("break matches nothing as it comes immediately", () => {
-        const b = new Break("friday");
+        const b = new Break(new Literal("friday"));
         const is = inputStateFromString("friday 14");
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
@@ -121,7 +121,7 @@ describe("Break", () => {
     });
 
     it("break matches all in concat", () => {
-        const b = new Break("14");
+        const b = new Break(new Literal("14"));
         const c = new Concat({
             prefix: b,
             number: new Span("41"),

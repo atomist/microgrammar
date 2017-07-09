@@ -6,8 +6,8 @@ import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch
 import { Literal, Regex } from "../Primitives";
 
 import { SkipCapable, WhiteSpaceHandler } from "../Config";
+import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { Break } from "./snobol/Break";
 
 /**
  * Represents something that can be passed into a microgrammar

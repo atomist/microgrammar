@@ -6,7 +6,7 @@ import { PatternMatch } from "../src/PatternMatch";
 import { Regex } from "../src/Primitives";
 
 import * as assert from "power-assert";
-import { Break } from "../src/matchers/snobol/Break";
+import { Break } from "../src/internal/Break";
 
 describe("Regex", () => {
 

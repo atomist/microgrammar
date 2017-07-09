@@ -1,8 +1,8 @@
 import { Concat } from "../matchers/Concat";
 import { RestOfInput } from "../matchers/skip/Skip";
-import { Break } from "../matchers/snobol/Break";
 import { Literal, Regex } from "../Primitives";
 import { Rep } from "../Rep";
+import { Break } from "./Break";
 
 const elementReference = new Concat({
     $id: "component",

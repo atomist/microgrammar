@@ -10,9 +10,11 @@ import { TerminalPatternMatch } from "../../PatternMatch";
  */
 export class Span implements MatchingLogic {
 
-    public $id = `Span[${this.characters}]`;
-
     constructor(public characters: string) {
+    }
+
+    get $id() {
+        return `Span[${this.characters}]`;
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
