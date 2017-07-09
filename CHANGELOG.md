@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+-   Added `flatten` method for working with `Opt`
 -   Tiered contexts for current parse and current match
 -   Convenience functions `atLeastOne` and `zeroOrMore` for working with repetition
 -   `RestOfLine` convenience matcher function

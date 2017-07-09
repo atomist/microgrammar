@@ -7,8 +7,6 @@ import { UndefinedPatternMatch } from "./PatternMatch";
 /**
  * Optional match on the given matcher
  * @param o matcher
- * @param pullUp property from the matcher to pull up to the
- * parent if specified
  * @return {Opt}
  */
 export function optional(o: any): MatchingLogic {
@@ -22,7 +20,6 @@ export class Opt implements MatchingLogic {
     /**
      * Optional match
      * @param o matching logic
-     * @param pullUp property to pull up if we want one
      */
     constructor(o: any) {
         this.matcher = toMatchingLogic(o);
