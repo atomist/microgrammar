@@ -9,8 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.3.11...HEAD
 
+### Added
+
+-   Tiered contexts for current parse and current match
+-   Convenience functions `atLeastOne` and `zeroOrMore` for working with repetition
+-   `RestOfLine` convenience matcher function
+
 ### Changed
 
+-   **Breaking** Configuration properties are now added to definition literals 
+    directly
 -   **Breaking** `Regex` now adds a start anchor if none is specified.
 -   **Breaking** `Concat` moved to `matchers` directory as it should not be
 used directly by end users in most cases.
