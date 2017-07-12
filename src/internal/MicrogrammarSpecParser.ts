@@ -107,6 +107,7 @@ export class MicrogrammarSpecParser {
             return new Literal(literal);
         }
         // TODO why, if we don't put this in, does it fail?
+        // Is this just in Nashorn?
         // it gets TypeError: literal.split is not a function
         if (typeof literal === "string") {
             const whiteSpaceSeparated = literal.split(/\s/);

@@ -191,7 +191,6 @@ export abstract class MatchingMachine {
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
                 if (isSuccessfulMatch(tryMatch)) {
-                    // TODO will this spoil offsets? Might want to create an input state
                     const matches = omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
@@ -222,7 +221,9 @@ export abstract class MatchingMachine {
      * React to a match. The return can change the matcher, or return the current matcher.
      * @param pm matcher
      */
-    protected abstract onMatch(pm: PatternMatch): any;
+    protected onMatch(pm: PatternMatch): any {
+        return this.matcher;
+    }
 
 }
 

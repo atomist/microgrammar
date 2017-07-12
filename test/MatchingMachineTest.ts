@@ -4,8 +4,6 @@ import { MatchingLogic } from "../src/Matchers";
 import { MatchingMachine } from "../src/Microgrammar";
 import { optional } from "../src/Ops";
 import { PatternMatch } from "../src/PatternMatch";
-
-import { takeUntil } from "../src/matchers/skip/Skip";
 import { GAV, LEGAL_VALUE, VersionedArtifact, XML_TAG_WITH_SIMPLE_VALUE, XmlTag } from "./MavenGrammars";
 
 describe("MatchingMachine", () => {
@@ -150,23 +148,40 @@ class Sun:
 				</exclusion>
 			</exclusions>`)));
 
-    const DEPENDENCY = {
-        _l: "<",
-        _e: "dependency",
-        _r: ">",
-        _content: takeUntil({
-            _l: "</",
-            _e: "dependency",
-            _r: ">",
-        }),
-    };
-
     function parsePomWithTracker(pom: string) {
         const xt = new XmlTracker();
         xt.consume(pom);
         assert(xt.dependencies.length === 1);
         assert(xt.dependencies[0].group === "com.foo.bar");
     }
+
+    it("captures correct offsets for observed matches", () => {
+        class SaveMethodsFromClass extends MatchingMachine {
+
+            public bars: PatternMatch[] = [];
+
+            constructor() {
+                super("foo", "bar");
+            }
+
+            protected observeMatch(pm: PatternMatch) {
+                this.bars.push(pm);
+                return this.matcher;
+            }
+        }
+
+        const input = "foo -bar foo foo foo bar foo bar baz";
+        const mm = new SaveMethodsFromClass();
+        mm.consume(input);
+        assert(mm.bars.length === 3);
+        let lastOffset = -1;
+        mm.bars.forEach(pm => {
+            assert(pm.$value === "bar");
+            assert(input.substring(pm.$offset, pm.$offset + 3) === "bar");
+            assert(pm.$offset !== lastOffset);
+            lastOffset = pm.$offset;
+        });
+    });
 });
 
 export class XmlTracker extends MatchingMachine {
@@ -197,13 +212,9 @@ export class XmlTracker extends MatchingMachine {
     }
 
     protected onMatch(pm: PatternMatch & XmlTag) {
-        // console.log(pm.name + " [" + this.elementStack.join("/") + "]");
         if (this.elementStack.indexOf("dependencies") > -1 &&
             !this.underOneOf("dependencyManagement", "plugin", "pluginManagement", "exclusions")) {
             // We're building a dependency
-
-            // console.log(`**** found ${pm.name} under [${this.path()}]`)
-
             switch (pm.name) {
                 case "groupId":
                     this.group = pm.value;

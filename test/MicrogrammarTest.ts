@@ -238,16 +238,16 @@ describe("Microgrammar", () => {
         // Now access match for the name
         const nameMatch = r0.second.$valueMatches.name as PatternMatch;
 
-        for (const p in r0.second) {
-            if ("tslint wants an if") {
-                console.log(`property ${p}:`);
-                console.log(`[${JSON.stringify(r0.second[p])}]`);
-            }
-        }
+        // for (const p in r0.second) {
+        //     if ("tslint wants an if") {
+        //         console.log(`property ${p}:`);
+        //         console.log(`[${JSON.stringify(r0.second[p])}]`);
+        //     }
+        // }
 
-        console.log(`yo [${JSON.stringify(r0.second)}]`);
+        // console.log(`yo [${JSON.stringify(r0.second)}]`);
         assert(nameMatch.$value === "second");
-        console.log("not yo");
+        // console.log("not yo");
         assert(nameMatch.$matched === nameMatch.$value);
         assert(nameMatch.$offset === "<first><".length);
     });

@@ -5,8 +5,9 @@ import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
 /**
- * Flatten this
- * @param o
+ * Flatten this match, pulling up its only property with the name given to
+ * this matcher.
+ * @param o matcher
  * @return {FlatteningMatcher}
  */
 export function flatten(o: any): MatchingLogic {
