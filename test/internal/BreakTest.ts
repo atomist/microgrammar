@@ -1,16 +1,16 @@
-import { Concat } from "../../../src/matchers/Concat";
-import { PatternMatch } from "../../../src/PatternMatch";
-import { Integer, Literal, Regex } from "../../../src/Primitives";
+import { Concat } from "../../src/matchers/Concat";
+import { PatternMatch } from "../../src/PatternMatch";
+import { Integer, Literal, Regex } from "../../src/Primitives";
 
-import { Break } from "../../../src/internal/Break";
+import { Break } from "../../src/internal/Break";
 
-import { inputStateFromString } from "../../../src/internal/InputStateFactory";
-import { Span } from "../../../src/matchers/snobol/Span";
-import { Alt } from "../../../src/Ops";
+import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { Span } from "../../src/matchers/snobol/Span";
+import { Alt } from "../../src/Ops";
 
 import * as assert from "power-assert";
-import { WhiteSpaceSensitive } from "../../../src/Config";
-import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
+import { WhiteSpaceSensitive } from "../../src/Config";
+import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
 
 describe("Break", () => {
 
@@ -52,7 +52,7 @@ describe("Break", () => {
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-            assert((mmmm).$matched === "HEY YOU ");
+            assert(mmmm.$matched === "HEY YOU ");
         } else {
             assert.fail("Didn't match");
         }
@@ -64,7 +64,7 @@ describe("Break", () => {
         const m = b.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-            assert((mmmm).$matched === "friday ");
+            assert(mmmm.$matched === "friday ");
 
         } else {
             assert.fail("Didn't match");
@@ -137,5 +137,4 @@ describe("Break", () => {
         }
     });
 
-})
-;
+});

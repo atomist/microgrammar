@@ -2,8 +2,9 @@ import { Microgrammar } from "../../../src/Microgrammar";
 import { Alt } from "../../../src/Ops";
 
 import * as assert from "power-assert";
+import { WhiteSpaceSensitive } from "../../../src/Config";
 import { inputStateFromString } from "../../../src/internal/InputStateFactory";
-import { RestOfLine, yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
+import { RestOfLine, skipTo, yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../src/matchers/skip/Skip";
 import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
 
 describe("Skip", () => {
@@ -37,6 +38,24 @@ describe("Skip", () => {
         const input = "The quick brown fox jumps over the lazy dog";
         const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}, {});
         assert(isSuccessfulMatch(pm) && pm.$matched === input);
+    });
+
+    it.skip("skipTo jumps to complicated matcher and preserves structure", () => {
+        const b = skipTo({
+            ...WhiteSpaceSensitive,
+            _start: "${",
+            name: /[a-z]+/,
+            _end: "}",
+        });
+        const is = inputStateFromString("HEY YOU ${thing} and more stuff");
+        const m = b.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+            assert(mmmm.$matched === "HEY YOU ${thing}");
+            assert(mmmm.name === "thing");
+        } else {
+            assert.fail("Didn't match");
+        }
     });
 
 });
