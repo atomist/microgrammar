@@ -1,7 +1,7 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
-import { TerminalPatternMatch } from "../PatternMatch";
+import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -68,8 +68,8 @@ export class Break implements MatchingLogic {
         }
         // We have found the terminal if we get here
         if (this.consume && isSuccessfulMatch(terminalMatch)) {
-            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched + terminalMatch.match.$matched,
-                terminalMatch.$offset, terminalMatch.match.$value));
+            terminalMatch.match.$matched = matched + terminalMatch.match.$matched;
+            return matchPrefixSuccess(terminalMatch.match);
         }
         return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched));
     }

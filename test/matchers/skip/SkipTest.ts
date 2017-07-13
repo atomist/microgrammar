@@ -40,7 +40,7 @@ describe("Skip", () => {
         assert(isSuccessfulMatch(pm) && pm.$matched === input);
     });
 
-    it.skip("skipTo jumps to complicated matcher and preserves structure", () => {
+    it("skipTo jumps to complicated matcher and preserves structure", () => {
         const b = skipTo({
             ...WhiteSpaceSensitive,
             _start: "${",
@@ -52,9 +52,9 @@ describe("Skip", () => {
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
             assert(mmmm.$matched === "HEY YOU ${thing}");
-            assert(mmmm.name === "thing");
+            assert(mmmm.name === "thing", "Couldn't find name property: Structure was " + JSON.stringify(mmmm));
         } else {
-            assert.fail("Didn't match");
+            assert.fail("Didn't match:" + JSON.stringify(m));
         }
     });
 
