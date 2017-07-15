@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.1...HEAD
 
+### Added
+
+-   Allow `⤞` character in `Microgrammar.fromString` specs to skip over intervening content
+    without binding
+
 ### Changed
 
 -   Fixed `skipTo` where target matcher is a non-terminal

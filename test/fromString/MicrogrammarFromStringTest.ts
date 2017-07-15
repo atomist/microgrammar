@@ -288,4 +288,15 @@ describe("MicrogrammarFromString", () => {
         assert.deepEqual(matches[0].cats, ["Felix", "Oscar"]);
     });
 
+    it("handles escaped literal $", () => {
+        const content = "The $AUD has risen lately";
+        const mg = Microgrammar.fromString("The \$${currency} has risen lately", {
+            currency: /[A-Z]{3}/,
+        });
+        const result = mg.findMatches(content);
+        assert(result.length === 1);
+        const r0 = result[0] as any;
+        assert(r0.currency === "AUD");
+    });
+
 });

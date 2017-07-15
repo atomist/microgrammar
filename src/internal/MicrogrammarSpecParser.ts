@@ -9,6 +9,12 @@ import { exactMatch } from "./ExactMatch";
 import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
 
 /**
+ * Use this token when you want an anonymous, unbound stream of content to skip
+ * @type {string}
+ */
+const DiscardToken = "⤞";
+
+/**
  * Parses microgrammars expressed as strings.
  */
 export class MicrogrammarSpecParser {
@@ -16,6 +22,7 @@ export class MicrogrammarSpecParser {
     private anonFieldCount = 0;
 
     public fromString(spec: string, elements: object = {}): Concat {
+        spec = this.preprocess(spec);
         const match = exactMatch<MicrogrammarSpec>(specGrammar, spec);
         if (!isPatternMatch(match)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
@@ -33,6 +40,24 @@ export class MicrogrammarSpecParser {
             }
         }
         return concat;
+    }
+
+    /**
+     * Given a spec, replace all the DiscardToken instances with a named,
+     * but unbound, matcher spec
+     * @param spec spec to preprocess before parsing
+     * @returns {string}
+     */
+    private preprocess(spec: string): string {
+        const split = spec.split(DiscardToken);
+        let joined = "";
+        for (let i = 0; i < split.length; i++) {
+            if (i > 0) {
+                joined += "${_discard" + i + "}";
+            }
+            joined += split[i];
+        }
+        return joined;
     }
 
     private definitionSpecsFromMicrogrammarSpec(match: MicrogrammarSpec, consumeWhiteSpaceBetweenTokens: boolean): DefinitionSpec[] {
@@ -89,8 +114,8 @@ export class MicrogrammarSpecParser {
     }
 
     private definitionsFromSpecs(id: string, definitionSpecs: SatisfiedDefinitionSpec[]): object {
-        const definitions = {$id: id};
-        definitionSpecs.forEach( t  => {
+        const definitions = { $id: id };
+        definitionSpecs.forEach(t => {
             if (isAnonymous(t)) {
                 this.addAnonymousToDefinitions(definitions, t.anonymous);
             }
