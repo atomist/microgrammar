@@ -127,7 +127,7 @@ export class Regex extends AbstractRegex {
 export class MatchInteger extends AbstractRegex {
 
     constructor() {
-        super(/[1-9][0-9]*/);
+        super(/(?:0|[1-9]\d*)/);
     }
 
     public canStartWith(c: string): boolean {
@@ -141,7 +141,7 @@ export class MatchInteger extends AbstractRegex {
 }
 
 /**
- * Match an integer. Leading 0 not permitted
+ * Match an integer. Allows 0  but not leading 0 if more digits
  */
 export const Integer = new MatchInteger();
 

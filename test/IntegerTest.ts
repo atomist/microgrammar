@@ -4,7 +4,7 @@ import { Integer } from "../src/Primitives";
 
 import * as assert from "power-assert";
 
-describe("Integer", () => {
+describe("Integer performance optimizations", () => {
 
     it("should recognize valid prefixes", () => {
         for (let i = 0; i <= 10; i++) {
@@ -29,7 +29,32 @@ describe("Integer matching", () => {
             const match = mmmm;
             assert(match.$matched === "1");
             assert(match.$value === 1);
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
+    it("accept 0", () => {
+        const is = inputStateFromString("0");
+        const m = Integer.matchPrefix(is);
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+            const match = mmmm;
+            assert(match.$matched === "0");
+            assert(match.$value === 0);
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
+
+    it("not accept leading 0", () => {
+        const is = inputStateFromString("01");
+        const m = Integer.matchPrefix(is);
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+            const match = mmmm;
+            assert(match.$matched === "0");
+            assert(match.$value === 0);
         } else {
             assert.fail("Didn't match");
         }

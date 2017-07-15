@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.1...HEAD
 
+### Changed
+
+-   Fixed `skipTo` where target matcher is a non-terminal
+-   Fixed `Integer` to accept 0 but not accept a pattern with a leading 0
+
 ## [0.5.1] - 2017-07-09
 
 Bug fix - remove cycle
