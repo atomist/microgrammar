@@ -13,17 +13,16 @@ const elementReference = new Concat({
 
 export const specGrammar = new Concat({
     $id: "spec",
-    these: new Rep(
-        new Concat({
-            $id: "literal, then component",
-            literal: new Break(elementReference),
-            element: elementReference,
-        })),
+    these: new Rep({
+        $id: "literal, then component",
+        literal: new Break(elementReference),
+        element: elementReference,
+    }),
     trailing: RestOfInput, //  matchEverything
 
 });
 
 export interface MicrogrammarSpec {
-    these: Array<{literal: string, element: { elementName: string }}>;
+    these: Array<{ literal: string, element: { elementName: string } }>;
     trailing: string;
 }
