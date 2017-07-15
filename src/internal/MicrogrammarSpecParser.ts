@@ -16,11 +16,10 @@ export class MicrogrammarSpecParser {
     private anonFieldCount = 0;
 
     public fromString(spec: string, elements: object = {}): Concat {
-        const mpr = exactMatch<MicrogrammarSpec>(specGrammar, spec);
-        if (!isPatternMatch(mpr)) {
+        const match = exactMatch<MicrogrammarSpec>(specGrammar, spec);
+        if (!isPatternMatch(match)) {
             throw new Error(`Unable to parse microgrammar: ${spec}`);
         }
-        const match = mpr as MicrogrammarSpec;
         const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,
             (elements as WhiteSpaceHandler).$consumeWhiteSpaceBetweenTokens !== false);
         const matcherSequence2 = this.populateSpecifiedElements(elements, matcherSequence1);
