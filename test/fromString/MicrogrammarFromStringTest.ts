@@ -13,6 +13,7 @@ import {
 
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../../src/Config";
+import { Float } from "../../src/Primitives";
 
 describe("MicrogrammarFromString", () => {
 
@@ -297,6 +298,19 @@ describe("MicrogrammarFromString", () => {
         assert(result.length === 1);
         const r0 = result[0] as any;
         assert(r0.currency === "AUD");
+    });
+
+    it("uses dictionary in long sentence", () => {
+        const dictionary = {
+            currency: /[A-Z]{3}/,
+            amount: Float,
+        };
+        const content = "The recent movement in the AUD has gained you $762.49";
+        const mg = Microgrammar.fromString<any>("The recent movement in the ${currency} has gained you $${amount}", dictionary);
+        const result = mg.findMatches(content) as any[];
+        assert(result.length === 1);
+        assert(result[0].currency === "AUD");
+        assert(result[0].amount === 762.49);
     });
 
 });

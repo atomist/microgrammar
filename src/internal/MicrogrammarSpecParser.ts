@@ -15,6 +15,16 @@ import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
 const DiscardToken = "⤞";
 
 /**
+ * Convenient function to create a microgrammar from a spec within another grammar
+ * @param spec string spec
+ * @param elements
+ * @returns {Concat}
+ */
+export function sentence(spec: string, elements: object = {}): Concat {
+    return new MicrogrammarSpecParser().fromString(spec, elements);
+}
+
+/**
  * Parses microgrammars expressed as strings.
  */
 export class MicrogrammarSpecParser {

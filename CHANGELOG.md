@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+-   Added nesting support via `sentence` function for `Microgrammar.fromString`
 -   Allow `⤞` character in `Microgrammar.fromString` specs to skip over intervening content
     without binding
 
