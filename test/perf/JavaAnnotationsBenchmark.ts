@@ -3,6 +3,9 @@ import * as assert from "power-assert";
 import { ChangeControlledMethodGrammar } from "../integration/RealWorldTest2";
 
 import { canonicalize } from "../../src/matchers/java/JavaUtils";
+import { Microgrammar } from "../../src/Microgrammar";
+
+import { skipTo, takeUntil } from "../../src/matchers/skip/Skip";
 
 describe("Java Benchmark", () => {
 
@@ -40,6 +43,65 @@ describe("Java Benchmark", () => {
             assert(matches.length === 8 + validTargetMethods);
         }
     }).timeout(55000);
+
+});
+
+describe("Break Benchmark", () => {
+
+    const parseCount = 500;
+
+    const validTargetMethods = 0;
+
+    const randomMethods = 0;
+
+    const invalidMethods = 0;
+
+    const comments = 0;
+
+    it("parses break to }", () => parseGrammar({
+        _public: "public",
+        toFirstRightCurlie: takeUntil("}"),
+    })).timeout(55000);
+
+    it("parses break to //", () => parseGrammar({
+        _public: "public",
+        toFirstRightCurlie: takeUntil("//"),
+    })).timeout(55000);
+
+    it("parses break for most of big file", () => parseGrammar({
+        _public: "class",
+        toFirstRightCurlie: takeUntil("/*eof*/"),
+    })).timeout(55000);
+
+    it("parses skipTo for most of big file", () => parseGrammar({
+        _public: "class",
+        toFirstRightCurlie: skipTo("/*eof*/"),
+    })).timeout(55000);
+
+    function parseGrammar(a: {}, commentCount = comments) {
+        const g = Microgrammar.fromDefinitions<any>(a);
+        let additional = "";
+        for (let m = 0; m < validTargetMethods; m++) {
+            additional += validMethod(m);
+        }
+        for (let m = 0; m < invalidMethods; m++) {
+            additional += invalidMethod(m);
+        }
+        for (let m = 0; m < randomMethods; m++) {
+            additional += randomMethod(m);
+        }
+        for (let m = 0; m < commentCount; m++) {
+            additional += comment();
+        }
+        const src = Java1.replace("//placeholder", additional);
+
+        // console.log(`Src length=${src.split("\n").length} lines`);
+        // src = canonicalize(src);
+        for (let i = 0; i < parseCount; i++) {
+            const matches = g.findMatches(src);
+            assert(matches.length > 0);
+        }
+    }
 
 });
 
@@ -142,7 +204,7 @@ public class Foo {
 
     //placeholder
 
-}
+}/*eof*/
 `;
 
 function validMethod(n: number) {

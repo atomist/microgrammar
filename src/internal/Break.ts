@@ -2,6 +2,7 @@ import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
 import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import { readyToMatch } from "./Whitespace";
 
 /**
  * Inspired by SNOBOL BREAK: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -46,12 +47,15 @@ export class Break implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        if (is.exhausted()) {
-            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
-        }
-
         let currentIs = is;
         let matched = "";
+
+        // Apply optimization if possible where we skip to the terminal if we're consuming it and not avoiding a bad match
+        if (this.consume && !this.badMatcher) {
+            const skipped = readyToMatch(currentIs, false, this.terminateOn);
+            matched += skipped.skipped;
+            currentIs = skipped.state;
+        }
         let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
         while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
