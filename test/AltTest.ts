@@ -2,7 +2,7 @@ import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import assert = require("power-assert");
 import { fail } from "power-assert";
 
-import { Alt } from "../src/Ops";
+import { Alt, firstOf } from "../src/Ops";
 
 import { inputStateFromString } from "../src/internal/InputStateFactory";
 
@@ -27,24 +27,23 @@ describe("Alt", () => {
         const is = inputStateFromString("AB");
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
-
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   });
+            const mmmm = m.match as any;
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
     it("should match when B matches", () => {
         const alt = new Alt("A", "B");
         const is = inputStateFromString("BA");
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
+            const mmmm = m.match as any;
 
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   });
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
     it("should match when C matches", () => {
         const alt = new Alt("A", "B", "C");
@@ -62,11 +61,37 @@ describe("Alt", () => {
         const is = inputStateFromString("AD");
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-                       const mmmm = m.match as any;
+            const mmmm = m.match as any;
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
 
-                    } else {
-                       assert.fail("Didn't match");
-                    }
-                   });
+    it("should work with firstOf and 3", () => {
+        const alt = firstOf("A", "B", "C");
+        const is = inputStateFromString("AD");
+        const m = alt.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(m)) {
+            const mmmm = m.match as any;
+        } else {
+            assert.fail("Didn't match");
+        }
+    });
+
+});
+
+describe("firstOf", () => {
+
+    it("should produce correct result with 2", () => {
+        const fof = firstOf("a", "b");
+        const alt = new Alt("a", "b");
+        assert.deepEqual(fof, alt);
+    });
+
+    it("should produce correct result with 4", () => {
+        const fof = firstOf("a", "b", "c", /cardigans/);
+        const alt = new Alt("a", "b", "c", /cardigans/);
+        assert.deepEqual(fof, alt);
+    });
 
 });

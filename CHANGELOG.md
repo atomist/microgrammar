@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+-   Added `firstOf` convenience function to create `Alt` instances
 -   Added nesting support via `fromString` function for `Microgrammar.fromString`
 -   Introduced `FromStringOptions` to customize `Microgrammar.fromString` behavior
 -   Added `FromStringOptions.ellipsis` option for `Microgrammar.fromString` specs to skip over intervening content

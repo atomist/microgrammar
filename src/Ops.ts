@@ -44,6 +44,17 @@ export class Opt implements MatchingLogic {
 }
 
 /**
+ * Match the first of these matchers that matches. Equivalent to an Alt (alternate)
+ * @param a first matcher
+ * @param b second matcher
+ * @param matchers any further matchers: varargs
+ * @returns {Alt}
+ */
+export function firstOf(a: any, b: any, ...matchers: any[]): MatchingLogic {
+    return new Alt(a, b, ...matchers);
+}
+
+/**
  * Matches first match of 2 or more matchers.
  */
 export class Alt implements MatchingLogic {
