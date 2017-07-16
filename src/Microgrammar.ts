@@ -7,6 +7,7 @@ import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
+import { FromStringOptions } from "./FromStringOptions";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
 import { exactMatch } from "./internal/ExactMatch";
@@ -70,9 +71,10 @@ export class Microgrammar<T> implements Term {
     }
 
     public static fromString<T>(spec: string,
-                                components: object = {}): Microgrammar<T> {
+                                components: object = {},
+                                options: FromStringOptions = {}): Microgrammar<T> {
         return new Microgrammar<T>(
-             new MicrogrammarSpecParser().fromString(spec, components));
+            new MicrogrammarSpecParser().fromString(spec, components, options));
     }
 
     public $id;
@@ -118,7 +120,7 @@ export class Microgrammar<T> implements Term {
      * @return {PatternMatch&T}
      */
     public exactMatch(input: string | InputStream, parseContext = {}): PatternMatch & T | DismatchReport {
-      return exactMatch<T>(this.matcher, input, parseContext);
+        return exactMatch<T>(this.matcher, input, parseContext);
     }
 
 }

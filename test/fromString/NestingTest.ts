@@ -1,7 +1,7 @@
 import { Microgrammar } from "../../src/Microgrammar";
 
 import * as assert from "power-assert";
-import { sentence } from "../../src/internal/MicrogrammarSpecParser";
+import { fromString } from "../../src/internal/MicrogrammarSpecParser";
 import { Alt } from "../../src/Ops";
 import { Rep1Sep, RepSep } from "../../src/Rep";
 
@@ -10,7 +10,7 @@ describe("Nesting in Microgrammar.fromString", () => {
     it("nest simple", () => {
         const content = "cats can suffer from fleas and can suffer from worms";
         const mg = Microgrammar.fromString<{ num: number }>("cats ${catStatement}", {
-            catStatement: new RepSep(sentence("can suffer from ${bug}", {
+            catStatement: new RepSep(fromString("can suffer from ${bug}", {
                 bug: /[a-z]+/,
             }), "and"),
         });
@@ -28,7 +28,7 @@ describe("Nesting in Microgrammar.fromString", () => {
         };
         const content = "cats can suffer from fleas and can suffer from worms but enjoy grooming & playing";
         const mg = Microgrammar.fromString<{ num: number }>("cats ${catProblems} but enjoy ${catActivities}", {
-            catProblems: new Rep1Sep(sentence("can suffer from ${bug}", dictionary), "and"),
+            catProblems: new Rep1Sep(fromString("can suffer from ${bug}", dictionary), "and"),
             catActivities: new Rep1Sep(dictionary.activity, "&"),
         });
         const result = mg.findMatches(content) as any[];
