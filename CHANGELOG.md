@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.1...HEAD
 
+### Added
+
+-   Added nesting support via `fromString` function for `Microgrammar.fromString`
+-   Introduced `FromStringOptions` to customize `Microgrammar.fromString` behavior
+-   Added `FromStringOptions.ellipsis` option for `Microgrammar.fromString` specs to skip over intervening content
+    without binding. Defaults to `...`.
+-   Added `FromStringOptions.componentPrefix` option for `Microgrammar.fromString` specs to 
+    specify component prefix. Defaults to former `$`.
+
 ### Changed
 
 -   Fixed `skipTo` where target matcher is a non-terminal
