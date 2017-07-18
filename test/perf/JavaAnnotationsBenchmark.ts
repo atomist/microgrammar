@@ -46,66 +46,7 @@ describe("Java Benchmark", () => {
 
 });
 
-describe("Break Benchmark", () => {
-
-    const parseCount = 500;
-
-    const validTargetMethods = 0;
-
-    const randomMethods = 0;
-
-    const invalidMethods = 0;
-
-    const comments = 0;
-
-    it("parses break to }", () => parseGrammar({
-        _public: "public",
-        toFirstRightCurlie: takeUntil("}"),
-    })).timeout(55000);
-
-    it("parses break to //", () => parseGrammar({
-        _public: "public",
-        toFirstRightCurlie: takeUntil("//"),
-    })).timeout(55000);
-
-    it("parses break for most of big file", () => parseGrammar({
-        _public: "class",
-        toFirstRightCurlie: takeUntil("/*eof*/"),
-    })).timeout(55000);
-
-    it("parses skipTo for most of big file", () => parseGrammar({
-        _public: "class",
-        toFirstRightCurlie: skipTo("/*eof*/"),
-    })).timeout(55000);
-
-    function parseGrammar(a: {}, commentCount = comments) {
-        const g = Microgrammar.fromDefinitions<any>(a);
-        let additional = "";
-        for (let m = 0; m < validTargetMethods; m++) {
-            additional += validMethod(m);
-        }
-        for (let m = 0; m < invalidMethods; m++) {
-            additional += invalidMethod(m);
-        }
-        for (let m = 0; m < randomMethods; m++) {
-            additional += randomMethod(m);
-        }
-        for (let m = 0; m < commentCount; m++) {
-            additional += comment();
-        }
-        const src = Java1.replace("//placeholder", additional);
-
-        // console.log(`Src length=${src.split("\n").length} lines`);
-        // src = canonicalize(src);
-        for (let i = 0; i < parseCount; i++) {
-            const matches = g.findMatches(src);
-            assert(matches.length > 0);
-        }
-    }
-
-});
-
-const Java1 = `
+export const Java1 = `
 package com.foo.bar;
 
 import foo.bar;
@@ -207,7 +148,7 @@ public class Foo {
 }/*eof*/
 `;
 
-function validMethod(n: number) {
+export function validMethod(n: number) {
     return `
 @ChangeControlled("andthis is some crazy value")
     @Other
@@ -220,7 +161,7 @@ function validMethod(n: number) {
  * @param n
  * @return {string}
  */
-function invalidMethod(n: number) {
+export function invalidMethod(n: number) {
     return `
 @ChangeControlled("andthis is some crazy value")
     @Other
@@ -233,14 +174,14 @@ function invalidMethod(n: number) {
  * @param n
  * @return {string}
  */
-function randomMethod(n: number) {
+export function randomMethod(n: number) {
     return `
 @Foo public void random${n}(a: int, b: int, c: String) {
         // We won't need to parse the content of this as it doesn't match the annotation
     }`;
 }
 
-function comment() {
+export function comment() {
     /* tslint:disable:max-line-length */
     return `
 /*

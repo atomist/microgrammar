@@ -39,6 +39,6 @@
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "testone": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
     "test": "mocha --compilers ts:espower-typescript/guess \"test/**/!(*Benchmark).ts\"",
-    "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/JavaAnnotationsBenchmark.ts\"; node --prof-process isolate-* > profile.txt"
+    "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/*Benchmark.ts\"; node --prof-process isolate-* > profile.txt"
   }
 }

@@ -4,11 +4,11 @@ import { ADD_DEPENDENCY, POM_WITH_DEPENDENCY_MANAGEMENT, XmlTracker } from "../M
 
 describe("XML Benchmark", () => {
 
-    const parseCount = 50;
+    const parseCount = 1000;
 
     const addedDependencies = 10;
 
-    const comments = 5;
+    const comments = 10;
 
     it("parses POM", () => {
 

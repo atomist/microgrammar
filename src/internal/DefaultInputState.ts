@@ -1,4 +1,4 @@
-import { InputState, InputStateListener, Listeners, Skipped } from "../InputState";
+import { InputState, Listeners, Skipped } from "../InputState";
 import { InputStateManager } from "./InputStateManager";
 
 /**
@@ -33,14 +33,8 @@ export class DefaultInputState implements InputState {
         }
         const is = new DefaultInputState(this.ism, offset);
         const skipped = is.seenSince(this);
-        let newListeners;
         if (this.listeners) {
-            newListeners = cloneListeners(this.listeners);
-            const listeners: InputStateListener[] = Object.keys(newListeners).map(key => newListeners[key]);
-            for (const l of listeners) {
-                l.read(skipped);
-            }
-            is.listeners = newListeners;
+            is.listeners = cloneListeners(this.listeners, skipped);
         }
         return {skipped, state: is};
     }
@@ -93,9 +87,7 @@ export class DefaultInputState implements InputState {
      * @return {string}
      */
     public peek(n: number): string {
-        return this.exhausted() ?
-            "" :
-            this.ism.get(this.offset, n);
+        return this.ism.get(this.offset, n);
     }
 
     /**
@@ -104,9 +96,6 @@ export class DefaultInputState implements InputState {
      * @return {string}
      */
     private seenSince(l: DefaultInputState): string {
-        if (l.ism !== this.ism) {
-            throw new Error("Can't seenSince: Different input streams");
-        }
         return this.ism.get(l.offset, this.offset - l.offset);
     }
 
