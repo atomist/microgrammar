@@ -39,8 +39,8 @@ export class NestingDepthStateMachine extends JavaContentStateMachine {
                     default:
                 }
                 break;
-            case "inString":
-            case "seenEscapeInString":
+            case "String":
+            case "afterEscapeInString":
             case "inLineComment":
                 break;
             default:

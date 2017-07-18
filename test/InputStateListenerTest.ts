@@ -55,7 +55,7 @@ describe("InputStateListener", () => {
 
             public matchPrefix(is: InputState, mc, parseContext): MatchPrefixResult {
                 const l = is.listeners.l as JavaContentStateMachine;
-                if (is.peek(1) === "@" && l.state !== "inString") {
+                if (is.peek(1) === "@" && l.state !== "String") {
                     return matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@"));
                 }
                 return new MatchFailureReport("id", is.offset, {}, "wrong");

@@ -54,8 +54,8 @@ class JavaBody implements MatchingLogic {
                         default:
                     }
                     break;
-                case "inString":
-                case "seenEscapeInString":
+                case "String":
+                case "afterEscapeInString":
                 case "inLineComment":
                     break;
             }

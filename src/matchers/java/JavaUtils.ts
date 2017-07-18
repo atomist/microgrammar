@@ -12,13 +12,13 @@ export function stripComments(source: string) {
     for (const s of source) {
         sm.consume(s);
         switch (sm.state) {
-            case "inCComment":
+            case "CComment":
             case "inLineComment":
-            case "seen*InCComment":
+            case "*inCComment":
             case "seen/":
                 break;
             case "outsideString":
-                if (previousState !== "seen*InCComment") {
+                if (previousState !== "*inCComment") {
                     stripped += s;
                 }
                 break;
@@ -45,9 +45,9 @@ export function stripWhitespace(source: string): string {
     for (const s of source) {
         sm.consume(s);
         switch (sm.state) {
-            case "inString":
+            case "String":
                 // If we've just entered a string, add the stripped chunk that preceded it
-                if (previousState !== "inString") {
+                if (previousState !== "String") {
                     stripped += strip(chunk);
                     chunk = "";
                 }

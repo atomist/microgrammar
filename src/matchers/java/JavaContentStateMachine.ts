@@ -3,8 +3,10 @@ import { AbstractStateMachine } from "../../support/AbstractStateMachine";
 /**
  * State of input in a Java source file
  */
-export type JavaState = "outsideString" | "seen/" | "inString" | "seenEscapeInString" |
-    "inLineComment" | "inCComment" | "seen*InCComment";
+export type JavaState = "outsideString" | "seen/" |
+    "String" | "afterEscapeInString" |
+    "inLineComment" | "CComment" |
+    "*inCComment";
 
 /**
  * State machine for recognizing Java strings and comments.
@@ -26,12 +28,12 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
                     this.state = "outsideString";
                 }
                 break;
-            case "inCComment":
+            case "CComment":
                 if (s === "*") {
-                    this.state = "seen*InCComment";
+                    this.state = "*inCComment";
                 }
                 break;
-            case "seen*InCComment":
+            case "*inCComment":
                 if (s === "/") {
                     this.state = "outsideString";
                 }
@@ -39,7 +41,7 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
             case "outsideString":
                 switch (s) {
                     case '"':
-                        this.state = "inString";
+                        this.state = "String";
                         break;
                     case "/":
                         this.state = "seen/";
@@ -52,26 +54,26 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
                         this.state = "inLineComment";
                         break;
                     case "*":
-                        this.state = "inCComment";
+                        this.state = "CComment";
                         break;
                     default:
                         this.state = "outsideString";
                         break;
                 }
                 break;
-            case "inString":
+            case "String":
                 switch (s) {
                     case '"':
                         this.state = "outsideString";
                         break;
                     case "\\":
-                        this.state = "seenEscapeInString";
+                        this.state = "afterEscapeInString";
                         break;
                     default:
                 }
                 break;
-            case "seenEscapeInString":
-                this.state = "inString";
+            case "afterEscapeInString":
+                this.state = "String";
                 break;
         }
     }
