@@ -37,10 +37,13 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
                 }
                 break;
             case "outsideString":
-                if (s === '"') {
-                    this.state = "inString";
-                } else if (s === "/") {
-                    this.state = "seen/";
+                switch (s) {
+                    case '"':
+                        this.state = "inString";
+                        break;
+                    case "/":
+                        this.state = "seen/";
+                        break;
                 }
                 break;
             case "seen/":
