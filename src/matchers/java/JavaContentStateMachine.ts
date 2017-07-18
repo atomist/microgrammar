@@ -1,11 +1,23 @@
+import { AbstractStateMachine } from "../../support/AbstractStateMachine";
 
 /**
- * State machine for recognizing Java strings.
+ * State of input in a Java source file
  */
-export class JavaContentStateMachine {
+export type JavaState = "outsideString" | "seen/" | "inString" | "seenEscapeInString" |
+    "inLineComment" | "inCComment" | "seen*InCComment";
 
-    public state: "outsideString" | "seen/" | "inString" | "seenEscapeInString" |
-        "inLineComment" | "inCComment" | "seen*InCComment" = "outsideString";
+/**
+ * State machine for recognizing Java strings and comments.
+ */
+export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
+
+    constructor(state: JavaState = "outsideString") {
+        super(state);
+    }
+
+    public clone(): JavaContentStateMachine {
+        return new JavaContentStateMachine(this.state);
+    }
 
     public consume(s: string): void {
         switch (this.state) {

@@ -43,7 +43,7 @@ export class InputStateManager {
     }
 
     public exhausted() {
-        return this.stream.exhausted() && this.window === "";
+        return this.window.length === 0 && this.stream.exhausted();
     }
 
     private right() {

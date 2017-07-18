@@ -1,5 +1,4 @@
-
-import { InputState, Skipped } from "../InputState";
+import { InputState, InputStateListener, Listeners, Skipped } from "../InputState";
 import { InputStateManager } from "./InputStateManager";
 
 /**
@@ -8,7 +7,8 @@ import { InputStateManager } from "./InputStateManager";
 export class DefaultInputState implements InputState {
 
     public constructor(private readonly ism: InputStateManager,
-                       public readonly offset: number = 0) {
+                       public readonly offset: number,
+                       public listeners?: Listeners) {
     }
 
     /**
@@ -32,7 +32,17 @@ export class DefaultInputState implements InputState {
             ++offset;
         }
         const is = new DefaultInputState(this.ism, offset);
-        return { skipped: is.seenSince(this), state: is };
+        const skipped = is.seenSince(this);
+        let newListeners;
+        if (this.listeners) {
+            newListeners = cloneListeners(this.listeners);
+            const listeners: InputStateListener[] = Object.keys(newListeners).map(key => newListeners[key]);
+            for (const l of listeners) {
+                l.read(skipped);
+            }
+            is.listeners = newListeners;
+        }
+        return {skipped, state: is};
     }
 
     /**
@@ -54,7 +64,8 @@ export class DefaultInputState implements InputState {
         if (actual !== s) {
             throw new Error(`Invalid call to InputState.consume: Cannot consume [${s}] from [${actual}]. Log: ${message}`);
         }
-        return new DefaultInputState(this.ism, this.offset + s.length);
+        return new DefaultInputState(this.ism, this.offset + s.length,
+            cloneListeners(this.listeners, s));
     }
 
     /**
@@ -62,10 +73,18 @@ export class DefaultInputState implements InputState {
      * @return {InputState}
      */
     public advance(): InputState {
-        if (this.exhausted()) {
-            throw new Error(`Illegal call to InputState.advance: Stream is exhausted`);
+        if (!this.listeners) {
+            // If there are no listeners we can short circuit this
+            return new DefaultInputState(this.ism, this.offset + 1, undefined);
+        } else {
+            // We need to notify listeners of what we read
+            const next = this.peek(1);
+            if (next.length === 0) {
+                throw new Error(`Illegal call to InputState.advance: Stream is exhausted`);
+            }
+            return new DefaultInputState(this.ism, this.offset + 1,
+                cloneListeners(this.listeners, next));
         }
-        return new DefaultInputState(this.ism, this.offset + 1);
     }
 
     /**
@@ -91,4 +110,24 @@ export class DefaultInputState implements InputState {
         return this.ism.get(l.offset, this.offset - l.offset);
     }
 
+}
+
+/**
+ * Clone the given listeners object
+ * @param l object to clone
+ * @param s string for the clone to read, if defined
+ * @returns {any}
+ */
+function cloneListeners(l: Listeners, s?: string): Listeners {
+    if (!l) {
+        return undefined;
+    }
+    const cloned = {};
+    for (const key of Object.keys(l)) {
+        cloned[key] = l[key].clone();
+        if (s) {
+            cloned[key].read(s);
+        }
+    }
+    return cloned as any;
 }

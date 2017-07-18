@@ -89,8 +89,9 @@ export class Alt implements MatchingLogic {
 /**
  * Add a condition with a function that verifies that even if we found a match
  * we are happy with it: For example, we like the value it contains.
+ * Also capable of vetoing match if the input state is problematic before the potential match
  */
-export function when(o: any, matchTest: (PatternMatch) => boolean) {
+export function when(o: any, matchTest: (PatternMatch) => boolean, inputStateTest: (InputState) => boolean = is => true) {
 
     const matcher = toMatchingLogic(o);
     const conditionalMatcher = {} as any;
@@ -105,7 +106,9 @@ export function when(o: any, matchTest: (PatternMatch) => boolean) {
     }
 
     function conditionalMatch(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
+        const result = inputStateTest(is) ?
+            matcher.matchPrefix(is, thisMatchContext, parseContext) :
+            undefined;
         return (isSuccessfulMatch(result) && matchTest(result.match)) ?
             result :
             new MatchFailureReport(this.$id, is.offset, context);

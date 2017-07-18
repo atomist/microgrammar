@@ -175,7 +175,7 @@ describe("Microgrammar", () => {
         expect(result.length).to.equal(2);
         expect(result[0].name).to.equal("Emmanuel");
         expect(result[1].name).to.equal("Marine");
-        const result2 = mg.findMatches("Greg Tony", {}, pm => true);
+        const result2 = mg.findMatches("Greg Tony", {}, undefined, pm => true);
         expect(result2.length).to.equal(1);
         expect(result2[0].name).to.equal("Greg");
         const result3 = mg.firstMatch("Bill George");

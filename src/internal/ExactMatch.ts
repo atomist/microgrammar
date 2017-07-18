@@ -1,3 +1,4 @@
+import { Listeners } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { Concat } from "../matchers/Concat";
 import { RestOfInput } from "../matchers/skip/Skip";
@@ -8,13 +9,14 @@ import { StringInputStream } from "../spi/StringInputStream";
 import { inputStateFromStream } from "./InputStateFactory";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-                              parseContext = {}): PatternMatch & T | DismatchReport {
+                              parseContext = {},
+                              l?: Listeners): PatternMatch & T | DismatchReport {
 
     const wrapped = new Concat({
         desired: matcher,
         trailingJunk: RestOfInput,
     });
-    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input)), {}, parseContext);
+    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input), l), {}, parseContext);
 
     if (isSuccessfulMatch(result)) {
         const detyped = result.match as any;

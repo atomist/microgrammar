@@ -33,10 +33,11 @@
   },
   "scripts": {
     "autotest": "supervisor -q -n exit -e ts -x npm -- run test",
-    "clean": "rm -rf build ; find src test -type f -name '*.js' -print0 | xargs -0 rm -f",
+    "clean": "rm -f *-v8.log; rm -f profile.txt; rm -rf build ; find src test -type f -name '*.js' -print0 | xargs -0 rm -f",
     "compile": "tsc -p .",
     "lint": "tslint '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
-    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\""
+    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
+    "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/JavaAnnotationsBenchmark.ts\"; node --prof-process isolate-* > profile.txt"
   }
 }

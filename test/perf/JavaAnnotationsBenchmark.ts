@@ -224,7 +224,7 @@ function invalidMethod(n: number) {
     return `
 @ChangeControlled("andthis is some crazy value")
     @Other
-    @AndMore$(i = 12) public void invalid_${n}(a: int, b: int, c: String {
+    @AndMore$(i = 12) public void invalid_${n}(a: int, b: int, c: String) // Invalid
     }`;
 }
 

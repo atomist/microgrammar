@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+-   Added listener mechanism and state machine support to `InputState`
 -   Added `firstOf` convenience function to create `Alt` instances
 -   Added nesting support via `fromString` function for `Microgrammar.fromString`
 -   Introduced `FromStringOptions` to customize `Microgrammar.fromString` behavior

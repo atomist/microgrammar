@@ -34,14 +34,13 @@ class JavaBody implements MatchingLogic {
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
         const sm = new JavaContentStateMachine();
         let depth = 1;
-        if (is.exhausted()) {
-            return matchPrefixSuccess(new TerminalPatternMatch(this.$id, "", is.offset, is));
-        }
-
         let currentIs = is;
         let matched = "";
-        while (!currentIs.exhausted() && depth > 0) {
+        while (depth > 0) {
             const next = currentIs.peek(1);
+            if (next.length === 0) {
+                break;
+            }
             sm.consume(next);
             switch (sm.state) {
                 case "outsideString":
@@ -74,7 +73,7 @@ class JavaBody implements MatchingLogic {
         }
 
         // We supply the offset to preserve it in this match
-        return this.inner.matchPrefix(inputStateFromString(matched, is.offset), thisMatchContext, parseContext);
+        return this.inner.matchPrefix(inputStateFromString(matched, undefined, is.offset), thisMatchContext, parseContext);
     }
 }
 

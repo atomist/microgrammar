@@ -1,4 +1,3 @@
-
 /**
  * InputState abstraction, exposed to matchers.
  * Backed by a buffer or stream that is managed transparently.
@@ -6,6 +5,12 @@
 export interface InputState {
 
     readonly offset: number;
+
+    /**
+     * InputStateListeners, if set.
+     * InputStateListener instances will have seen only the characters up to this point.
+     */
+    readonly listeners?: Listeners;
 
     /**
      * Is the input exhausted?
@@ -50,6 +55,29 @@ export interface InputState {
      */
     peek(n: number): string;
 
+}
+
+export interface Listeners {
+
+    [key: string]: InputStateListener;
+}
+
+/**
+ * Listener invoked when characters are consumed from an InputState.
+ * Useful for implementing a state machine or tracking previously seen characters.
+ */
+export interface InputStateListener {
+
+    /**
+     * Invoked when the given characters were read from the input
+     * @param s input read
+     */
+    read(s: string): this;
+
+    /**
+     * Return an independent clone of this listener
+     */
+    clone(): InputStateListener;
 }
 
 export interface Skipped {

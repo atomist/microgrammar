@@ -148,7 +148,7 @@ describe("MicrogrammarFromString", () => {
         assert(result.length === 2);
         assert(result[0].name === "Greg");
         assert(result[1].name === "Tony");
-        const result2 = mg.findMatches("David Theresa", {}, pm => true);
+        const result2 = mg.findMatches("David Theresa", {}, {}, pm => true);
         assert(result2.length === 1);
         assert(result2[0].name === "David");
         const result3 = mg.firstMatch("Gough Malcolm");

@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { inputStateFromString } from "../src/internal/InputStateFactory";
 import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import { when } from "../src/Ops";
@@ -22,7 +21,6 @@ describe("When", () => {
         const m = matcher.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
         } else {
             assert.fail("Didn't match");
         }
@@ -33,7 +31,7 @@ describe("When", () => {
         const is = inputStateFromString("foo bar");
         const matcher = when(primitive, pm => false);
         const m = matcher.matchPrefix(is, {}, {});
-        expect(isSuccessfulMatch(m)).to.equal(false);
+        assert(!isSuccessfulMatch(m));
     });
 
     it("ability to veto content", () => {
@@ -41,7 +39,7 @@ describe("When", () => {
         const is = inputStateFromString("foo bar");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
         const m = hatesFoo.matchPrefix(is, {}, {});
-        expect(isSuccessfulMatch(m)).to.equal(false);
+        assert(!isSuccessfulMatch(m));
     });
 
     it("ability to veto content: not vetoed", () => {
@@ -74,13 +72,13 @@ describe("When", () => {
         const is = inputStateFromString("bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
         const m = requiresFoo.matchPrefix(is, {}, {});
-        expect(isSuccessfulMatch(m)).to.equal(false);
+        assert(!isSuccessfulMatch(m));
     });
 
     it("preserves properties", () => {
         const primitive = new Literal("foo");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        expect(requiresFoo.literal).to.equal(primitive.literal);
+        assert(requiresFoo.literal === primitive.literal);
     });
 
 });

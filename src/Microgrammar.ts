@@ -1,4 +1,4 @@
-import { InputState } from "./InputState";
+import { InputState, Listeners } from "./InputState";
 import { MatchingLogic, Term } from "./Matchers";
 import { Concat, toMatchingLogic } from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
@@ -90,13 +90,15 @@ export class Microgrammar<T> implements Term {
      * @param stopAfterMatch() function that can cause matching to stop after a given match.
      * Often used to stop after one.
      * @param parseContext context for the whole parsing operation
+     * @param l listeners observing input characters as they are read
      * @return {PatternMatch[]}
      */
     public findMatches(input: string | InputStream,
                        parseContext?: {},
+                       l?: Listeners,
                        stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch);
-        lm.consume(input, parseContext);
+        lm.consume(input, parseContext, l);
         return lm.matches as Array<T & PatternMatch>;
     }
 
@@ -104,10 +106,11 @@ export class Microgrammar<T> implements Term {
      * Convenient method to find the first match, or null if not found.
      * Stops searching after the first match.
      * @param input
+     * @param l listeners observing input characters as they are read
      * @returns {PatternMatch[]}
      */
-    public firstMatch(input: string | InputStream): PatternMatch & T {
-        const found = this.findMatches(input, pm => true);
+    public firstMatch(input: string | InputStream, l?: Listeners): PatternMatch & T {
+        const found = this.findMatches(input, {}, l, pm => true);
         return found.length > 0 ? found[0] : null;
     }
 
@@ -117,10 +120,11 @@ export class Microgrammar<T> implements Term {
      * building an AST for a whole file.
      * @param input
      * @param parseContext context for the whole parsing operation
+     * @param l listeners observing input characters as they are read
      * @return {PatternMatch&T}
      */
-    public exactMatch(input: string | InputStream, parseContext = {}): PatternMatch & T | DismatchReport {
-        return exactMatch<T>(this.matcher, input, parseContext);
+    public exactMatch(input: string | InputStream, parseContext = {}, l?: Listeners): PatternMatch & T | DismatchReport {
+        return exactMatch<T>(this.matcher, input, parseContext, l);
     }
 
 }
@@ -156,15 +160,16 @@ export abstract class MatchingMachine {
      * Stream-oriented matching. The observer can match in parallel with the main matcher.
      * @param input
      * @param parseContext context for the whole parsing operation
+     * @param l listeners observing input characters as they are read
      */
-    public consume(input: string | InputStream, parseContext = {}): void {
+    public consume(input: string | InputStream, parseContext = {}, l?: Listeners): void {
         const omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
 
         let currentMatcher: MatchingLogic = this.matcher;
         const stream = toInputStream(input);
         const stateManager = new InputStateManager(stream);
 
-        let currentInputState: InputState = new DefaultInputState(stateManager);
+        let currentInputState: InputState = new DefaultInputState(stateManager, 0, l);
         while (currentMatcher && !currentInputState.exhausted()) {
             currentInputState = readyToMatch(currentInputState,
                 (this.matcher as any).$consumeWhiteSpaceBetweenTokens === true,
@@ -172,8 +177,7 @@ export abstract class MatchingMachine {
                 this.observer).state;
 
             const previousIs = currentInputState;
-            const tryMatch =
-                currentMatcher.matchPrefix(currentInputState, {}, parseContext);
+            const tryMatch = currentMatcher.matchPrefix(currentInputState, {}, parseContext);
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
