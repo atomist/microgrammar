@@ -37,7 +37,8 @@
     "compile": "tsc -p .",
     "lint": "tslint '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
     "fix": "tslint --fix '**/*.ts' --exclude 'node_modules/**' --exclude 'build/**' -t verbose",
-    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
+    "testone": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
+    "test": "mocha --compilers ts:espower-typescript/guess \"test/**/!(*Benchmark).ts\"",
     "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/JavaAnnotationsBenchmark.ts\"; node --prof-process isolate-* > profile.txt"
   }
 }

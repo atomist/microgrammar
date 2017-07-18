@@ -9,15 +9,15 @@ import { skipTo, takeUntil } from "../../src/matchers/skip/Skip";
 
 describe("Java Benchmark", () => {
 
-    const parseCount = 50;
+    const parseCount = 170;
 
-    const validTargetMethods = 0;
+    const validTargetMethods = 100;
 
-    const randomMethods = 0;
+    const randomMethods = 100;
 
-    const invalidMethods = 0;
+    const invalidMethods = 100;
 
-    const comments = 0;
+    const comments = 100;
 
     it("parses annotated methods", () => {
         let additional = "";

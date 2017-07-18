@@ -139,4 +139,12 @@ Run all the tests in mocha:
 
 Run one test file:
 
-`TEST=MyTestFile.ts npm test`
+`TEST=MyTestFile.ts npm testone`
+
+Run benchmarks with profiling, leaving a `profile.txt` file to view:
+
+`npm run benchmark`
+
+Clean (including deleting any profiling data):
+
+`npm run clean`
