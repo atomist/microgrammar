@@ -1,7 +1,7 @@
 
 import { InputStream } from "../spi/InputStream";
 
-const DEFAULT_BUFFER_SIZE = 1000;
+const DEFAULT_BUFFER_SIZE = 5000;
 
 /**
  * Window over input. Enables us to use a simple InputStream
