@@ -9,7 +9,7 @@ export class NestingDepthStateMachine extends JavaContentStateMachine {
 
     private readonly pop: string;
 
-    constructor(private kind: "block" | "parens" = "block", state: JavaState = "outsideString", public depth = 0) {
+    constructor(private kind: "block" | "parens" = "block", state: JavaState = "normal", public depth = 0) {
         super(state);
         switch (kind) {
             case "block":
@@ -27,24 +27,16 @@ export class NestingDepthStateMachine extends JavaContentStateMachine {
 
     public consume(char: string): void {
         super.consume(char);
-        switch (this.state) {
-            case "outsideString":
-                switch (char) {
-                    case this.push:
-                        this.depth++;
-                        break;
-                    case this.pop:
-                        this.depth--;
-                        break;
-                    default:
-                }
-                break;
-            case "String":
-            case "afterEscapeInString":
-            case "inLineComment":
-                break;
-            default:
-                break;
+        if (this.state === "normal") {
+            switch (char) {
+                case this.push:
+                    this.depth++;
+                    break;
+                case this.pop:
+                    this.depth--;
+                    break;
+                default:
+            }
         }
     }
 }

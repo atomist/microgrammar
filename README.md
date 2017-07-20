@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
 [![Slack Status](https://join.atomist.com/badge.svg)](https://join.atomist.com)
 
-This repository contains a TypeScript implementation of microgrammars
-for parsing and updating structured content.
+Parsing library written in TypeScript. Can parse and cleanly update 
+structured content.
 
 ## Concepts
 
@@ -21,12 +21,13 @@ built using regex.
 Microgrammars have obvious similarities to [BNF grammars][bnf], but
 differ in some important respects:
 
--   They are intended to match and explain parts of the input, rather
+-   They are intended to match and explain _parts_ of the input, rather
     than the whole input
 -   They excel at skipping content they are uninterested in
 -   They are not necessarily context free
 -   They do not need to construct a full AST, although they construct
-    ASTs for the structures they do match
+    ASTs for structures they do match. Thus they can easily cope with 
+    partially structured data, happily skipping over incomprehensible content
 
 [bnf]: https://en.wikipedia.org/wiki/Backus–Naur_form (Backus–Naur Form)
 

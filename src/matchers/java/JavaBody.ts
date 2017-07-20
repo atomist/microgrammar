@@ -42,22 +42,16 @@ class JavaBody implements MatchingLogic {
                 break;
             }
             sm.consume(next);
-            switch (sm.state) {
-                case "outsideString":
-                    switch (next) {
-                        case this.push:
-                            depth++;
-                            break;
-                        case this.pop:
-                            depth--;
-                            break;
-                        default:
-                    }
-                    break;
-                case "String":
-                case "afterEscapeInString":
-                case "inLineComment":
-                    break;
+            if (sm.state === "normal") {
+                switch (next) {
+                    case this.push:
+                        depth++;
+                        break;
+                    case this.pop:
+                        depth--;
+                        break;
+                    default:
+                }
             }
             if (depth > 0) {
                 matched += next;

@@ -1,5 +1,4 @@
-
-import { JavaContentStateMachine } from "./JavaContentStateMachine";
+import { JavaContentStateMachine, JavaState } from "./JavaContentStateMachine";
 
 /**
  * Strip Java comments
@@ -8,22 +7,24 @@ import { JavaContentStateMachine } from "./JavaContentStateMachine";
 export function stripComments(source: string) {
     let stripped = "";
     const sm = new JavaContentStateMachine();
-    let previousState = sm.state;
-    for (const s of source) {
-        sm.consume(s);
+    let previousState: JavaState = "normal";
+    for (const ch of source) {
+        sm.consume(ch);
         switch (sm.state) {
             case "CComment":
             case "inLineComment":
-            case "*inCComment":
-            case "seen/":
+                if (sm.state !== previousState) {
+                    // Get rid of the first /, which was written to the string
+                    stripped = stripped.substring(0, stripped.length - 1);
+                }
                 break;
-            case "outsideString":
-                if (previousState !== "*inCComment") {
-                    stripped += s;
+            case "normal":
+                if (!(ch === "/" && previousState.indexOf("Comment") !== -1)) {
+                    stripped += ch;
                 }
                 break;
             default:
-                stripped += s;
+                stripped += ch;
         }
         previousState = sm.state;
     }

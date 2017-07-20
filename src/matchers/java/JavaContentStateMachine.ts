@@ -3,17 +3,20 @@ import { AbstractStateMachine } from "../../support/AbstractStateMachine";
 /**
  * State of input in a Java source file
  */
-export type JavaState = "outsideString" | "seen/" |
-    "String" | "afterEscapeInString" |
-    "inLineComment" | "CComment" |
-    "*inCComment";
+export type JavaState =
+    "normal" |
+    "String" |
+    "inLineComment" |
+    "CComment";
 
 /**
  * State machine for recognizing Java strings and comments.
  */
 export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
 
-    constructor(state: JavaState = "outsideString") {
+    private previousChar: string;
+
+    constructor(state: JavaState = "normal") {
         super(state);
     }
 
@@ -21,60 +24,42 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
         return new JavaContentStateMachine(this.state);
     }
 
-    public consume(s: string): void {
+    public consume(ch: string): void {
         switch (this.state) {
             case "inLineComment":
-                if (s === "\n") {
-                    this.state = "outsideString";
+                if (ch === "\n") {
+                    this.state = "normal";
                 }
                 break;
             case "CComment":
-                if (s === "*") {
-                    this.state = "*inCComment";
+                if (ch === "/" && this.previousChar === "*") {
+                    this.state = "normal";
                 }
                 break;
-            case "*inCComment":
-                if (s === "/") {
-                    this.state = "outsideString";
-                }
-                break;
-            case "outsideString":
-                switch (s) {
-                    case '"':
+            case "normal":
+                switch (ch) {
+                    case '"' :
                         this.state = "String";
                         break;
                     case "/":
-                        this.state = "seen/";
-                        break;
-                }
-                break;
-            case "seen/":
-                switch (s) {
-                    case "/":
-                        this.state = "inLineComment";
+                        if (this.previousChar === "/") {
+                            this.state = "inLineComment";
+                        }
                         break;
                     case "*":
-                        this.state = "CComment";
+                        if (this.previousChar === "/") {
+                            this.state = "CComment";
+                        }
                         break;
                     default:
-                        this.state = "outsideString";
-                        break;
                 }
                 break;
             case "String":
-                switch (s) {
-                    case '"':
-                        this.state = "outsideString";
-                        break;
-                    case "\\":
-                        this.state = "afterEscapeInString";
-                        break;
-                    default:
+                if (ch === '"' && this.previousChar !== "\\") {
+                    this.state = "normal";
                 }
                 break;
-            case "afterEscapeInString":
-                this.state = "String";
-                break;
         }
+        this.previousChar = ch;
     }
 }
