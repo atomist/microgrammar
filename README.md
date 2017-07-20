@@ -9,10 +9,12 @@ for parsing and updating structured content.
 ## Concepts
 
 [Microgrammars][mg-paper] are a powerful way of parsing structured
-content such as code. Microgrammars are designed to recognize
+content such as source code. Microgrammars are designed to recognize
 structures in a string or stream and extract their content: For
 example, to recognize a Java method that has a particular annotation
-and to extract particular parameters.
+and to extract particular parameters. They are more powerful and [typically more
+readable][regex-hell] than [regular expressions][regex] for complex cases, although they can be
+built using regex.
 
 [mg-paper]: http://web.stanford.edu/~mlfbrown/paper.pdf (How to build static checking systems using orders of magnitude less code Brown et al., ASPLOS 2016)
 
@@ -47,7 +49,7 @@ Compared to regular expressions, microgrammars are:
 
 While it would be overkill to use a microgrammar for something that
 can be expressed in a simple regex, microgrammars tend to be clearer
-for complex cases
+for complex cases.
 
 Atomist microgrammars go beyond the Stanford paper example in that
 they permit _updating_ as well as matching, preserving positions. They
@@ -55,6 +57,8 @@ also draw inspiration from other experience and sources such as the
 old [SNOBOL programming language][snobol].
 
 [snobol]: https://en.wikipedia.org/wiki/SNOBOL (SNOBOL Programming Language)
+[regex-hell]: https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags#answer-1732454
+[regex]: https://en.wikipedia.org/wiki/Regular_expression
 
 ## Examples
 
@@ -87,7 +91,8 @@ Some notes:
     matchers (like `Integer`). It's easy to define custom matchers for
     use in composition.
 -   All properties need to match for the whole microgrammar to match.
--   Properties that match are bound to the result.
+-   Properties that match are bound to the result, unless their names begin with `_`, in which
+    case the values are discarded.
 -   Certain out of band values, beginning with `$`, are added to the
     results, showing the exact text that matched, the offset etc.
 -   When using TypeScript, microgrammar returns can be strongly typed. In this case we've
@@ -105,6 +110,45 @@ Some notes:
 Of course, such a simple example could easily be handled by a regular
 expression and capture groups. But the power becomes apparent with
 nested productions and more elaborate matchers.
+
+A more complex example, showing composition:
+
+```
+export const CLASS_NAME = /[a-zA-Z_$][a-zA-Z0-9_$]+/;
+
+// Any annotation we're not interested in
+const DiscardedAnnotation = {
+    _at: "@",
+    _annotationName: CLASS_NAME,
+    _content: optional(JavaParenthesizedExpression),
+};
+
+const SpringBootApp = Microgrammar.fromDefinitions<{ name: string }>({
+    _app: "@SpringBootApplication",
+    _content: optional(JavaParenthesizedExpression),
+    _otherAnnotations: zeroOrMore(DiscardedAnnotation),
+    _visibility: optional("public"),
+    _class: "class",
+    name: CLASS_NAME,
+});
+```
+
+This will match content like this:
+
+```
+@SpringBootApplication
+@Foo
+@Bar(name = "Baz", magicParam = 31754)
+public class MySpringBootApplication
+```
+
+Notes:
+
+- `JavaParenthesizedExpression` is a built-in matcher constant that matches any valid Java content within `(...)`. It uses a state
+machine. It's easy to write such custom matchers.
+- By default, microgrammars are tolerant of whitespace, treating it as a token separator. This is the behavior we want when
+parsing most languages or configuration formats.
+- Because the other properties have names beginning with `_`, only the class name (`MySpringBootApplication` in our example) is bound to the result. We care about the structure of the rest of the class declaration, but we don't need to extract other values in this particular case.
 
 ## Usage
 
