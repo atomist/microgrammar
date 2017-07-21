@@ -1,8 +1,8 @@
 import "mocha";
-import { JavaParenthesizedExpression } from "../src/matchers/java/JavaBody";
+import { JavaParenthesizedExpression } from "../src/matchers/lang/cfamily/java/JavaBody";
 import { Microgrammar } from "../src/Microgrammar";
 import { isPatternMatch } from "../src/PatternMatch";
-import { JAVA_IDENTIFIER } from "./matchers/java/JavaBlockMicrogrammarTest";
+import { JAVA_IDENTIFIER } from "./matchers/lang/cfamily/java/JavaBlockMicrogrammarTest";
 
 import * as assert from "power-assert";
 import { fail } from "power-assert";

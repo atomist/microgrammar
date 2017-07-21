@@ -1,22 +1,12 @@
-import { AbstractStateMachine } from "../../support/AbstractStateMachine";
-
-/**
- * State of input in a Java source file
- */
-export type JavaState =
-    "normal" |
-    "String" |
-    "inLineComment" |
-    "CComment";
+import { LangState, LangStateMachine } from "../../LangStateMachine";
+import {DoubleString, Normal, SlashSlashComment, SlashStarComment } from "../States";
 
 /**
  * State machine for recognizing Java strings and comments.
  */
-export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
+export class JavaContentStateMachine extends LangStateMachine {
 
-    private previousChar: string;
-
-    constructor(state: JavaState = "normal") {
+    constructor(state: LangState = Normal) {
         super(state);
     }
 
@@ -25,38 +15,39 @@ export class JavaContentStateMachine extends AbstractStateMachine<JavaState> {
     }
 
     public consume(ch: string): void {
+        this.previousState = this.state;
         switch (this.state) {
-            case "inLineComment":
+            case SlashSlashComment:
                 if (ch === "\n") {
-                    this.state = "normal";
+                    this.state = Normal;
                 }
                 break;
-            case "CComment":
+            case SlashStarComment:
                 if (ch === "/" && this.previousChar === "*") {
-                    this.state = "normal";
+                    this.state = Normal;
                 }
                 break;
-            case "normal":
+            case Normal:
                 switch (ch) {
                     case '"' :
-                        this.state = "String";
+                        this.state = DoubleString;
                         break;
                     case "/":
                         if (this.previousChar === "/") {
-                            this.state = "inLineComment";
+                            this.state = SlashSlashComment;
                         }
                         break;
                     case "*":
                         if (this.previousChar === "/") {
-                            this.state = "CComment";
+                            this.state = SlashStarComment;
                         }
                         break;
                     default:
                 }
                 break;
-            case "String":
+            case DoubleString:
                 if (ch === '"' && this.previousChar !== "\\") {
-                    this.state = "normal";
+                    this.state = Normal;
                 }
                 break;
         }

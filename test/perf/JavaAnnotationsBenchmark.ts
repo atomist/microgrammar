@@ -2,10 +2,7 @@ import "mocha";
 import * as assert from "power-assert";
 import { ChangeControlledMethodGrammar } from "../integration/RealWorldTest2";
 
-import { canonicalize } from "../../src/matchers/java/JavaUtils";
-import { Microgrammar } from "../../src/Microgrammar";
-
-import { skipTo, takeUntil } from "../../src/matchers/skip/Skip";
+import { CFamilyLangHelper } from "../../src/matchers/lang/cfamily/CFamilyLangHelper";
 
 describe("Java Benchmark", () => {
 
@@ -36,7 +33,7 @@ describe("Java Benchmark", () => {
         const src = Java1.replace("//placeholder", additional);
 
         // console.log(`Src length=${src.split("\n").length} lines`);
-        // src = canonicalize(src);
+        // src = new CFamilyLangHelper().canonicalize(src);
 
         for (let i = 0; i < parseCount; i++) {
             const matches = ChangeControlledMethodGrammar.findMatches(src);

@@ -1,6 +1,6 @@
 import assert = require("power-assert");
 
-import { stripComments, stripWhitespace } from "../../../src/matchers/java/JavaUtils";
+import { CFamilyLangHelper } from "../../../../src/matchers/lang/cfamily/CFamilyLangHelper";
 
 describe("Comment stripping", () => {
 
@@ -9,7 +9,7 @@ describe("Comment stripping", () => {
             `
             public class Foo { }
             `;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src);
     });
 
@@ -19,7 +19,7 @@ describe("Comment stripping", () => {
             `public class Foo { }
             `;
         const src = comment + "\n" + block;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src.replace(comment, ""));
     });
 
@@ -30,7 +30,7 @@ describe("Comment stripping", () => {
             `public class Foo { }
             `;
         const src = comment1 + "\n" + comment2 + "\n" + block;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src.replace(comment1, "").replace(comment2, ""));
     });
 
@@ -40,7 +40,7 @@ describe("Comment stripping", () => {
             `public class Foo { }
             `;
         const src = comment + "\n" + block;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src.replace(comment, ""));
     });
 
@@ -53,7 +53,7 @@ describe("Comment stripping", () => {
             `public class Foo { }
             `;
         const src = comment + "\n" + block;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src.replace(comment, ""));
     });
 
@@ -66,7 +66,7 @@ describe("Comment stripping", () => {
             `public class Foo { }
             `;
         const src = comment + "\n" + block;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped === src.replace(comment, ""));
     });
 
@@ -77,11 +77,12 @@ describe("Comment stripping", () => {
             int a ${comment}
             ) { }
             `;
-        const stripped = stripComments(src);
+        const stripped = new CFamilyLangHelper().stripComments(src);
         assert(stripped.charAt(0) === "p");
         assert(stripped.charAt(stripped.length - 1) === src.charAt(src.length - 1));
         const expected = src.replace(comment, "");
-        assert(stripWhitespace(stripped) === stripWhitespace(expected), "\n" + stripped + "\n" + expected);
+        assert(new CFamilyLangHelper().stripWhitespace(stripped) ===
+            new CFamilyLangHelper().stripWhitespace(expected), "\n" + stripped + "\n" + expected);
     });
 
 });

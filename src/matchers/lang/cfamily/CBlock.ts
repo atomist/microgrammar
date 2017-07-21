@@ -1,26 +1,25 @@
-import { InputState } from "../../InputState";
-import { MatchingLogic } from "../../Matchers";
-import { MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
-import { TerminalPatternMatch } from "../../PatternMatch";
-import { Concat } from "../Concat";
-
-import { inputStateFromString } from "../../internal/InputStateFactory";
-
-import { JavaContentStateMachine } from "./JavaContentStateMachine";
+import { InputState } from "../../../InputState";
+import { inputStateFromString } from "../../../internal/InputStateFactory";
+import { MatchingLogic } from "../../../Matchers";
+import { MatchPrefixResult, matchPrefixSuccess } from "../../../MatchPrefixResult";
+import { TerminalPatternMatch } from "../../../PatternMatch";
+import { Concat } from "../../Concat";
+import { LangStateMachine } from "../LangStateMachine";
 
 /**
- * The rest of a Java block, going to a matching depth of +1 curlies or braces.
+ * The rest of a C family block, going to a matching depth of +1 curlies or braces.
  * Does not read final curly
  */
-class JavaBody implements MatchingLogic {
+export class CBlock implements MatchingLogic {
 
-    public $id: "Java.BlockBody";
+    public $id: "C.BlockBody";
 
     private push: string;
 
     private pop: string;
 
-    constructor(private kind: "block" | "parens", private inner?: MatchingLogic) {
+    constructor(private stateMachineFactory: () => LangStateMachine,
+                private kind: "block" | "parens", private inner?: MatchingLogic) {
         switch (kind) {
             case "block":
                 [this.push, this.pop] = ["{", "}"];
@@ -32,7 +31,7 @@ class JavaBody implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        const sm = new JavaContentStateMachine();
+        const sm = this.stateMachineFactory();
         let depth = 1;
         let currentIs = is;
         let matched = "";
@@ -42,7 +41,7 @@ class JavaBody implements MatchingLogic {
                 break;
             }
             sm.consume(next);
-            if (sm.state === "normal") {
+            if (sm.state.normal()) {
                 switch (next) {
                     case this.push:
                         depth++;
@@ -72,32 +71,37 @@ class JavaBody implements MatchingLogic {
 }
 
 /**
- * Match a Java block with balanced curlies
+ * Match a block with balanced curlies
  * @type {Term}
  */
-export const JavaBlock = new Concat({
-    $id: "{...}",
-    _lp: "{",
-    block: new JavaBody("block"),
-    _rp: "}",
-});
-
-export function javaBlockContaining(m: Concat) {
+export function block(stateMachineFactory: () => LangStateMachine) {
     return new Concat({
         $id: "{...}",
         _lp: "{",
-        block: new JavaBody("block", m),
+        block: new CBlock(stateMachineFactory, "block"),
+        _rp: "}",
+    });
+}
+
+export function blockContaining(stateMachineFactory: () => LangStateMachine,
+                                m: Concat) {
+    return new Concat({
+        $id: "{...}",
+        _lp: "{",
+        block: new CBlock(stateMachineFactory, "block", m),
         _rp: "}",
     });
 }
 
 /**
- * Match a parenthesized Java expression with ()
+ * Match a parenthesized expression including ()
  * @type {Concat}
  */
-export const JavaParenthesizedExpression = new Concat({
-    $id: "(...)",
-    _lp: "(",
-    block: new JavaBody("parens"),
-    _rp: ")",
-});
+export function parenthesizedExpression(stateMachineFactory: () => LangStateMachine) {
+    return new Concat({
+        $id: "(...)",
+        _lp: "(",
+        block: new CBlock(stateMachineFactory, "parens"),
+        _rp: ")",
+    });
+}
