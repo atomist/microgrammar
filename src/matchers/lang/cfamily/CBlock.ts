@@ -5,6 +5,7 @@ import { MatchPrefixResult, matchPrefixSuccess } from "../../../MatchPrefixResul
 import { TerminalPatternMatch } from "../../../PatternMatch";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";
+import { CFamilyStateMachine } from "./CFamilyStateMachine";
 
 /**
  * The rest of a C family block, going to a matching depth of +1 curlies or braces.
@@ -83,8 +84,8 @@ export function block(stateMachineFactory: () => LangStateMachine) {
     });
 }
 
-export function blockContaining(stateMachineFactory: () => LangStateMachine,
-                                m: Concat) {
+export function blockContaining(m: Concat,
+                                stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
     return new Concat({
         $id: "{...}",
         _lp: "{",
@@ -97,7 +98,7 @@ export function blockContaining(stateMachineFactory: () => LangStateMachine,
  * Match a parenthesized expression including ()
  * @type {Concat}
  */
-export function parenthesizedExpression(stateMachineFactory: () => LangStateMachine) {
+export function parenthesizedExpression(stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
     return new Concat({
         $id: "(...)",
         _lp: "(",

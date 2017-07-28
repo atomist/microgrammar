@@ -1,15 +1,15 @@
 import { Concat } from "../../../Concat";
 import { block, blockContaining, parenthesizedExpression } from "../CBlock";
-import { JavaContentStateMachine } from "./JavaContentStateMachine";
+import { CFamilyStateMachine } from "../CFamilyStateMachine";
 
 /**
  * Match a Java block with balanced curlies
  * @type {Term}
  */
-export const JavaBlock = block(() => new JavaContentStateMachine());
+export const JavaBlock = block(() => new CFamilyStateMachine());
 
 export function javaBlockContaining(m: Concat) {
-    return blockContaining(() => new JavaContentStateMachine(), m);
+    return blockContaining(m);
 }
 
 /**
@@ -17,4 +17,4 @@ export function javaBlockContaining(m: Concat) {
  * @type {Concat}
  */
 export const JavaParenthesizedExpression =
-    parenthesizedExpression(() => new JavaContentStateMachine());
+    parenthesizedExpression();

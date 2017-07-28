@@ -4,7 +4,7 @@
 export interface LangHelper {
 
     /**
-     * Remove all comments
+     * Remove all comments from the given source code
      * @param source
      */
     stripComments(source: string): string;

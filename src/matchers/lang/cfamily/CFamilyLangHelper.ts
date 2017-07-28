@@ -1,6 +1,6 @@
 
 import { LangHelper } from "../LangHelper";
-import { JavaContentStateMachine } from "./java/JavaContentStateMachine";
+import { CFamilyStateMachine } from "./CFamilyStateMachine";
 import { DoubleString, Normal, SlashSlashComment, SlashStarComment } from "./States";
 
 export class CFamilyLangHelper implements LangHelper {
@@ -11,7 +11,7 @@ export class CFamilyLangHelper implements LangHelper {
      */
     public stripComments(source: string) {
         let stripped = "";
-        const sm = new JavaContentStateMachine();
+        const sm = new CFamilyStateMachine();
         for (const ch of source) {
             sm.consume(ch);
             switch (sm.state) {
@@ -38,7 +38,7 @@ export class CFamilyLangHelper implements LangHelper {
         let stripped = "";
         let chunk = "";
 
-        const sm = new JavaContentStateMachine();
+        const sm = new CFamilyStateMachine();
         for (const s of source) {
             sm.consume(s);
             switch (sm.state) {

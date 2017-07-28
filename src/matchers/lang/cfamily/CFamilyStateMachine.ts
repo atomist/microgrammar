@@ -1,17 +1,18 @@
-import { LangState, LangStateMachine } from "../../LangStateMachine";
-import {DoubleString, Normal, SlashSlashComment, SlashStarComment } from "../States";
+import { LangState, LangStateMachine } from "../LangStateMachine";
+import {DoubleString, Normal, SlashSlashComment, SlashStarComment } from "./States";
 
 /**
- * State machine for recognizing Java strings and comments.
+ * State machine for recognizing C family strings and comments.
+ * Directly usable for Java, C and C++
  */
-export class JavaContentStateMachine extends LangStateMachine {
+export class CFamilyStateMachine extends LangStateMachine {
 
     constructor(state: LangState = Normal) {
         super(state);
     }
 
-    public clone(): JavaContentStateMachine {
-        return new JavaContentStateMachine(this.state);
+    public clone(): CFamilyStateMachine {
+        return new CFamilyStateMachine(this.state);
     }
 
     public consume(ch: string): void {

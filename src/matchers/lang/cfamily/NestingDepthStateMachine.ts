@@ -1,6 +1,6 @@
 import { AbstractStateMachine } from "../../../support/AbstractStateMachine";
 import { LangState, LangStateMachine } from "../LangStateMachine";
-import { JavaContentStateMachine } from "./java/JavaContentStateMachine";
+import { CFamilyStateMachine } from "./CFamilyStateMachine";
 import { Normal } from "./States";
 
 /**
@@ -15,7 +15,7 @@ export class NestingDepthStateMachine extends AbstractStateMachine<LangState> {
     private stateMachine: LangStateMachine;
 
     constructor(private kind: "block" | "parens" = "block",
-                private factory: () => LangStateMachine = () => new JavaContentStateMachine(),
+                private factory: () => LangStateMachine = () => new CFamilyStateMachine(),
                 state: LangState = Normal,
                 public depth = 0) {
         super(state);

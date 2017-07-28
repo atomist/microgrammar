@@ -4,8 +4,8 @@ import * as assert from "power-assert";
 import { InputState, InputStateListener } from "../src/InputState";
 import { MatchingLogic } from "../src/Matchers";
 import { CFamilyLangHelper } from "../src/matchers/lang/cfamily/CFamilyLangHelper";
+import { CFamilyStateMachine } from "../src/matchers/lang/cfamily/CFamilyStateMachine";
 import { JavaBlock } from "../src/matchers/lang/cfamily/java/JavaBody";
-import { JavaContentStateMachine } from "../src/matchers/lang/cfamily/java/JavaContentStateMachine";
 import { NestingDepthStateMachine } from "../src/matchers/lang/cfamily/NestingDepthStateMachine";
 import { DoubleString } from "../src/matchers/lang/cfamily/States";
 import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../src/MatchPrefixResult";
@@ -55,7 +55,7 @@ describe("InputStateListener", () => {
         class AtNotInString implements MatchingLogic {
 
             public matchPrefix(is: InputState, mc, parseContext): MatchPrefixResult {
-                const l = is.listeners.l as JavaContentStateMachine;
+                const l = is.listeners.l as CFamilyStateMachine;
                 if (is.peek(1) === "@" && l.state !== DoubleString) {
                     return matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@"));
                 }
@@ -76,7 +76,7 @@ public class Foo {
     }
 }
         `;
-        const l = new JavaContentStateMachine();
+        const l = new CFamilyStateMachine();
         const matches = m.findMatches(input, {}, { l });
         assert(matches.length === 2);
     });

@@ -21,6 +21,15 @@ export abstract class LangStateMachine extends AbstractStateMachine<LangState> {
  */
 export class LangState {
 
+    /**
+     * Create a new state
+     * @param name name of the state. Merely informative.
+     * @param comment is this a comment state? A language
+     * can have multiple kinds of comments, such as /* and // comments
+     * @param stringLiteral are we in a string literal?
+     * A language can have multiple kinds of string literals, like
+     * Scala " and """ strings
+     */
     constructor(public name: string,
                 public comment: boolean,
                 public stringLiteral: boolean) {
