@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.5.1...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.6.0...HEAD
+
+## [0.6.0]
+
+Listener and `fromString` improvement release.
+
+[0.6.0]: https://github.com/atomist/microgrammar/compare/0.5.1...0.6.0
 
 ### Added
 
@@ -23,7 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   **Breaking** Unified "block" support to a handle C family languages
-    in a consistent manner, rather than just Java.
+    in a consistent manner, rather than just Java
 -   Fixed `skipTo` where target matcher is a non-terminal
 -   Fixed `Integer` to accept 0 but not accept a pattern with a leading 0
 

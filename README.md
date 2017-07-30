@@ -3,8 +3,10 @@
 [![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
 [![Slack Status](https://join.atomist.com/badge.svg)](https://join.atomist.com)
 
-Parsing library written in TypeScript. Can parse and cleanly update 
-structured content.
+Parsing library written in TypeScript, filling the large gap between the sweet spots of 
+regular expressions and full-blown [BNF][bnf] or equivalent grammars. 
+Can parse and cleanly update 
+structured content. `npm` module page [here][npm-mod].
 
 ## Concepts
 
@@ -17,6 +19,7 @@ readable][regex-hell] than [regular expressions][regex] for complex cases, altho
 built using regex.
 
 [mg-paper]: http://web.stanford.edu/~mlfbrown/paper.pdf (How to build static checking systems using orders of magnitude less code Brown et al., ASPLOS 2016)
+[npm-mod]: https://www.npmjs.com/package/@atomist/microgrammar (node module)
 
 Microgrammars have obvious similarities to [BNF grammars][bnf], but
 differ in some important respects:
