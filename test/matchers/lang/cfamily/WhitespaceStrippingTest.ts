@@ -1,34 +1,34 @@
 import assert = require("power-assert");
 
-import { stripWhitespace } from "../../../src/matchers/java/JavaUtils";
+import { CFamilyLangHelper } from "../../../../src/matchers/lang/cfamily/CFamilyLangHelper";
 
 describe("Whitespace stripping", () => {
 
     it("shouldn't change when no whitespace", () => {
         const src =
             `public class Foo{}`;
-        const stripped = stripWhitespace(src);
+        const stripped = new CFamilyLangHelper().stripWhitespace(src);
         assert(stripped === src);
     });
 
     it("should strip leading newline", () => {
         const src =
             `public class Foo{}`;
-        const stripped = stripWhitespace("\n" + src);
+        const stripped = new CFamilyLangHelper().stripWhitespace("\n" + src);
         assert(stripped === src);
     });
 
     it("should strip leading tabs and drop trailing newline", () => {
         const src =
             `public class Foo{}`;
-        const stripped = stripWhitespace("\t\t" + src + "\n");
+        const stripped = new CFamilyLangHelper().stripWhitespace("\t\t" + src + "\n");
         assert(stripped === src);
     });
 
-    it("should replace 3 unecessary spaces with none", () => {
+    it("should replace 3 unnecessary spaces with none", () => {
         const src =
             `public class Foo {    }`;
-        const stripped = stripWhitespace(src);
+        const stripped = new CFamilyLangHelper().stripWhitespace(src);
         assert(stripped === "public class Foo{}");
     });
 

@@ -1,13 +1,13 @@
-import { JavaBlock, javaBlockContaining } from "../../../src/matchers/java/JavaBody";
-import { Microgrammar } from "../../../src/Microgrammar";
-import { PatternMatch } from "../../../src/PatternMatch";
-import { Regex } from "../../../src/Primitives";
+import { JavaBlock, javaBlockContaining } from "../../../../../src/matchers/lang/cfamily/java/JavaBody";
+import { Microgrammar } from "../../../../../src/Microgrammar";
+import { PatternMatch } from "../../../../../src/PatternMatch";
+import { Regex } from "../../../../../src/Primitives";
 
-import { inputStateFromString } from "../../../src/internal/InputStateFactory";
+import { inputStateFromString } from "../../../../../src/internal/InputStateFactory";
 
 import * as assert from "power-assert";
-import { RestOfInput } from "../../../src/matchers/skip/Skip";
-import { isSuccessfulMatch } from "../../../src/MatchPrefixResult";
+import { RestOfInput } from "../../../../../src/matchers/skip/Skip";
+import { isSuccessfulMatch } from "../../../../../src/MatchPrefixResult";
 
 describe("JavaBlock", () => {
 

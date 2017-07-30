@@ -1,4 +1,4 @@
-import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/java/JavaBody";
+import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/lang/cfamily/java/JavaBody";
 import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
 
 import { Microgrammar } from "../../src/Microgrammar";

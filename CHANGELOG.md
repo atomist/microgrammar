@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+-   **Breaking** Unified "block" support to a handle C family languages
+    in a consistent manner, rather than just Java.
 -   Fixed `skipTo` where target matcher is a non-terminal
 -   Fixed `Integer` to accept 0 but not accept a pattern with a leading 0
 
