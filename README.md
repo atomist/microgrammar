@@ -10,8 +10,9 @@ structured content. `npm` module page [here][npm-mod].
 
 ## Concepts
 
-[Microgrammars][mg-paper] are a powerful way of parsing structured
-content such as source code. Microgrammars are designed to recognize
+**Microgrammars** are a powerful way of parsing structured
+content such as source code, described in this [Stanford paper][mg-paper]. 
+Microgrammars are designed to recognize
 structures in a string or stream and extract their content: For
 example, to recognize a Java method that has a particular annotation
 and to extract particular parameters. They are more powerful and [typically more
@@ -20,40 +21,6 @@ built using regex.
 
 [mg-paper]: http://web.stanford.edu/~mlfbrown/paper.pdf (How to build static checking systems using orders of magnitude less code Brown et al., ASPLOS 2016)
 [npm-mod]: https://www.npmjs.com/package/@atomist/microgrammar (node module)
-
-Microgrammars have obvious similarities to [BNF grammars][bnf], but
-differ in some important respects:
-
--   They are intended to match and explain _parts_ of the input, rather
-    than the whole input
--   They excel at skipping content they are uninterested in
--   They are not necessarily context free
--   They do not need to construct a full AST, although they construct
-    ASTs for structures they do match. Thus they can easily cope with 
-    partially structured data, happily skipping over incomprehensible content
-
-[bnf]: https://en.wikipedia.org/wiki/Backus–Naur_form (Backus–Naur Form)
-
-Similarities are:
-
--   The idea of **productions**
--   Composability, including the ability to reuse productions in
-    different grammars
--   Operations such as _alternative_, _optional_ and _rep_, that
-    enable building complex structures.
-
-Compared to regular expressions, microgrammars are:
-
--   Capable of handing greater complexity
--   More composable
--   Higher level, able to use regular expressions as building blocks
--   Capable of expressing nested structures
--   Arbitrarily extensible through TypeScript function predicates and
-    custom **matchers**
-
-While it would be overkill to use a microgrammar for something that
-can be expressed in a simple regex, microgrammars tend to be clearer
-for complex cases.
 
 Atomist microgrammars go beyond the Stanford paper example in that
 they permit _updating_ as well as matching, preserving positions. They
@@ -153,6 +120,42 @@ machine. It's easy to write such custom matchers.
 - By default, microgrammars are tolerant of whitespace, treating it as a token separator. This is the behavior we want when
 parsing most languages or configuration formats.
 - Because the other properties have names beginning with `_`, only the class name (`MySpringBootApplication` in our example) is bound to the result. We care about the structure of the rest of the class declaration, but we don't need to extract other values in this particular case.
+
+## Alternatives and When To Use Microgrammars
+
+Microgrammars have obvious similarities to [BNF grammars][bnf], but
+differ in some important respects:
+
+-   They are intended to match and explain _parts_ of the input, rather
+    than the whole input
+-   They excel at skipping content they are uninterested in
+-   They are not necessarily context free
+-   They do not need to construct a full AST, although they construct
+    ASTs for structures they do match. Thus they can easily cope with 
+    partially structured data, happily skipping over incomprehensible content
+
+[bnf]: https://en.wikipedia.org/wiki/Backus–Naur_form (Backus–Naur Form)
+
+Similarities are:
+
+-   The idea of **productions**
+-   Composability, including the ability to reuse productions in
+    different grammars
+-   Operations such as _alternative_, _optional_ and _rep_, that
+    enable building complex structures.
+
+Compared to regular expressions, microgrammars are:
+
+-   Capable of handing greater complexity
+-   More composable
+-   Higher level, able to use regular expressions as building blocks
+-   Capable of expressing nested structures
+-   Arbitrarily extensible through TypeScript function predicates and
+    custom **matchers**
+
+While it would be overkill to use a microgrammar for something that
+can be expressed in a simple regex, microgrammars tend to be clearer
+for complex cases.
 
 ## Usage
 
