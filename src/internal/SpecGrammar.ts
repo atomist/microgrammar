@@ -5,7 +5,7 @@ import { Break } from "./Break";
 import { CompleteFromStringOptions } from "./CompleteFromStringOptions";
 
 function componentReference(fso: CompleteFromStringOptions) {
-    return new Concat({
+    return Concat.of({
         $id: "component",
         _start: fso.componentPrefix + "{",
         elementName: /[a-zA-Z0-9_]+/,
@@ -15,7 +15,7 @@ function componentReference(fso: CompleteFromStringOptions) {
 
 export function specGrammar(fso: CompleteFromStringOptions) {
     const componentRef = componentReference(fso);
-    return new Concat({
+    return Concat.of({
         $id: "spec",
         these: new Rep({
             $id: "literal, then component",

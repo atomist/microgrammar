@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://github.com/atomist/microgrammar/compare/0.6.0...HEAD
 
+### Added
+
+-   It's now possible to set definition members after initial
+    construction, to enable circular references. See `Concat.lazy`
+
+### Changed
+
+-   `Concat` constructor is now private. Use `Concat.of` static
+    function instead
+
 ## [0.6.0]
 
 Listener and `fromString` improvement release.

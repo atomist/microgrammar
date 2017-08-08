@@ -14,7 +14,7 @@ describe("Concat", () => {
 
     it("single literal", () => {
         const content = "foo ";
-        const mg = new Concat({
+        const mg = Concat.of({
             name: "foo",
         });
         const is = inputStateFromString(content);
@@ -29,7 +29,7 @@ describe("Concat", () => {
 
     it("single digit with regex", () => {
         const content = "2";
-        const mg = new Concat({
+        const mg = Concat.of({
             $id: "Foo",
             num: /[1-9][0-9]*/,
         });
@@ -44,7 +44,7 @@ describe("Concat", () => {
 
     it("integer with single digit", () => {
         const content = "2";
-        const mg = new Concat({
+        const mg = Concat.of({
             num: Integer,
         });
         const is = inputStateFromString(content);
@@ -65,7 +65,7 @@ describe("Concat", () => {
 
     it("integer with multiple digits", () => {
         const content = "24";
-        const mg = new Concat({
+        const mg = Concat.of({
             num: Integer,
         });
         const is = inputStateFromString(content);
@@ -82,7 +82,7 @@ describe("Concat", () => {
 
     it("integers", () => {
         const content = "24x7";
-        const mg = new Concat({
+        const mg = Concat.of({
             hours: Integer,
             _x: "x",
             days: Integer,
@@ -101,7 +101,7 @@ describe("Concat", () => {
     });
 
     it("respects nesting without name collisions", () => {
-        const mg = new Concat({
+        const mg = Concat.of({
             name: /[A-Za-z]+/,
             _plus: "+",
             spouse: {
@@ -122,7 +122,7 @@ describe("Concat", () => {
     });
 
     it("respects nesting without name collisions using nested rep", () => {
-        const mg = new Concat({
+        const mg = Concat.of({
             names: new Rep1Sep(/[A-Za-z]+/, ","),
             _plus: "+",
             spouse: {
@@ -147,7 +147,7 @@ describe("Concat", () => {
         const nameList = {
             names: new Rep1Sep(/[A-Za-z]+/, ","),
         };
-        const mg = new Concat({
+        const mg = Concat.of({
             gentlemen: nameList,
             _bp: "vs",
             players: nameList,
@@ -167,7 +167,7 @@ describe("Concat", () => {
     });
 
     it("respects nesting without name collisions using parallel reps without concats", () => {
-        const mg = new Concat({
+        const mg = Concat.of({
             gentlemen: new Rep1Sep(/[A-Za-z]+/, ","),
             _bp: "vs",
             players: new Rep1Sep(/[A-Za-z]+/, ","),
@@ -195,7 +195,7 @@ describe("Concat", () => {
                 rp: ")",
             }, ","),
         };
-        const mg = new Concat({
+        const mg = Concat.of({
             gentlemen: nameList,
             _bp: "vs",
             players: nameList,
@@ -220,7 +220,7 @@ describe("Concat", () => {
 
     it("rep array structure", () => {
         const content = "Donald: golf, tweeting";
-        const mg = new Concat({
+        const mg = Concat.of({
             name: /[A-Z][a-z]+/,
             delim: ":",
             hobbies: new RepSep(/[a-z]+/, ","),
@@ -241,7 +241,7 @@ describe("Concat", () => {
 
     it("does not allow undefined matcher field steps", () => {
         const literal: string = undefined;
-        assert.throws(() => new Concat({
+        assert.throws(() => Concat.of({
             opening: literal,
             thing: "thing",
         }), e => {
@@ -252,7 +252,7 @@ describe("Concat", () => {
 
     it("does not allow null matcher field steps", () => {
         const literal: string = null;
-        assert.throws(() => new Concat({
+        assert.throws(() => Concat.of({
             opening: literal,
             thing: "thing",
         }), e => {
@@ -263,7 +263,7 @@ describe("Concat", () => {
 
     it("does not skip", () => {
         const content = "tom:49";
-        const mg = new Concat({
+        const mg = Concat.of({
             name: /[a-z]+/,
             age: Integer,
         });
@@ -274,7 +274,7 @@ describe("Concat", () => {
 
     it("skips: simple", () => {
         const content = "tom:49";
-        const mg = new Concat({
+        const mg = Concat.of({
             ...Skipper,
             name: /[a-z]+/,
             age: Integer,
@@ -286,7 +286,7 @@ describe("Concat", () => {
 
     it("skips: more complex", () => {
         const content = "Katrina and this is a whole bunch of junk the Waves were a band in the 80s in England and this is junk";
-        const mg = new Concat({
+        const mg = Concat.of({
             ...Skipper,
             lead: /[A-Z][a-z]+/,
             band: /[A-Z][a-z]+/,

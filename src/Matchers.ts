@@ -52,3 +52,18 @@ export interface Matcher extends MatchingLogic {
     readonly name: string;
 
 }
+
+/**
+ * Interface implemented by matchers that can be lazily initialized
+ */
+export interface LazyMatchingLogic extends MatchingLogic {
+
+    $lazy: boolean;
+
+    /**
+     * Prepare the matcher for use
+     * @private
+     */
+    _init(): void;
+
+}

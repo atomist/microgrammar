@@ -42,7 +42,7 @@ describe("Break", () => {
 
     it("break matches a complicated matcher", () => {
         const b = new Break(
-            new Concat({
+            Concat.of({
                 ...WhiteSpaceSensitive,
                 _start: "${",
                 name: new Regex(/[a-z]+/),
@@ -122,7 +122,7 @@ describe("Break", () => {
 
     it("break matches all in concat", () => {
         const b = new Break(new Literal("14"));
-        const c = new Concat({
+        const c = Concat.of({
             prefix: b,
             number: new Span("41"),
         });

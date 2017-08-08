@@ -12,7 +12,7 @@ export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStrea
                               parseContext = {},
                               l?: Listeners): PatternMatch & T | DismatchReport {
 
-    const wrapped = new Concat({
+    const wrapped = Concat.of({
         desired: matcher,
         trailingJunk: RestOfInput,
     });

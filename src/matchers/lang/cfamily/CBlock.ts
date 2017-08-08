@@ -76,7 +76,7 @@ export class CBlock implements MatchingLogic {
  * @type {Term}
  */
 export function block(stateMachineFactory: () => LangStateMachine) {
-    return new Concat({
+    return Concat.of({
         $id: "{...}",
         _lp: "{",
         block: new CBlock(stateMachineFactory, "block"),
@@ -86,7 +86,7 @@ export function block(stateMachineFactory: () => LangStateMachine) {
 
 export function blockContaining(m: Concat,
                                 stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
-    return new Concat({
+    return Concat.of({
         $id: "{...}",
         _lp: "{",
         block: new CBlock(stateMachineFactory, "block", m),
@@ -99,7 +99,7 @@ export function blockContaining(m: Concat,
  * @type {Concat}
  */
 export function parenthesizedExpression(stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
-    return new Concat({
+    return Concat.of({
         $id: "(...)",
         _lp: "(",
         block: new CBlock(stateMachineFactory, "parens"),

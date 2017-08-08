@@ -1,4 +1,3 @@
-import { Term } from "../src/Matchers";
 import { Concat } from "../src/matchers/Concat";
 import { Microgrammar } from "../src/Microgrammar";
 import { Opt, when } from "../src/Ops";
@@ -97,7 +96,7 @@ export interface PropertiesBlock {
     properties: Array<{ name: string, value: string }>;
 }
 
-export const XML_TAG_WITH_SIMPLE_VALUE = new Concat({
+export const XML_TAG_WITH_SIMPLE_VALUE = Concat.of({
     _l: "<",
     name: LEGAL_VALUE,
     _r: ">",
@@ -113,15 +112,10 @@ export interface XmlTag {
     value: string;
 }
 
-export const GAV_CONCAT = when(new Concat({
+export const GAV_CONCAT = when(Concat.of({
     tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
 }), pm => pm.tags.filter(t => t.name === "groupId").length > 0 &&
 pm.tags.filter(t => t.name === "artifactId").length > 0);
-
-// This correctly handles ordering, which is free
-// We should be using this elsewhere
-export const GAV_GRAMMAR =
-    new Microgrammar(GAV_CONCAT);
 
 export class GAV {
 
@@ -129,34 +123,6 @@ export class GAV {
     }
 
 }
-
-export function asVersionedArtifact(tags: XmlTag[]): VersionedArtifact {
-    const groups = tags.filter(tag => tag.name === "groupId");
-    const artifacts = tags.filter(tag => tag.name === "artifactId");
-    const versions = tags.filter(tag => tag.name === "version");
-    const group = groups.length === 1 ? groups[0].value : undefined;
-    const artifact = groups.length === 1 ? artifacts[0].value : undefined;
-    const version = versions.length === 1 ? versions[0].value : undefined;
-    return (group && artifact) ?
-        new GAV(group, artifact, version) :
-        undefined;
-}
-
-export const PARENT_STANZA = Microgrammar.fromDefinitions({
-    _start: "<parent>",
-    gav: GAV_GRAMMAR,
-    $id: "parent",
-} as Term);
-
-export const FIRST_DEPENDENCY = Microgrammar.fromDefinitions({
-    _deps: "<dependencies>",
-    dependency: ALL_DEPENDENCY_GRAMMAR,
-});
-
-export const FIRST_PLUGIN = Microgrammar.fromDefinitions({
-    _plugins: "<plugins>",
-    plugin: ALL_PLUGIN_GRAMMAR,
-});
 
 export const ARTIFACT_VERSION_GRAMMAR = Microgrammar.fromDefinitions({
     // _lx1: "<dependency>",

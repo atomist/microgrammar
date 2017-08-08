@@ -59,7 +59,7 @@ export function firstOf(a: any, b: any, ...matchers: any[]): MatchingLogic {
  */
 export class Alt implements MatchingLogic {
 
-    private matchers: MatchingLogic[];
+    public readonly matchers: MatchingLogic[];
 
     constructor(a: any, b: any, ...matchers: any[]) {
         const matchObjects = [a, b].concat(matchers);

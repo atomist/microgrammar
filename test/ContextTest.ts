@@ -9,7 +9,7 @@ import { Integer, LowercaseBoolean } from "../src/Primitives";
 describe("ContextTest", () => {
 
     it("binds calculation", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             a: Integer,
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
@@ -21,7 +21,7 @@ describe("ContextTest", () => {
     });
 
     it("doesn't veto match based on false calculation", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             a: Integer,
             b: Integer,
             willBeFalse: ctx => typeof ctx.a === "string",
@@ -34,7 +34,7 @@ describe("ContextTest", () => {
     });
 
     it("binds calculation to returned value", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             a: Integer,
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
@@ -46,7 +46,7 @@ describe("ContextTest", () => {
     });
 
     it("rewrites property using separate function", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             a: Integer,
             b: /[0-9]+/,
             _rework(ctx) {
@@ -59,7 +59,7 @@ describe("ContextTest", () => {
     });
 
     it("rewrites property using transformation", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             a: Integer,
             stringB: /[0-9]+/,
             b: ctx => parseInt(ctx.stringB, 10),
@@ -70,7 +70,7 @@ describe("ContextTest", () => {
     });
 
     it("use function to dictate match", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             flag: LowercaseBoolean,
             _done(ctx) {
                 return ctx.flag;
@@ -85,7 +85,7 @@ describe("ContextTest", () => {
     });
 
     it("handles nested matches", () => {
-        const cc = new Concat({
+        const cc = Concat.of({
             nested: {
                 name: /[a-z]+/,
             },

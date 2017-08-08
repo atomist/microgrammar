@@ -1,5 +1,5 @@
 import { InputState } from "../InputState";
-import { Matcher, MatchingLogic, Term } from "../Matchers";
+import { LazyMatchingLogic, Matcher, MatchingLogic, Term } from "../Matchers";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
 import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
@@ -37,22 +37,47 @@ const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requ
  * Users should only create Concats directly in the unusual case where they need
  * to control whitespace handling in a unique way for that particular Concat.
  */
-export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
+export class Concat implements LazyMatchingLogic, WhiteSpaceHandler, SkipCapable {
+
+    /**
+     * Normal way to create a Concat. If a $lazy field
+     * is set to true, the Concat will be lazily initialized, and
+     * _init() must be called before use.
+     * @param definitions
+     * @return {Concat}
+     */
+    public static of(definitions: any): Concat {
+        const concat = new Concat(definitions);
+        if (definitions.$lazy !== true) {
+            concat._init();
+        }
+        return concat;
+    }
 
     public $consumeWhiteSpaceBetweenTokens: boolean = true;
 
     public $skipGaps = false;
 
+    public $lazy = false;
+
     public readonly matchSteps: MatchStep[] = [];
 
     // Used to check first matcher. We want to do that to check
     // for required prefix etc.
-    private readonly firstMatcher: Matcher;
+    private firstMatcher: Matcher;
 
-    constructor(public definitions: any) {
-        for (const stepName in definitions) {
+    private constructor(public definitions: any) {}
+
+    /**
+     * Evaluate all members to ready this Concat for use.
+     * Only call this function after using the lazy static factory method:
+     * _init is called automatically in the case of the regular Concat.of
+     * function
+     */
+    public _init() {
+        for (const stepName in this.definitions) {
             if (methodsOnEveryMatchingLogic.indexOf(stepName) === -1) {
-                const def = definitions[stepName];
+                const def = this.definitions[stepName];
                 if (def === undefined || def === null) {
                     throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
                 }
@@ -61,7 +86,7 @@ export class Concat implements MatchingLogic, WhiteSpaceHandler, SkipCapable {
                     this[stepName] = def;
                 } else if (typeof def === "function") {
                     // It's a calculation function
-                    if (def.length === 0) {
+                    if (def.length === 0 && stepName !== "_init") {
                         // A no arg function is invalid
                         throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
                     }
@@ -173,7 +198,7 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
     } else if ((o as Microgrammar<any>).findMatches) {
         return (o as Microgrammar<any>).matcher;
     } else {
-        return new Concat(o);
+        return Concat.of(o);
     }
 }
 

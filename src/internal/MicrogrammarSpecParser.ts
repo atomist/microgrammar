@@ -40,7 +40,7 @@ export class MicrogrammarSpecParser {
         const matcherSequence2 = this.populateSpecifiedElements(components, matcherSequence1);
         const matcherSequence3 = this.inferUnspecifiedElements(matcherSequence2);
         const definitions = this.definitionsFromSpecs(spec, matcherSequence3);
-        const concat = new Concat(definitions);
+        const concat = Concat.of(definitions);
         // Copy config to Concat
         for (const key in components) {
             if (key.charAt(0) === "$") {
@@ -153,7 +153,7 @@ export class MicrogrammarSpecParser {
                         this.addAnonymousToDefinitions(definitions, new Literal(token));
                     }
                 });
-                return new Concat(definitions);
+                return Concat.of(definitions);
             }
         }
     }

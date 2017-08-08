@@ -67,7 +67,7 @@ export class Microgrammar<T> implements Term {
     }
 
     public static fromDefinitions<T>(definitions: {}): Microgrammar<T> {
-        return new Microgrammar<T>(new Concat(definitions));
+        return new Microgrammar<T>(Concat.of(definitions));
     }
 
     public static fromString<T>(spec: string,
