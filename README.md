@@ -1,7 +1,6 @@
 # @atomist/microgrammar
 
 [![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
-[![Slack Status](https://join.atomist.com/badge.svg)](https://join.atomist.com)
 
 Parsing library written in TypeScript, filling the large gap between the sweet spots of 
 regular expressions and full-blown [BNF][bnf] or equivalent grammars. 
