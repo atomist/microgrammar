@@ -21,6 +21,7 @@ describe("updating matches", () => {
         const result = XmlGrammar().findMatches(content) as any;
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.second = "<newSecond>";
+        assert(updater.second === "<newSecond>");
         assert(updater.newContent() === "<first><newSecond>");
     });
 
@@ -29,6 +30,7 @@ describe("updating matches", () => {
         const result = XmlGrammar().findMatches(content) as any;
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.second.name = "newSecond";
+        assert(updater.second.name === "newSecond");
         assert(updater.newContent() === "<first><newSecond>");
     });
 

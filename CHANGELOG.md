@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.6.1...HEAD
+
+### [0.6.1]
+
+Circular reference support release.
+
+[0.6.1]: https://github.com/atomist/microgrammar/compare/0.6.0...0.6.1
 
 ### Added
 
