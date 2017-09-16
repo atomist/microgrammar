@@ -106,11 +106,13 @@ describe("MicrogrammarUpdateTest", () => {
         const results = person.findMatches(line) as any;
         assert(results.length === 2);
         const updatable = Microgrammar.updatable<any>(results, line);
-        updatable.matches[0].address.suburb.postcode = "2067/24";
+        updatable.matches[0].address.suburb.postcode = "2000";
+        assert(updatable.matches[0].address.suburb.postcode === "2000");
+
         updatable.matches[1].address.suburb.postcode = "1234";
         updatable.matches[0].address.suburb.country.code = "CA";
         assert(updatable.updated() ===
-            "Jenny 46 Coonamble, Chatswood 2067/24 CA/David 12 Somewhere, Someplace 1234 US");
+            "Jenny 46 Coonamble, Chatswood 2000 CA/David 12 Somewhere, Someplace 1234 US");
     });
 
     it("can update a whole section", () => {
@@ -163,8 +165,7 @@ describe("MicrogrammarUpdateTest", () => {
         // assert(updatable.matches[0].address.suburb === "tarantula");
         assert(updatable.matches[0].address.suburb.postcode === undefined);
         assert.throws(
-            () => updatable.matches[0].address.suburb.postcode = "2067/24",
-            e => e.message.indexOf("invalidated") !== -1);
+            () => updatable.matches[0].address.suburb.postcode = "2067/24");
     });
 
     // TODO This does not work yet

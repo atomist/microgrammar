@@ -43,9 +43,11 @@ export class MicrogrammarUpdates {
                 if (isTreePatternMatch(submatch) && submatch.submatches() === {}) {
                     initialValue = submatch.$matched; // or $value ? they should both be the string value.
                     // this could also be derived from content + offset, which reduces memory consumption
-                } else {
+                } else if (isTreePatternMatch(submatch)) {
                     initialValue = {};
                     this.addMatchesAsProperties(initialValue, cs, submatch);
+                } else {
+                    initialValue = submatch.$value;
                 }
 
                 const privateProperty = "_" + key;
@@ -62,12 +64,15 @@ export class MicrogrammarUpdates {
                         if ((target as any).$invalidated) {
                             throw new Error(`Cannot set [${key}] on [${target}]: invalidated by parent change`);
                         }
+                        target[privateProperty] = newValue;
                         cs.change(submatch, newValue);
                         if (isTreePatternMatch(submatch) && submatch.submatches() !== {}) {
                             // The caller has set the value of an entire property block.
                             // Invalidate the properties under it
                             for (const prop of Object.getOwnPropertyNames(target)) {
-                                target[prop].$invalidated = true;
+                                if (typeof target[prop] === "object") {
+                                    target[prop].$invalidated = true;
+                                }
                             }
                         }
                     },
