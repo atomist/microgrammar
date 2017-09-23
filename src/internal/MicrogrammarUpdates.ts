@@ -46,7 +46,7 @@ export class MicrogrammarUpdates {
                 } else if (isTreePatternMatch(submatch)) {
                     initialValue = {};
                     this.addMatchesAsProperties(initialValue, cs, submatch);
-                } else {
+                } else if (submatch) {
                     initialValue = submatch.$value;
                 }
 
