@@ -97,7 +97,7 @@ function main () {
             return 1
           fi
 
-          if ! sh npm-publish.bash ${pkg_version} private ; then
+          if ! ./npm-publish.bash ${pkg_version} private ; then
             err "fail at publishing"
             return 1
           fi
