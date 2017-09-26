@@ -89,16 +89,16 @@ function main () {
              fi
           fi
 
-          npm publish
-          if [[ $? -ne 0 || ! -e package.json ]]; then
-            err "failed to publish ${branch_module_name} to npm"
-            return 1
-          fi
-
+# what version did we pick?
           local pkg_version
           pkg_version=$(jq --raw-output .version package.json)
           if [[ $? -ne 0 || ! $pkg_version ]]; then
             err "failed to parse version from package.json"
+            return 1
+          fi
+
+          if ! sh npm-publish.bash ${pkg_version} private ; then
+            err "fail at publishing"
             return 1
           fi
 
