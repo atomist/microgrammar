@@ -35,6 +35,7 @@ function main () {
     fi
 
     # Publishing the branch privately to npm lets us test downstream projects
+    echo "[[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_BRANCH != master ]]"
     if [[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_BRANCH != master ]] ; then
       echo "I am a PR build! I have a branch! I will attempt to publish to NPM!"
       if [[ $NPM_TOKEN ]] ; then
