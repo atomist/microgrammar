@@ -106,7 +106,7 @@ function main () {
             return 1
           fi
 
-          if ! ./npm-publish.bash ${pkg_version} restricted ; then
+          if ! bash npm-publish.bash ${pkg_version} restricted ; then
             err "fail at publishing"
             return 1
           fi
