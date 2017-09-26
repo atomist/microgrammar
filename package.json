@@ -1,5 +1,5 @@
 {
-  "name": "@atomist/microgrammar",
+  "name": "@atomist/microgrammar_cascade",
   "version": "0.6.4",
   "description": "Parsing library filling the gap between regular expressions and complete grammars",
   "author": "Atomist",
