@@ -16,15 +16,6 @@ function err() {
 
 # usage: main "$@"
 function main () {
-
-    echo "Is NPM_TOKEN defined now?"
-    if [[ $NPM_TOKEN ]] ; then
-       echo "yes"
-    else
-       echo "no"
-    fi
-
-
     msg "running lint"
     if ! npm run lint; then
         err "tslint failed"
@@ -77,11 +68,6 @@ function main () {
           if [[ $? -ne 0 || ! $pkg_version ]]; then
             err "failed to parse version from package.json"
             return 1
-          fi
-
-          git checkout package.json
-          if [[ $? -ne 0 ]] ; then
-             echo "WARNING: I modified package.json and then couldn't put it back"
           fi
 
           echo "Published to npm as ${branch_module_name} version ${pkg_version}"
