@@ -35,8 +35,8 @@ function main () {
     fi
 
     # Publishing the branch privately to npm lets us test downstream projects
-    echo "[[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_BRANCH != master ]]"
-    if [[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_BRANCH != master ]] ; then
+    echo "[[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_PULL_REQUEST_BRANCH != master ]]"
+    if [[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_PULL_REQUEST_BRANCH != master ]] ; then
       echo "I am a PR build! I have a branch! I will attempt to publish to NPM!"
       if [[ $NPM_TOKEN ]] ; then
           echo "I have an NPM token! It could happen!"
@@ -47,7 +47,7 @@ function main () {
             return 1
           fi
           local branch_module_name
-          branch_module_name="${current_module_name}_$TRAVIS_BRANCH"
+          branch_module_name="${current_module_name}_$TRAVIS_PULL_REQUEST_BRANCH"
 
           # update the package.json
           mv package.json old-package.json
