@@ -35,12 +35,12 @@ function main () {
     fi
 
     # Publishing the branch privately to npm lets us test downstream projects
-    if [[ $TRAVIS_PULL_REQUEST && $TRAVIS_BRANCH != master ]] ; then
+    if [[ $TRAVIS_PULL_REQUEST != false && $TRAVIS_BRANCH != master ]] ; then
       echo "I am a PR build! I have a branch! I will attempt to publish to NPM!"
       if [[ $NPM_TOKEN ]] ; then
           echo "I have an NPM token! It could happen!"
           local current_module_name
-          current_module_name=$(jq .name package.json)
+          current_module_name=$(jq --raw-output .name package.json)
           if [[ $? -ne 0 || ! -e package.json ]]; then
             err "failed to parse name in package.json"
             return 1
