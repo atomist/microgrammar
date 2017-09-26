@@ -67,6 +67,15 @@ function main () {
           fi
           rm ${temp_package_json}
 
+          # create this file so we can use npm show on private modules
+           msg "creating local .npmrc using NPM token from environment"
+            if ! ( umask 077 && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > "$HOME/.npmrc" ); then
+                err "failed to create $HOME/.npmrc"
+                return 1
+            fi
+            # tell the npm-publish script that we've done this already
+            unset NPM_TOKEN
+
           # is there already one of these published ?
           local last_existing_version
           last_existing_version=$(npm show ${branch_module_name} version)
