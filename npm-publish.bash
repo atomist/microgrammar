@@ -15,6 +15,8 @@ function err() {
 
 function main() {
     local module_version=$1
+    local access=${2-public}
+    echo "access is ${access}"
     if [[ ! $module_version ]]; then
         err "first parameter must be the version number of the module to publish"
         return 10
@@ -41,7 +43,7 @@ function main() {
     else
         msg "assuming your .npmrc is setup correctly for this project"
     fi
-    if ! npm publish --access=public; then
+    if ! npm publish --access=${access}; then
         err "failed to publish node module"
         cat npm-debug.log
         return 1
