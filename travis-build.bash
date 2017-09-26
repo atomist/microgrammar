@@ -92,7 +92,7 @@ function main () {
              fi
              rm ${temp_package_json}
 
-             if ! npm version -f ; then
+             if ! npm version -f patch ; then
                 err "failed to increment version in package.json"
                 return 1
              fi
