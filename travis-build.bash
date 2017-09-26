@@ -34,8 +34,51 @@ function main () {
         return 1
     fi
 
+    # Publishing the branch privately to npm lets us test downstream projects
+    if [[ $TRAVIS_PULL_REQUEST && $TRAVIS_BRANCH != master ]] ; then
+      echo "I am a PR build! I have a branch! I will attempt to publish to NPM!"
+      if [[ $NPM_TOKEN ]] ; then
+          echo "I have an NPM token! It could happen!"
+          local current_module_name
+          current_module_name=$(jq .name package.json)
+          if [[ $? -ne 0 || ! -e package.json ]]; then
+            err "failed to parse name in package.json"
+            return 1
+          fi
+          local branch_module_name
+          branch_module_name="${current_module_name}_$TRAVIS_BRANCH"
+
+          # update the package.json
+          mv package.json old-package.json
+          jq ".name=\"${branch_module_name}\"" old-package.json > package.json
+          if [[ $? -ne 0 || ! -e package.json ]]; then
+            err "failed to update name in package.json"
+            return 1
+          fi
+
+          npm publish
+          if [[ $? -ne 0 || ! -e package.json ]]; then
+            err "failed to publish ${branch_module_name} to npm"
+            return 1
+          fi
+
+          local pkg_version
+          pkg_version=$(jq --raw-output .version package.json)
+          if [[ $? -ne 0 || ! $pkg_version ]]; then
+            err "failed to parse version from package.json"
+            return 1
+          fi
+
+          echo "Published to npm as ${branch_module_name} version ${pkg_version}"
+      else
+         echo "No NPM_TOKEN, couldn't publish"
+      fi
+    fi
+
+# i think this says, exit if it's a PR buid
     [[ $TRAVIS_PULL_REQUEST == false ]] || return 0
 
+# I think all this sets a tag
     if [[ $TRAVIS_BRANCH == master || $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(m|rc)\.[0-9]+)?$ ]]; then
         local project_version
         if [[ $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(m|rc)\.[0-9]+)?$ ]]; then
