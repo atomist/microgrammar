@@ -2,21 +2,21 @@ dist: trusty
 sudo: false
 language: node_js
 node_js:
-- 8.1.2
+- 8.4.0
 branches:
   except:
   - "/\\+travis\\d+$/"
 env:
   global:
   - secure: beXRr41PHOPi6CxOfwUPaF5lw3J1ZKuKKhcEpuah1fsjJ8/I2ejwxYKKdqY9uIiVjAfLjXRejPgbtlt3CWJtI7IM6gne3L1SEPXvMZ0QHlJUSggy3WRvENzTz/fWafztjcSSIX1R9vnNMbsukq/UKmY1b4czklw+XlEJ+JSnQN/6ou6Al0sx1TNbJ7/z+eQ7Op884ZqLQWvwsoKz0zRvxPDALxQwTRNfcDWR1OOpHFO4p07d141DU2qlKkMk/f4QJtPB0AUbMPSMpLzWzOk6dK6cOY8uEx43Ux7gm4d8wGYNrANxmDNJadYfKdlThEiXtoq7pmFCP0QCdlcrZQVz1Wa6GsYdeKvIdfOBRdfUx8Fz6lopsZ6V4xAaS3dYL6K0ERaVlQb8R2yUxxaQ2vM4tkYJAo0lOvYEyj9cdO3ezQqwtZXkJa+WTPWH+2+C2LKv39p0exQ/CBCCgK6oNXTo+w2pKus0ZJoGQX/86/NuIRY1VQx9sU/aU929Ou62sp5ZqAVdu7zImsULv/VveMAVxYJDvEBTsT6zD1TH28MJ8wyaY8ioccoQ2VErl9wg/PLnpuh/PesilThI1qmMjPu15jf818bpkxsOrYn8NQwW0rZqKNjRef0V5MAVflGGfhb6N01538fVLvxS+U4wWOLXnkziS11VK4VEgvHD6KRt5Y0=
-  - secure: LSfY+xas2Fr753Qsr4xbuORUAfjlk12YPyCVlOuv0Htylhd5/BOJkvA/A37Oj6Frhub8OPU+CqA6HS8deeG7eCfTnTgETnEVngSKl7rnpRNpP/3HowozIeaIqx9jISH2QxyywLQNMR3RI6HNEFA56m9d3GNG32OHZ8C2x+eazz8tP70QjChzi5oV2V2xibay+HksBk8XIK2mC6J4EBt+TKo7Lm2EOV1yPOxHwwSl2wpdZAaGB0SeqGDgkpC222b9IS3FtGuznYMhh5U1yXIIUU52ps3sS1XRlamHXGGsSuk8GyiGuMqxMKLpwiMh8TcnqOu15NSjTuxCNcqR/EHSzI3QiCYMdPXHbJCSb45Gcoeo0MQ5L4K8QsW9Abx/n9cogZFbFtwRdMlJ7njMJh5l7AlpXHJOopEN+wsOfNVHdCRlhSU9hal+u5ZZiQH3/RsmsNm+Y6FLSLn18TjipNknpiwAkUzCsn1QvSfdZJbQsdKTNmQyACm0mpY8rJ2NqYpg/x/xu3/ouM1bgySZnXLnXSa7g4G/2PVbWk201kTMpr41qNFFbb18kanDsR7WXoGh4LGInFYlPwkBAac3H6KitlIiE5BtfHJpU0/kVjG5ptLtdsCpyA8L9wjAdP9wGPTJjeaBXCafrZcd8FXwjAS8dPgzBTWDWV2AeljjTc0V9nA=
-script: bash travis-build.bash
+  - secure: FQJyDQvCwCqrt4CLXQH1Scf2B6/67ox/nnd1Ur4V9L2JcXhZZLdm/sWdttC4Oouzs/Hk0kgPjfMqwWeaGkbaRRkKte89L2H0SO/C8DWhmYmbbE26iUYOHENNBcEZpkRaqqDBtlroxz0uaSFkkjAh2zWC9mb9OBg7Gzmd9YWk6020vXObbjK6cvMs7Vd7ukKDDXyAM9h3CD3bTp2lKy0Z8fVQXf3DkzY8IaUZeZTbZYbtbikiLLzT+lELIjF2vZW52sbw3GsJgHtMXSwh1Mo2VVkwOnQ3Fkl8h0lRpOTwBQmpGFBrFJqAfnS+4esqtpp+aYV3SCSZ5DKfGxrZY+0IyB5GTZpxANGO5DrrnuXic2WTTc37mZqIPt/uQpc5lOZA9ZysN4wROBygtvjHHkyZjb/msv/ajhDa22L1Y0bGHD1xVI82fBz76oEEuLHdcPR2gXkcNjx4xkao4EI1MHkBqUP3j8L3rSO3DJGPJjgaDqyzGb3IY21SF4e1lVpUCw52yk7khedmwwRiw0tBtn1rJILYmmUj3HLt1Gzlv5amwd9PSvROnzcGsO0FYcKj1e3AIJ4MEFuYW8FAxX05KEBiYQcftaFGg5RMBdRlPck4SA02MiDwmpE3rh82vIAGmOTGAadkJ4qkNyh6KszonwCEeFPP91n38KEA7HFFF2UemOQ=
+script: bash scripts/travis-build.bash
 notifications:
   email: false
   webhooks:
     urls:
-    - 'https://webhook.atomist.com/travis'
-    - 'https://webhook-staging.atomist.services/atomist/travis/teams/T6MFSUPDL'
+    - "https://webhook.atomist.com/atomist/travis/teams/T29E48P34"
+    - "https://webhook-staging.atomist.services/atomist/travis/teams/T6MFSUPDL"
     on_success: always
     on_failure: always
     on_start: always
@@ -33,4 +33,5 @@ deploy:
     tags: true
     condition: "$TRAVIS_TAG =~ ^[0-9]+\\.[0-9]+\\.[0-9]+(-(m|rc)\\.[0-9]+)?$"
 after_deploy:
-- bash npm-publish.bash $TRAVIS_TAG
+- bash scripts/npm-publish.bash --access public
+- bash scripts/gh-publish.bash $TRAVIS_REPO_SLUG
