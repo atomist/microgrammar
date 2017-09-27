@@ -15,7 +15,7 @@ notifications:
   email: false
   webhooks:
     urls:
-    - "https://webhook.atomist.com/travis/teams/T29E48P34"
+    - "https://webhook.atomist.com/atomist/travis/teams/T29E48P34"
     - "https://webhook-staging.atomist.services/atomist/travis/teams/T6MFSUPDL"
     on_success: always
     on_failure: always
