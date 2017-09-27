@@ -2,15 +2,15 @@
 
 [![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
 
-Parsing library written in TypeScript, filling the large gap between the sweet spots of 
-regular expressions and full-blown [BNF][bnf] or equivalent grammars. 
-Can parse and cleanly update 
+Parsing library written in TypeScript, filling the large gap between the sweet spots of
+regular expressions and full-blown [BNF][bnf] or equivalent grammars.
+Can parse and cleanly update
 structured content. `npm` module page [here][npm-mod].
 
 ## Concepts
 
 **Microgrammars** are a powerful way of parsing structured
-content such as source code, described in this [Stanford paper][mg-paper]. 
+content such as source code, described in this [Stanford paper][mg-paper].
 Microgrammars are designed to recognize
 structures in a string or stream and extract their content: For
 example, to recognize a Java method that has a particular annotation
@@ -130,7 +130,7 @@ differ in some important respects:
 -   They excel at skipping content they are uninterested in
 -   They are not necessarily context free
 -   They do not need to construct a full AST, although they construct
-    ASTs for structures they do match. Thus they can easily cope with 
+    ASTs for structures they do match. Thus they can easily cope with
     partially structured data, happily skipping over incomprehensible content
 
 [bnf]: https://en.wikipedia.org/wiki/Backus–Naur_form (Backus–Naur Form)
@@ -198,6 +198,3 @@ Run benchmarks with profiling, leaving a `profile.txt` file to view:
 Clean (including deleting any profiling data):
 
 `npm run clean`
- 
- 
- 

@@ -2,21 +2,21 @@ dist: trusty
 sudo: false
 language: node_js
 node_js:
-- 8.1.2
+- 8.4.0
 branches:
   except:
-  - /\+travis\d+$/
+  - "/\\+travis\\d+$/"
 env:
   global:
   - secure: beXRr41PHOPi6CxOfwUPaF5lw3J1ZKuKKhcEpuah1fsjJ8/I2ejwxYKKdqY9uIiVjAfLjXRejPgbtlt3CWJtI7IM6gne3L1SEPXvMZ0QHlJUSggy3WRvENzTz/fWafztjcSSIX1R9vnNMbsukq/UKmY1b4czklw+XlEJ+JSnQN/6ou6Al0sx1TNbJ7/z+eQ7Op884ZqLQWvwsoKz0zRvxPDALxQwTRNfcDWR1OOpHFO4p07d141DU2qlKkMk/f4QJtPB0AUbMPSMpLzWzOk6dK6cOY8uEx43Ux7gm4d8wGYNrANxmDNJadYfKdlThEiXtoq7pmFCP0QCdlcrZQVz1Wa6GsYdeKvIdfOBRdfUx8Fz6lopsZ6V4xAaS3dYL6K0ERaVlQb8R2yUxxaQ2vM4tkYJAo0lOvYEyj9cdO3ezQqwtZXkJa+WTPWH+2+C2LKv39p0exQ/CBCCgK6oNXTo+w2pKus0ZJoGQX/86/NuIRY1VQx9sU/aU929Ou62sp5ZqAVdu7zImsULv/VveMAVxYJDvEBTsT6zD1TH28MJ8wyaY8ioccoQ2VErl9wg/PLnpuh/PesilThI1qmMjPu15jf818bpkxsOrYn8NQwW0rZqKNjRef0V5MAVflGGfhb6N01538fVLvxS+U4wWOLXnkziS11VK4VEgvHD6KRt5Y0=
   - secure: FQJyDQvCwCqrt4CLXQH1Scf2B6/67ox/nnd1Ur4V9L2JcXhZZLdm/sWdttC4Oouzs/Hk0kgPjfMqwWeaGkbaRRkKte89L2H0SO/C8DWhmYmbbE26iUYOHENNBcEZpkRaqqDBtlroxz0uaSFkkjAh2zWC9mb9OBg7Gzmd9YWk6020vXObbjK6cvMs7Vd7ukKDDXyAM9h3CD3bTp2lKy0Z8fVQXf3DkzY8IaUZeZTbZYbtbikiLLzT+lELIjF2vZW52sbw3GsJgHtMXSwh1Mo2VVkwOnQ3Fkl8h0lRpOTwBQmpGFBrFJqAfnS+4esqtpp+aYV3SCSZ5DKfGxrZY+0IyB5GTZpxANGO5DrrnuXic2WTTc37mZqIPt/uQpc5lOZA9ZysN4wROBygtvjHHkyZjb/msv/ajhDa22L1Y0bGHD1xVI82fBz76oEEuLHdcPR2gXkcNjx4xkao4EI1MHkBqUP3j8L3rSO3DJGPJjgaDqyzGb3IY21SF4e1lVpUCw52yk7khedmwwRiw0tBtn1rJILYmmUj3HLt1Gzlv5amwd9PSvROnzcGsO0FYcKj1e3AIJ4MEFuYW8FAxX05KEBiYQcftaFGg5RMBdRlPck4SA02MiDwmpE3rh82vIAGmOTGAadkJ4qkNyh6KszonwCEeFPP91n38KEA7HFFF2UemOQ=
-script: bash travis-build.bash
+script: bash scripts/travis-build.bash
 notifications:
   email: false
   webhooks:
     urls:
-    - 'https://webhook.atomist.com/travis'
-    - 'https://webhook-staging.atomist.services/atomist/travis/teams/T6MFSUPDL'
+    - "https://webhook.atomist.com/travis/teams/T095SFFBK"
+    - "https://webhook-staging.atomist.services/atomist/travis/teams/T6MFSUPDL"
     on_success: always
     on_failure: always
     on_start: always
@@ -24,13 +24,14 @@ notifications:
     on_error: always
 cache:
   directories:
-  - $HOME/.npm
+  - "$HOME/.npm"
 deploy:
   provider: releases
   api_key:
     secure: Mw/QvM8Pnr6aU/tnc6E75diHdkDm/dAWoW3U7qhnmRhbpi7oi2yUt0ekAzK51+bBxP52knJ+sjpAnKV61JWsLUAxxXvny3ty4D8H98myWI17nqDVmd+HI62i7bNRk5GrXL6rrVH+H3/k2H287T0pUj6xB3qsQTS5tl3jksrgnwjOyDoDW+G/N+or9STvjsD7jEGLUTLMAg035mep9+SAq1hI4MPxmLVqIf7HBrV4YmN+b4z+KOnZlRmg/R2e3N3yMzu/TxuVz7s+5QiHT0QKByIBDlWV9736+wmiOcdXXrnFkLMdoLFYo7zpOHEUHM16hJJqO47HMKXUFUAeiYSbfPBc7jS4iROFK2qoiGPHe5V9Ag3GIgKKnro49XX1S+X710JjyGGGTfAlIyoJPDKdgLwsn8mf22oNtJl6gfKbXGcHI6k81uoj0I+8bvyqJICw6Jacp2gsK9DlGhp71PLFzdelvVItqq6CbnQPKZMzHedb3xOqRuXqecv3ewGT/MKjjti0qjUsEtZY+U7/AjQKXDU1OsM8ipgfvPKjU1E4+rYeRWv3mEEiZsD+w6ZiapXi/lRIEQB7J/u5budRNCoVfcFmfDeNGyqNCx15gCkK06uAJEUyRudCnjuI3VyjXPmQcgPPA0x5bTc6O2ATYBZWRYPa1WoSuPLi9Ok+3d9unTU=
   on:
     tags: true
-    condition: $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(m|rc)\.[0-9]+)?$
+    condition: "$TRAVIS_TAG =~ ^[0-9]+\\.[0-9]+\\.[0-9]+(-(m|rc)\\.[0-9]+)?$"
 after_deploy:
-- bash npm-publish.bash $TRAVIS_TAG
+- bash scripts/npm-publish.bash --access public
+- bash scripts/gh-publish.bash $TRAVIS_REPO_SLUG
