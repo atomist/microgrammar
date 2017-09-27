@@ -14,23 +14,14 @@ function err() {
 }
 
 function main() {
-    local module_version=$1
-    if [[ ! $module_version ]]; then
-        err "first parameter must be the version number of the module to publish"
-        return 10
-    fi
-    shift
-
-    if ! npm version --allow-same-version --no-git-tag-version "$module_version"; then
-        err "failed to set version to $module_version"
-        return 1
-    fi
-
-    msg "copying compiled types and JavaScript"
+    msg "packaging module"
     if ! cp -r build/src/* .; then
-        err "copying compiled JavaScript failed"
+        err "packaging module failed"
         return 1
     fi
+
+    # npm honors this
+    rm -f .gitignore
 
     if [[ $NPM_TOKEN ]]; then
         msg "creating local .npmrc using NPM token from environment"
@@ -41,7 +32,7 @@ function main() {
     else
         msg "assuming your .npmrc is setup correctly for this project"
     fi
-    if ! npm publish --access=public; then
+    if ! npm publish "$@"; then
         err "failed to publish node module"
         cat npm-debug.log
         return 1
