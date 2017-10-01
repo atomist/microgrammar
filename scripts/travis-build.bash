@@ -14,39 +14,6 @@ function err() {
     msg "$*" 1>&2
 }
 
-# use environment variables to create .npmrc
-function create-npmrc () {
-    local npmrc=$HOME/.npmrc
-    rm -f "$npmrc"
-    if ! ( umask 077 && echo -e 'always-auth = true\nemail = travis-ci@atomist.com' > "$npmrc" )
-    then
-        err "failed to create $npmrc"
-        return 1
-    fi
-
-    if [[ $NPM_TOKEN ]]; then
-        msg "adding NPM registry token to $npmrc"
-        if ! echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> "$npmrc"; then
-            err "failed to add NPM token to $npmrc"
-            return 1
-        fi
-    fi
-    if [[ $NPM_REGISTRY && $ARTIFACTORY_TOKEN ]]; then
-        local registry
-        registry=$(echo "$NPM_REGISTRY" | sed -e 's/https\{0,1\}://' -e 's/[^\/]\{1,\}$//')
-        if [[ $? -ne 0 || ! $registry ]]; then
-            err "failed to parse registry base: $NPM_REGISTRY"
-            return 1
-        fi
-        msg "adding Artifactory registry $registry token to $npmrc"
-        if ! echo "$registry:_authToken=$ARTIFACTORY_TOKEN" >> "$npmrc"
-        then
-            err "failed to add Artifactory token to $npmrc"
-            return 1
-        fi
-    fi
-}
-
 # upsert a value in package.json
 function edit-package-json () {
     local jpath=$1
@@ -251,11 +218,6 @@ function main () {
     msg "running tests"
     if ! npm test; then
         err "npm test failed"
-        return 1
-    fi
-
-    if ! create-npmrc; then
-        err "failed to create .npmrc"
         return 1
     fi
 

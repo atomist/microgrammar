@@ -36,3 +36,6 @@ deploy:
     condition: "$TRAVIS_TAG =~ ^[0-9]+\\.[0-9]+\\.[0-9]+(-(m|rc)\\.[0-9]+)?$"
 after_deploy:
 - bash scripts/gh-publish.bash $TRAVIS_REPO_SLUG
+before_install:
+- openssl aes-256-cbc -K $encrypted_f06f43220ac4_key -iv $encrypted_f06f43220ac4_iv
+  -in scripts/.npmrc.enc -out $HOME/.npmrc -d
