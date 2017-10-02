@@ -172,7 +172,7 @@ function npm-publish-pr () {
     if [[ $? -ne 0 || ! $published_version ]] ; then
         msg "looks like this is the first time we've published this branch, cool"
     else
-        if ! npm version "$published_version"; then
+        if ! npm version --allow-same-version "$published_version"; then
             return 1
         fi
         if ! npm version --no-git-tag-version -f patch; then
