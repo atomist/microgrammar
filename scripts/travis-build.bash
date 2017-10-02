@@ -70,7 +70,7 @@ function git-tag () {
     fi
     local remote=origin
     if [[ $GITHUB_TOKEN ]]; then
-        remote=https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG
+        remote=https://$GITHUB_TOKEN:x-oauth-basic@github.com/$TRAVIS_REPO_SLUG.git
     fi
     if ! git push --quiet "$remote" "$tag" > /dev/null 2>&1; then
         err "failed to push git tag: $tag"
@@ -102,7 +102,7 @@ function npm-publish () {
 
     local pub_file pub_base
     for pub_file in build/src/*; do
-        pub_base=${$pub_file##*/}
+        pub_base=${pub_file#build/src/}
         rm -rf "$pub_base"
     done
 }
@@ -203,21 +203,46 @@ function npm-publish-pr () {
 
 # usage: main "$@"
 function main () {
+    local arg ignore_lint
+    for arg in "$@"; do
+        case "$arg" in
+            --ignore-lint | --ignore-lin | --ignore-li | --ignore-l)
+                ignore_lint=1
+                ;;
+            -*)
+                err "unknown option: $arg"
+                return 2
+                ;;
+        esac
+    done
+
     msg "running lint"
-    if ! npm run lint; then
-        err "tslint failed"
+    local lint_status
+    npm run lint
+    lint_status=$?
+    if [[ $lint_status -eq 0 ]]; then
+        :
+    elif [[ $lint_status -eq 2 ]]; then
+        err "TypeScript failed to pass linting"
+        if [[ $ignore_lint ]]; then
+            err "ignoring linting failure"
+        else
+            return 1
+        fi
+    else
+        err "tslint errored"
         return 1
     fi
 
-    msg "compiling typescript"
+    msg "compiling TypeScript"
     if ! npm run compile; then
-        err "typescript compilation failed"
+        err "compilation failed"
         return 1
     fi
 
     msg "running tests"
     if ! npm test; then
-        err "npm test failed"
+        err "test failed"
         return 1
     fi
 
