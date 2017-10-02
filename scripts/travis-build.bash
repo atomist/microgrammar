@@ -6,15 +6,20 @@ set -o pipefail
 declare Pkg=travis-build-node
 declare Version=0.4.0
 
+# write message to standard out (stdout)
+# usage: msg MESSAGE
 function msg() {
     echo "$Pkg: $*"
 }
 
+# write message to standard error (stderr)
+# usage: err MESSAGE
 function err() {
     msg "$*" 1>&2
 }
 
 # upsert a value in package.json
+# usage: edit-package-json JSON_PATH VALUE
 function edit-package-json () {
     local jpath=$1
     if [[ ! $jpath ]]; then
@@ -24,7 +29,7 @@ function edit-package-json () {
     shift
     local value=$1
     if [[ ! $value ]]; then
-        err "set-version: missing required argument: VALUE"
+        err "edit-package-json: missing required argument: VALUE"
         return 10
     fi
     shift
@@ -49,6 +54,7 @@ function edit-package-json () {
 }
 
 # git tag and push
+# usage: git-tag TAG
 function git-tag () {
     local tag=$1
     if [[ ! $tag ]]; then
@@ -79,6 +85,7 @@ function git-tag () {
 }
 
 # npm publish
+# usage: npm-publish [NPM_PUBLISH_ARGS]...
 function npm-publish () {
     msg "packaging module"
     if ! cp -r build/src/* .; then
@@ -107,11 +114,24 @@ function npm-publish () {
     done
 }
 
-# publish a public version of master to non-standard registry
-function npm-publish-master () {
+# publish a public timestamp version to non-standard registry
+# usage: npm-publish-timestamp [BRANCH]
+function npm-publish-timestamp () {
     if [[ ! $NPM_REGISTRY ]]; then
         msg "no team registry set"
         return 0
+    fi
+
+    local branch=$1 prerelease
+    if [[ $branch ]]; then
+        shift
+        local safe_branch
+        safe_branch=$(echo -n "$branch" | tr -C -s '[:alnum:]-' .)
+        if [[ $? -ne 0 || ! $prerelease ]]; then
+            err "failed to create safe branch name from '$branch': $safe_branch"
+            return 1
+        fi
+        prerelease=$safe_branch.
     fi
 
     local pkg_version
@@ -126,77 +146,19 @@ function npm-publish-master () {
         err "failed to generate timestamp"
         return 1
     fi
-    local project_version=$pkg_version-$timestamp
+    local project_version=$pkg_version-$prerelease$timestamp
     if ! npm version "$project_version"; then
-        err "failed to set master build version: $project_version"
+        err "failed to set package version: $project_version"
         return 1
     fi
 
+    msg "publishing NPM module version $project_version"
     if ! npm-publish --registry "$NPM_REGISTRY" --access public; then
         err "failed to publish to Artifactory NPM registry"
         return 1
     fi
 
-    if ! git-tag "$project_version+travis$TRAVIS_BUILD_NUMBER"; then
-        return 1
-    fi
-}
-
-# publish a restricted version of a PR build
-function npm-publish-pr () {
-    if [[ ! $NPM_REGISTRY ]]; then
-        msg "no team registry set"
-        return 0
-    fi
-
-    if [[ $TRAVIS_PULL_REQUEST_BRANCH == master ]]; then
-        msg "will not publish PR from $TRAVIS_PULL_REQUEST_BRANCH"
-        return 0
-    fi
-    msg "attempting to publish PR build on branch $TRAVIS_PULL_REQUEST_BRANCH"
-
-    local name pkg_json=package.json
-    name=$(jq -e --raw-output .name "$pkg_json")
-    if [[ $? -ne 0 || ! $name ]]; then
-        err "failed to parse name in $pkg_json: $name"
-        return 1
-    fi
-    local branch_module_name="${name}_$TRAVIS_PULL_REQUEST_BRANCH"
-    if ! edit-package-json .name "$branch_module_name"; then
-        return 1
-    fi
-
-    # is there already one of these published?
-    local published_version
-    published_version=$(npm show --registry "$NPM_REGISTRY" "$branch_module_name" version)
-    if [[ $? -ne 0 || ! $published_version ]] ; then
-        msg "looks like this is the first time we've published this branch, cool"
-    else
-        if ! npm version --allow-same-version "$published_version"; then
-            return 1
-        fi
-        if ! npm version --no-git-tag-version -f patch; then
-            err "failed to increment version in $pkg_json"
-            return 1
-        fi
-    fi
-    local pkg_version
-    pkg_version=$(jq -e --raw-output .version "$pkg_json")
-    if [[ $? -ne 0 || ! $pkg_version ]]; then
-        err "failed to parse version from $pkg_json"
-        return 1
-    fi
-
-    if ! npm-publish --registry "$NPM_REGISTRY" --access public; then
-        err "npm publish of PR build failed"
-        return 1
-    fi
-    msg "published PR build to npm as $branch_module_name version $pkg_version"
-
-    if ! git checkout -- "$pkg_json"; then
-        err "updated $pkg_json and could not check out the original"
-    fi
-    if ! git-tag "${branch_module_name}-${pkg_version}"; then
+    if ! git-tag "$project_version+travis.$TRAVIS_BUILD_NUMBER"; then
         return 1
     fi
 }
@@ -247,20 +209,24 @@ function main () {
     fi
 
     if [[ $TRAVIS_PULL_REQUEST != false ]] ; then
-        if ! npm-publish-pr; then
-            err "failed to publish PR build"
-            return 1
+        if [[ $TRAVIS_PULL_REQUEST_BRANCH != master ]]; then
+            if ! npm-publish-timestamp "$TRAVIS_PULL_REQUEST_BRANCH"; then
+                err "failed to publish PR build"
+                return 1
+            fi
+        else
+            msg "will not publish PR from $TRAVIS_PULL_REQUEST_BRANCH"
         fi
     elif [[ $TRAVIS_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(m|rc)\.[0-9]+)?$ ]]; then
         if ! npm-publish --access public; then
             err "failed to publish tag build: $TRAVIS_TAG"
             return 1
         fi
-        if ! git-tag "$TRAVIS_TAG+travis$TRAVIS_BUILD_NUMBER"; then
+        if ! git-tag "$TRAVIS_TAG+travis.$TRAVIS_BUILD_NUMBER"; then
             return 1
         fi
     elif [[ $TRAVIS_BRANCH == master ]]; then
-        if ! npm-publish-master; then
+        if ! npm-publish-timestamp; then
             err "failed to publish master build"
             return 1
         fi
