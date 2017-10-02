@@ -91,7 +91,7 @@ function npm-publish () {
 
     if ! npm publish "$@"; then
         err "failed to publish node module"
-        cat npm-debug.log
+        cat $HOME/.npm/_logs/*-debug.log
         return 1
     fi
 
@@ -168,7 +168,7 @@ function npm-publish-pr () {
 
     # is there already one of these published?
     local published_version
-    published_version=$(npm show "$branch_module_name" version)
+    published_version=$(npm show --registry "$NPM_REGISTRY" "$branch_module_name" version)
     if [[ $? -ne 0 || ! $published_version ]] ; then
         msg "looks like this is the first time we've published this branch, cool"
     else
