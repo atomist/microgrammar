@@ -127,7 +127,7 @@ function npm-publish-timestamp () {
         shift
         local safe_branch
         safe_branch=$(echo -n "$branch" | tr -C -s '[:alnum:]-' .)
-        if [[ $? -ne 0 || ! $prerelease ]]; then
+        if [[ $? -ne 0 || ! $safe_branch ]]; then
             err "failed to create safe branch name from '$branch': $safe_branch"
             return 1
         fi
