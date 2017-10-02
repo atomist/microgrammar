@@ -10,8 +10,9 @@ env:
   global:
   - NPM_REGISTRY=https://atomist.jfrog.io/atomist/api/npm/npm-dev-local
   - secure: beXRr41PHOPi6CxOfwUPaF5lw3J1ZKuKKhcEpuah1fsjJ8/I2ejwxYKKdqY9uIiVjAfLjXRejPgbtlt3CWJtI7IM6gne3L1SEPXvMZ0QHlJUSggy3WRvENzTz/fWafztjcSSIX1R9vnNMbsukq/UKmY1b4czklw+XlEJ+JSnQN/6ou6Al0sx1TNbJ7/z+eQ7Op884ZqLQWvwsoKz0zRvxPDALxQwTRNfcDWR1OOpHFO4p07d141DU2qlKkMk/f4QJtPB0AUbMPSMpLzWzOk6dK6cOY8uEx43Ux7gm4d8wGYNrANxmDNJadYfKdlThEiXtoq7pmFCP0QCdlcrZQVz1Wa6GsYdeKvIdfOBRdfUx8Fz6lopsZ6V4xAaS3dYL6K0ERaVlQb8R2yUxxaQ2vM4tkYJAo0lOvYEyj9cdO3ezQqwtZXkJa+WTPWH+2+C2LKv39p0exQ/CBCCgK6oNXTo+w2pKus0ZJoGQX/86/NuIRY1VQx9sU/aU929Ou62sp5ZqAVdu7zImsULv/VveMAVxYJDvEBTsT6zD1TH28MJ8wyaY8ioccoQ2VErl9wg/PLnpuh/PesilThI1qmMjPu15jf818bpkxsOrYn8NQwW0rZqKNjRef0V5MAVflGGfhb6N01538fVLvxS+U4wWOLXnkziS11VK4VEgvHD6KRt5Y0=
-  - secure: FQJyDQvCwCqrt4CLXQH1Scf2B6/67ox/nnd1Ur4V9L2JcXhZZLdm/sWdttC4Oouzs/Hk0kgPjfMqwWeaGkbaRRkKte89L2H0SO/C8DWhmYmbbE26iUYOHENNBcEZpkRaqqDBtlroxz0uaSFkkjAh2zWC9mb9OBg7Gzmd9YWk6020vXObbjK6cvMs7Vd7ukKDDXyAM9h3CD3bTp2lKy0Z8fVQXf3DkzY8IaUZeZTbZYbtbikiLLzT+lELIjF2vZW52sbw3GsJgHtMXSwh1Mo2VVkwOnQ3Fkl8h0lRpOTwBQmpGFBrFJqAfnS+4esqtpp+aYV3SCSZ5DKfGxrZY+0IyB5GTZpxANGO5DrrnuXic2WTTc37mZqIPt/uQpc5lOZA9ZysN4wROBygtvjHHkyZjb/msv/ajhDa22L1Y0bGHD1xVI82fBz76oEEuLHdcPR2gXkcNjx4xkao4EI1MHkBqUP3j8L3rSO3DJGPJjgaDqyzGb3IY21SF4e1lVpUCw52yk7khedmwwRiw0tBtn1rJILYmmUj3HLt1Gzlv5amwd9PSvROnzcGsO0FYcKj1e3AIJ4MEFuYW8FAxX05KEBiYQcftaFGg5RMBdRlPck4SA02MiDwmpE3rh82vIAGmOTGAadkJ4qkNyh6KszonwCEeFPP91n38KEA7HFFF2UemOQ=
-  - secure: Zr+fC8pavdAg9c+ksBQh45k2U2Z1NS+UJjberkYk0ebYdXBbEhB+fj2PluHAweAnWLfE50I1MRoGK3LbrVPLSR55yBht4GDC1Y1ZbFF5U6zcAeWY7/lBiwfoMsxgM6D2MBResTMU8UVM8/ZeHL+BJkeG+/dyMSmugF8DU7MdrToe9kyfByR8lDnlwsFwVWwjYClA6BIW9F9UghW/btQMAI9PrwdtLV7u6mCbcM+FWjm/Vkfu/bdaw4RhnnRlT7bXMb2xDTC4wdi+tWkLbehYt+fmwowV/I/iKyNNWYeQVgc9pPuMZfGId/+t75k6UTO/jOJq1lMerR4l5XVaysZeXRu4B8VLIl7GnGqdWp61fKRPCfF86LrmO1EUsItItIT0U5ouldTBjeDfQwnFyq8HmwE+6bebestY2hGiZZ0X1SXjHV7MkipU8cNaT+DuoP/YQIyKViUc1NJ08hYVhEDo0jXzj3aXP+VBYkEQu6yYt6m6iZORLbLy+Q6CJMkHYyC/EbRY0VOhDBbdHnKiY6Ul6fIG48AJvtwrx5MfQBUPbNq1IcD166Etxp78iXS3FBFxmu4bH2yceRS8R3sumluCdS6QfdqBmrv8qJhdqMCZ7UBU5/3PhAT6T6GyWzMkW5VAG88Tu80iGeFkJYDfbaCPhl3PVndNtwfhahceIGC8CQY=
+before_install:
+- openssl aes-256-cbc -K $encrypted_f06f43220ac4_key -iv $encrypted_f06f43220ac4_iv
+  -in scripts/.npmrc.enc -out $HOME/.npmrc -d
 script: bash scripts/travis-build.bash
 notifications:
   email: false
@@ -36,6 +37,3 @@ deploy:
     condition: "$TRAVIS_TAG =~ ^[0-9]+\\.[0-9]+\\.[0-9]+(-(m|rc)\\.[0-9]+)?$"
 after_deploy:
 - bash scripts/gh-publish.bash $TRAVIS_REPO_SLUG
-before_install:
-- openssl aes-256-cbc -K $encrypted_f06f43220ac4_key -iv $encrypted_f06f43220ac4_iv
-  -in scripts/.npmrc.enc -out $HOME/.npmrc -d
