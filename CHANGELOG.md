@@ -5,21 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [Unreleased][]
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.6.2...HEAD
+[Unreleased]: https://github.com/atomist/microgrammar/compare/0.7.0...HEAD
 
-### [0.6.2]
+### [0.7.0][] - 2017-10-03
 
-Update bugfix release.
+[0.7.0]: https://github.com/atomist/microgrammar/compare/0.6.2...0.7.0
+
+Stricter release
+
+### Change
+
+-   Publish master and PR builds to Atomist NPM registry
+-   Make TypeScript compilation more strict
+
+### [0.6.2][] - 2017-09-24
 
 [0.6.2]: https://github.com/atomist/microgrammar/compare/0.6.1...0.6.2
+
+Update bugfix release.
 
 ### Fixed
 
 -   Guard for undefined access in some cases in microgrammar updates
 
-### [0.6.1]
+### [0.6.1][]
 
 Circular reference support release.
 
@@ -35,7 +46,7 @@ Circular reference support release.
 -   `Concat` constructor is now private. Use `Concat.of` static
     function instead
 
-## [0.6.0]
+## [0.6.0][]
 
 Listener and `fromString` improvement release.
 
@@ -49,7 +60,7 @@ Listener and `fromString` improvement release.
 -   Introduced `FromStringOptions` to customize `Microgrammar.fromString` behavior
 -   Added `FromStringOptions.ellipsis` option for `Microgrammar.fromString` specs to skip over intervening content
     without binding. Defaults to `...`.
--   Added `FromStringOptions.componentPrefix` option for `Microgrammar.fromString` specs to 
+-   Added `FromStringOptions.componentPrefix` option for `Microgrammar.fromString` specs to
     specify component prefix. Defaults to former `$`.
 
 ### Changed
@@ -59,16 +70,20 @@ Listener and `fromString` improvement release.
 -   Fixed `skipTo` where target matcher is a non-terminal
 -   Fixed `Integer` to accept 0 but not accept a pattern with a leading 0
 
-## [0.5.1] - 2017-07-09
+## [0.5.1][] - 2017-07-09
+
+[0.5.1]: https://github.com/atomist/microgrammar/compare/0.4.0...0.5.1
 
 Bug fix - remove cycle
 
 ### Changed
 
--   **Breaking** `Break` is now for internal use, to avoid cycle with `Concat`. 
+-   **Breaking** `Break` is now for internal use, to avoid cycle with `Concat`.
     Use functions in `Skip` to achieve `Break` behavior.
 
-## [0.5.0] - 2017-07-09
+## [0.5.0][] - 2017-07-09
+
+[0.5.0]: https://github.com/atomist/microgrammar/compare/0.4.1...0.5.0
 
 Config and context overhaul release
 
@@ -81,7 +96,7 @@ Config and context overhaul release
 
 ### Changed
 
--   **Breaking** Configuration properties are now added to definition literals 
+-   **Breaking** Configuration properties are now added to definition literals
     directly
 -   **Breaking** `Regex` now adds a start anchor if none is specified
 -   **Breaking** `Concat` moved to `matchers` directory as it should not be
@@ -96,7 +111,7 @@ Bugfix
 
 ### Changed
 
-- `Literal` and `Span` were not fully implementing the `matchPrefix` of the 
+- `Literal` and `Span` were not fully implementing the `matchPrefix` of the
   `MatchingLogic` interface
 
 ## [0.4.0] - 2017-07-02
