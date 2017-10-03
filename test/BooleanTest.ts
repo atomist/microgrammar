@@ -1,6 +1,6 @@
-import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import assert = require("power-assert");
 import { inputStateFromString } from "../src/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import { PatternMatch } from "../src/PatternMatch";
 import { LowercaseBoolean } from "../src/Primitives";
 

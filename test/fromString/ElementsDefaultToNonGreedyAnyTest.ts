@@ -1,6 +1,6 @@
+import assert = require("power-assert");
 import { Microgrammar } from "../../src/Microgrammar";
 import { isPatternMatch } from "../../src/PatternMatch";
-import assert = require("power-assert");
 
 describe("Elements default to non-greedy any", () => {
 

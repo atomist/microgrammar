@@ -87,7 +87,7 @@ export class TreePatternMatch extends PatternMatch {
 
     public readonly $valueMatches = {};
 
-    public readonly $value;
+    public readonly $value: {};
 
     constructor(matcherId: string,
                 matched: string,

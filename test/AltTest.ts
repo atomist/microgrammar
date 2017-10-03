@@ -1,6 +1,6 @@
-import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 import assert = require("power-assert");
 import { fail } from "power-assert";
+import { isSuccessfulMatch } from "../src/MatchPrefixResult";
 
 import { Alt, firstOf } from "../src/Ops";
 

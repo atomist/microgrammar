@@ -77,7 +77,7 @@ export class Microgrammar<T> implements Term {
             new MicrogrammarSpecParser().fromString(spec, components, options));
     }
 
-    public $id;
+    public $id: string;
 
     public definitions = this.matcher.definitions;
 
@@ -96,7 +96,7 @@ export class Microgrammar<T> implements Term {
     public findMatches(input: string | InputStream,
                        parseContext?: {},
                        l?: Listeners,
-                       stopAfterMatch: (PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
+                       stopAfterMatch: (pm: PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch);
         lm.consume(input, parseContext, l);
         return lm.matches as Array<T & PatternMatch>;
@@ -109,7 +109,7 @@ export class Microgrammar<T> implements Term {
      * @param l listeners observing input characters as they are read
      * @returns {PatternMatch[]}
      */
-    public firstMatch(input: string | InputStream, l?: Listeners): PatternMatch & T {
+    public firstMatch(input: string | InputStream, l?: Listeners): PatternMatch & T | null {
         const found = this.findMatches(input, {}, l, pm => true);
         return found.length > 0 ? found[0] : null;
     }
@@ -196,7 +196,7 @@ export abstract class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (isSuccessfulMatch(tryMatch)) {
+                if (isSuccessfulMatch(tryMatch) && omg) {
                     const matches = omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
@@ -243,11 +243,11 @@ class LazyMatcher extends MatchingMachine {
 
     public matches: PatternMatch[] = [];
 
-    constructor(ml: MatchingLogic, private stopAfterMatch: (PatternMatch) => boolean) {
+    constructor(ml: MatchingLogic, private stopAfterMatch: (pm: PatternMatch) => boolean) {
         super(ml);
     }
 
-    protected onMatch(pm: PatternMatch): MatchingLogic {
+    protected onMatch(pm: PatternMatch): MatchingLogic | undefined {
         this.matches.push(pm);
         return this.stopAfterMatch(pm) ? undefined : this.matcher;
     }
