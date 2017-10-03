@@ -2,7 +2,7 @@ import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
-import { UndefinedPatternMatch } from "./PatternMatch";
+import { PatternMatch, UndefinedPatternMatch } from "./PatternMatch";
 
 /**
  * Optional match on the given matcher
@@ -29,7 +29,7 @@ export class Opt implements MatchingLogic {
         return `Opt[${this.matcher.$id}]`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
             return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
@@ -71,7 +71,7 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
         if (is.exhausted()) {
             return new MatchFailureReport(this.$id, is.offset, {});
         }
@@ -91,12 +91,16 @@ export class Alt implements MatchingLogic {
  * we are happy with it: For example, we like the value it contains.
  * Also capable of vetoing match if the input state is problematic before the potential match
  */
-export function when(o: any, matchTest: (PatternMatch) => boolean, inputStateTest: (InputState) => boolean = is => true) {
+export function when(
+    o: any,
+    matchTest: (pm: PatternMatch) => boolean,
+    inputStateTest: (is: InputState) => boolean = is => true,
+) {
 
     const matcher = toMatchingLogic(o);
     const conditionalMatcher = {} as any;
 
-    conditionalMatcher.$id = `When[${this.matcher}]`;
+    conditionalMatcher.$id = `When[${matcher}]`;
 
     // Copy other properties
     for (const prop in o) {
@@ -105,13 +109,13 @@ export function when(o: any, matchTest: (PatternMatch) => boolean, inputStateTes
         }
     }
 
-    function conditionalMatch(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    function conditionalMatch(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
         const result = inputStateTest(is) ?
             matcher.matchPrefix(is, thisMatchContext, parseContext) :
             undefined;
-        return (isSuccessfulMatch(result) && matchTest(result.match)) ?
+        return (result && isSuccessfulMatch(result) && matchTest(result.match)) ?
             result :
-            new MatchFailureReport(this.$id, is.offset, context);
+            new MatchFailureReport(conditionalMatcher.$id, is.offset, context);
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;
