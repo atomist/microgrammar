@@ -4,7 +4,7 @@
 set -o pipefail
 
 declare Pkg=travis-build-node
-declare Version=0.4.0
+declare Version=0.4.1
 
 # write message to standard out (stdout)
 # usage: msg MESSAGE
@@ -16,41 +16,6 @@ function msg() {
 # usage: err MESSAGE
 function err() {
     msg "$*" 1>&2
-}
-
-# upsert a value in package.json
-# usage: edit-package-json JSON_PATH VALUE
-function edit-package-json () {
-    local jpath=$1
-    if [[ ! $jpath ]]; then
-        err "edit-package-json: missing required argument: JSON_PATH"
-        return 10
-    fi
-    shift
-    local value=$1
-    if [[ ! $value ]]; then
-        err "edit-package-json: missing required argument: VALUE"
-        return 10
-    fi
-    shift
-
-    local pkg_tmp pkg_json=package.json
-    pkg_tmp=$(mktemp "$pkg_json.XXXXXX")
-    if [[ $? -ne 0 || ! $pkg_tmp ]]; then
-        err "failed to create temporary file"
-        return 1
-    fi
-    trap "rm -f $pkg_tmp" RETURN
-
-    if ! cat "$pkg_json" > "$pkg_tmp"; then
-        err "failed to copy package.json to $pkg_tmp"
-        return 1
-    fi
-
-    if ! jq -e "$jpath=\"$value\"" "$pkg_tmp" > "$pkg_json"; then
-        err "failed to update $jpath in $pkg_json: $value"
-        return 1
-    fi
 }
 
 # git tag and push
