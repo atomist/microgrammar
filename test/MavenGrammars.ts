@@ -114,13 +114,12 @@ export interface XmlTag {
 
 export const GAV_CONCAT = when(Concat.of({
     tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
-}), pm => pm.tags.filter(t => t.name === "groupId").length > 0 &&
-pm.tags.filter(t => t.name === "artifactId").length > 0);
+}), pm => (pm as any).tags.filter(t => t.name === "groupId").length > 0 &&
+    (pm as any).tags.filter(t => t.name === "artifactId").length > 0);
 
 export class GAV {
 
-    constructor(public group: string, public artifact: string, public version: string) {
-    }
+    constructor(public group: string, public artifact: string, public version: string) { }
 
 }
 

@@ -47,7 +47,7 @@ describe("InputStateListener", () => {
         });
         const input = "this is a { without $ and this is one after ${ and this is ${ and { too";
 
-        const matches = m.findMatches(input, {}, { l: new Listener()});
+        const matches = m.findMatches(input, {}, { l: new Listener() });
         assert(matches.length === 2);
     });
 
@@ -55,8 +55,8 @@ describe("InputStateListener", () => {
         class AtNotInString implements MatchingLogic {
 
             public matchPrefix(is: InputState, mc, parseContext): MatchPrefixResult {
-                const l = is.listeners.l as CFamilyStateMachine;
-                if (is.peek(1) === "@" && l.state !== DoubleString) {
+                const mpl = is.listeners.l as CFamilyStateMachine;
+                if (is.peek(1) === "@" && mpl.state !== DoubleString) {
                     return matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@"));
                 }
                 return new MatchFailureReport("id", is.offset, {}, "wrong");
@@ -85,7 +85,7 @@ public class Foo {
         const m = Microgrammar.fromDefinitions<any>({
             toFlag: when(JavaBlock, _ => true, is => (is.listeners.depthCount as NestingDepthStateMachine).depth >= 4),
         });
-        const matches = m.findMatches(DeeplyNested, {}, {depthCount: new NestingDepthStateMachine() });
+        const matches = m.findMatches(DeeplyNested, {}, { depthCount: new NestingDepthStateMachine() });
         assert(matches.length === 1);
         assert(matches[0].toFlag.block, JSON.stringify(matches[0]));
         assert(new CFamilyLangHelper().canonicalize(matches[0].toFlag.block) === 'println("too deeply nested");');
