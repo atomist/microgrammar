@@ -27,7 +27,9 @@ describe("Circularity", () => {
     const type = firstOf(genericType2, simpleType);
     // Set references
     genericType.param = type;
+    assert(!genericType2._initialized);
     genericType2._init();
+    assert(genericType2._initialized);
 
     // Keep the type simple as we don't need full definition
     const typeGrammar = Microgrammar.fromDefinitions<{ type: { name: string, param: any } }>({

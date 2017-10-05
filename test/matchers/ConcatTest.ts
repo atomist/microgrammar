@@ -12,6 +12,14 @@ import { Skipper } from "../../src/Config";
 
 describe("Concat", () => {
 
+    it("reports initialized with normal use of Concat.of", () => {
+        const content = "foo ";
+        const mg = Concat.of({
+            name: "foo",
+        });
+        assert(mg._initialized);
+    });
+
     it("single literal", () => {
         const content = "foo ";
         const mg = Concat.of({
