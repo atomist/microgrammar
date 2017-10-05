@@ -58,6 +58,11 @@ export interface Matcher extends MatchingLogic {
  */
 export interface LazyMatchingLogic extends MatchingLogic {
 
+    /**
+     * Has this matcher been initialized?
+     */
+    readonly _initialized: boolean;
+
     $lazy: boolean;
 
     /**
