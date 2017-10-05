@@ -20,6 +20,27 @@ describe("Concat", () => {
         assert(mg._initialized);
     });
 
+    it("allows multiple init of lazy Concat", () => {
+        const content = "foo ";
+        const mg = Concat.of({
+            name: "foo",
+            $lazy: true,
+        });
+        assert(!mg._initialized);
+        mg._init();
+        assert(mg._initialized);
+        mg._init();
+        assert(mg._initialized);
+        const is = inputStateFromString(content);
+        const result = mg.matchPrefix(is, {}, {});
+        if (isSuccessfulMatch(result)) {
+            expect((result.match as any).name).to.equal("foo");
+            assert(result.$matched === "foo");
+        } else {
+            assert.fail("Did not match");
+        }
+    });
+
     it("single literal", () => {
         const content = "foo ";
         const mg = Concat.of({
