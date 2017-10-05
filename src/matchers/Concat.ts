@@ -14,8 +14,15 @@ import { readyToMatch } from "../internal/Whitespace";
  */
 export type TermDef = Term | string | RegExp;
 
-export interface MatchVeto { $id: string; veto: ((ctx: {}, thisMatchContext: {}, parseContext: {}) => boolean); }
-export interface ContextComputation { $id: string; compute: ((ctx: {}) => any ); }
+export interface MatchVeto {
+    $id: string;
+    veto: ((ctx: {}, thisMatchContext: {}, parseContext: {}) => boolean);
+}
+
+export interface ContextComputation {
+    $id: string;
+    compute: ((ctx: {}) => any );
+}
 
 function isMatchVeto(thing: MatchStep): thing is MatchVeto {
     return isSpecialMember(thing.$id);
@@ -66,7 +73,12 @@ export class Concat implements LazyMatchingLogic, WhiteSpaceHandler, SkipCapable
     // for required prefix etc.
     private firstMatcher: Matcher;
 
-    private constructor(public definitions: any) {}
+    private constructor(public definitions: any) {
+    }
+
+    get _initialized(): boolean {
+        return !!this.firstMatcher;
+    }
 
     /**
      * Evaluate all members to ready this Concat for use.
@@ -75,37 +87,39 @@ export class Concat implements LazyMatchingLogic, WhiteSpaceHandler, SkipCapable
      * function
      */
     public _init() {
-        for (const stepName in this.definitions) {
-            if (methodsOnEveryMatchingLogic.indexOf(stepName) === -1) {
-                const def = this.definitions[stepName];
-                if (def === undefined || def === null) {
-                    throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
-                }
-                if (stepName.charAt(0) === "$") {
-                    // It's a config property. Copy it over.
-                    this[stepName] = def;
-                } else if (typeof def === "function") {
-                    // It's a calculation function
-                    if (def.length === 0 && stepName !== "_init") {
-                        // A no arg function is invalid
-                        throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
+        if (!this._initialized) {
+            for (const stepName in this.definitions) {
+                if (methodsOnEveryMatchingLogic.indexOf(stepName) === -1) {
+                    const def = this.definitions[stepName];
+                    if (def === undefined || def === null) {
+                        throw new Error(`Invalid concatenation: Step [${stepName}] is ${def}`);
                     }
-                    if (isSpecialMember(stepName)) {
-                        this.matchSteps.push({$id: stepName, veto: def});
+                    if (stepName.charAt(0) === "$") {
+                        // It's a config property. Copy it over.
+                        this[stepName] = def;
+                    } else if (typeof def === "function") {
+                        // It's a calculation function
+                        if (def.length === 0 && stepName !== "_init") {
+                            // A no arg function is invalid
+                            throw new Error(`No arg function [${stepName}] is invalid as a matching step`);
+                        }
+                        if (isSpecialMember(stepName)) {
+                            this.matchSteps.push({$id: stepName, veto: def});
+                        } else {
+                            this.matchSteps.push({$id: stepName, compute: def});
+                        }
                     } else {
-                        this.matchSteps.push({$id: stepName, compute: def});
+                        // It's a normal matcher
+                        const m = toMatchingLogic(def);
+                        // If we are skipping gaps, skip between productions
+                        const named = new NamedMatcher(stepName,
+                            this.$skipGaps === true ? new Break(m, true) : m);
+                        this.matchSteps.push(named);
                     }
-                } else {
-                    // It's a normal matcher
-                    const m = toMatchingLogic(def);
-                    // If we are skipping gaps, skip between productions
-                    const named = new NamedMatcher(stepName,
-                        this.$skipGaps === true ? new Break(m, true) : m);
-                    this.matchSteps.push(named);
                 }
             }
+            this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
         }
-        this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
     }
 
     get $id() {
@@ -157,7 +171,7 @@ export class Concat implements LazyMatchingLogic, WhiteSpaceHandler, SkipCapable
                 if (isMatchVeto(step)) {
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
                         return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
-                          `Match vetoed by ${step.$id}`);
+                            `Match vetoed by ${step.$id}`);
                     }
                 } else {
                     bindingTarget[step.$id] = step.compute(bindingTarget);
