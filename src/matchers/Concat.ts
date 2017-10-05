@@ -68,6 +68,10 @@ export class Concat implements LazyMatchingLogic, WhiteSpaceHandler, SkipCapable
 
     private constructor(public definitions: any) {}
 
+    get _initialized(): boolean {
+        return !!this.firstMatcher;
+    }
+
     /**
      * Evaluate all members to ready this Concat for use.
      * Only call this function after using the lazy static factory method:
