@@ -27,7 +27,7 @@ For example, the following grammar matches a method that has an `@ChangeControll
 among other annotations, it's impossible to express that in the grammar itself. But we check promptly that such an 
 annotation was present and veto the match if it wasn't.
 
-```
+```typescript
 Microgrammar.fromDefinitions<ChangeControlledMethod>({
     annotations: new Rep1(AnyAnnotation),
     _check(ctx: any) {

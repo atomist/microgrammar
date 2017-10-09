@@ -31,10 +31,16 @@ old [SNOBOL programming language][snobol].
 [regex]: https://en.wikipedia.org/wiki/Regular_expression
 
 ## Examples
+There are two styles of use:
+
+- From definitions: Defining a grammar in JavaScript objects
+- From strings: Defining a grammar in a string that resembles input that will be matched
+
+### From Definitions Style
 
 Here's a simple example:
 
-```
+```typescript
 const mg = Microgrammar.fromDefinitions<{name: string, age: number}>({
     name: /[a-zA-Z0-9]+/,
     _col: ":",
@@ -83,7 +89,7 @@ nested productions and more elaborate matchers.
 
 A more complex example, showing composition:
 
-```
+```typescript
 export const CLASS_NAME = /[a-zA-Z_$][a-zA-Z0-9_$]+/;
 
 // Any annotation we're not interested in
@@ -105,7 +111,7 @@ const SpringBootApp = Microgrammar.fromDefinitions<{ name: string }>({
 
 This will match content like this:
 
-```
+```java
 @SpringBootApplication
 @Foo
 @Bar(name = "Baz", magicParam = 31754)
@@ -119,6 +125,30 @@ machine. It's easy to write such custom matchers.
 - By default, microgrammars are tolerant of whitespace, treating it as a token separator. This is the behavior we want when
 parsing most languages or configuration formats.
 - Because the other properties have names beginning with `_`, only the class name (`MySpringBootApplication` in our example) is bound to the result. We care about the structure of the rest of the class declaration, but we don't need to extract other values in this particular case.
+
+### From String Style
+This is a higher level usage model in which a string resembling the desired input but with variable placeholders is used to define the grammar. 
+
+This style is ideally suited for simpler grammars. For example:
+
+```typescript
+const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
+    "@${name}='${value}'");
+```
+It can be combined with the definitional style through providing optional definitions for the named fields. For example, to constrain the match on a name in the above example using a regular expression:
+
+```typescript
+const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
+    "@${name}='${value}'", {
+    	name: /[a-z]+/
+    });
+```
+As with the object definitional style, whitespace is ignored by default.
+
+
+Further documentation can be found in
+the [reference](docs/reference.md).  You can also take a
+look at the tests in this repository.
 
 ## Alternatives and When To Use Microgrammars
 
@@ -166,16 +196,12 @@ adding the dependency in your `package.json`.
 $ npm install @atomist/microgrammar --save
 ```
 
-Full documentation can be found in
-the [Atomist microgrammar documentation][mg-doc].  You can also take a
-look at the tests in this repository.
-
 [mg-doc]: http://docs.atomist.com/user-guide/rug/microgrammars/ (Atomist Documentation - Microgrammars)
 
 ## Performance considerations
 See [Writing efficient microgrammars][efficiency].
 
-[efficiency]: performance.md (Writing efficient microgrammars)
+[efficiency]: docs/performance.md (Writing efficient microgrammars)
 
 ## Development
 
