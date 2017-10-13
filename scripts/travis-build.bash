@@ -4,7 +4,7 @@
 set -o pipefail
 
 declare Pkg=travis-build-node
-declare Version=0.4.1
+declare Version=0.5.0
 
 # write message to standard out (stdout)
 # usage: msg MESSAGE
@@ -83,7 +83,7 @@ function npm-publish () {
 # usage: npm-publish-timestamp [BRANCH]
 function npm-publish-timestamp () {
     if [[ ! $NPM_REGISTRY ]]; then
-        msg "no team registry set"
+        msg "no team NPM registry set"
         return 0
     fi
 
@@ -99,10 +99,10 @@ function npm-publish-timestamp () {
         prerelease=$safe_branch.
     fi
 
-    local pkg_version
-    pkg_version=$(jq -e --raw-output .version package.json)
+    local pkg_version pkg_json=package.json
+    pkg_version=$(jq -e --raw-output .version "$pkg_json")
     if [[ $? -ne 0 || ! $pkg_version ]]; then
-        err "failed to parse version from package.json"
+        err "failed to parse version from $pkg_json"
         return 1
     fi
     local timestamp
@@ -126,6 +126,33 @@ function npm-publish-timestamp () {
     if ! git-tag "$project_version+travis.$TRAVIS_BUILD_NUMBER"; then
         return 1
     fi
+
+    local sha
+    if [[ $TRAVIS_PULL_REQUEST_SHA ]]; then
+        sha=$TRAVIS_PULL_REQUEST_SHA
+    else
+        sha=$TRAVIS_COMMIT
+    fi
+
+    local module_name
+    module_name=$(jq -er .name "$pkg_json")
+    if [[ $? -ne 0 || ! $module_name ]]; then
+        err "failed to parse NPM module name from $pkg_json"
+        return 1
+    fi
+    local module_url=https://atomist.jfrog.io/atomist/npm-dev/$module_name/-/$module_name-$project_version.tgz
+    local status_url=https://api.github.com/repos/$TRAVIS_REPO_SLUG/statuses/$sha
+    local post_data
+    printf -v post_data '{"state":"success","target_url":"%s","description":"Pre-release NPM module publication","context":"npm/atomist/prerelease"}' "$module_url"
+    if ! curl -s -H 'Accept: application/vnd.github.v3+json' \
+            -H 'Content-Type: application/json' \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -X POST -d "$post_data" "$status_url" > /dev/null
+    then
+        err "failed to post status on commit: $sha"
+        return 1
+    fi
+    msg "posted module URL $module_url to commit status $status_url"
 }
 
 # usage: main "$@"

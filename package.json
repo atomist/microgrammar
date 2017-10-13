@@ -36,6 +36,7 @@
   },
   "scripts": {
     "autotest": "supervisor -q -n exit -x npm -- test",
+    "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/*Benchmark.ts\"; node --prof-process isolate-* > profile.txt",
     "build": "npm run lint && npm run compile && npm test",
     "clean": "npm run clean-js ; rm -rf build *-v8.log profile.txt",
     "clean-js": "find src test -type f -name '*.js' -print0 | xargs -0 rm -f",
@@ -46,7 +47,6 @@
     "lint-fix": "npm run lint -- --fix",
     "test": "mocha --compilers ts:espower-typescript/guess 'test/**/!(*Benchmark).ts'",
     "testone": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
-    "typedoc": "typedoc --mode modules --excludeExternals",
-    "benchmark": "mocha --prof --compilers ts:espower-typescript/guess \"test/**/*Benchmark.ts\"; node --prof-process isolate-* > profile.txt"
+    "typedoc": "typedoc --mode modules --excludeExternals"
   }
 }
