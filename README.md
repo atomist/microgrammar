@@ -1,5 +1,6 @@
 # @atomist/microgrammar
 
+[![npm version](https://badge.fury.io/js/%40atomist%2Fmicrogrammar.svg)](https://badge.fury.io/js/%40atomist%2Fmicrogrammar)
 [![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
 
 Parsing library written in TypeScript, filling the large gap between the sweet spots of
@@ -127,7 +128,7 @@ parsing most languages or configuration formats.
 - Because the other properties have names beginning with `_`, only the class name (`MySpringBootApplication` in our example) is bound to the result. We care about the structure of the rest of the class declaration, but we don't need to extract other values in this particular case.
 
 ### From String Style
-This is a higher level usage model in which a string resembling the desired input but with variable placeholders is used to define the grammar. 
+This is a higher level usage model in which a string resembling the desired input but with variable placeholders is used to define the grammar.
 
 This style is ideally suited for simpler grammars. For example:
 
