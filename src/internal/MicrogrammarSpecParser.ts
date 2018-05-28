@@ -183,17 +183,6 @@ interface Named {
 type DefinitionSpec = Anonymous | Reference | Named;
 type SatisfiedDefinitionSpec = Anonymous | Named;
 
-// Dogfooding idea:
-// I wonder if I could make a Rug to generate these.
-// It could choose any property unique to each alternative.
-// Then I could put my learnings in the Rug. For instance, this !! strategy will
-// return false if the scrutinized property contains empty string >:-(
-// Then, the trick is, can I also make it configure a reviewer
-// that will flag an error if, say, I ever added the "named:" property
-// to one of the other alternatives? (If the property used to distinguish
-// ever became not unique)
-// ... that reviewer could check for this structure
-// and could run on TS files generally. Can it make a comment on a PR?
 function isAnonymous(thing: DefinitionSpec): thing is Anonymous {
     return !!(thing as Anonymous).anonymous;
 }
