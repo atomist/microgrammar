@@ -27,6 +27,7 @@
     "power-assert": "^1.4.4",
     "supervisor": "^0.12.0",
     "tslint": "^5.9.1",
+    "ts-node": "^3.3.0",
     "typedoc": "^0.8.0",
     "typescript": "^2.5.1",
     "typescript-formatter": "^6.0.0"
