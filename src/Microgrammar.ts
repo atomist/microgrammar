@@ -96,7 +96,7 @@ export class Microgrammar<T> implements Term {
     public findMatches(input: string | InputStream,
                        parseContext?: {},
                        l?: Listeners,
-                       stopAfterMatch: (pm: PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
+                       stopAfterMatch: (pm: PatternMatch) => boolean = () => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch);
         lm.consume(input, parseContext, l);
         return lm.matches as Array<T & PatternMatch>;
@@ -149,7 +149,7 @@ export abstract class MatchingMachine {
      * @param initialMatcher matcher to start using. This can be changed by the callback methods in this class
      * @param o optional observer
      */
-    constructor(initialMatcher: any, o?: any) {
+    protected constructor(initialMatcher: any, o?: any) {
         this.matcher = toMatchingLogic(initialMatcher);
         if (o) {
             this.observer = toMatchingLogic(o);
