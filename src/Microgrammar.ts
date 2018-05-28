@@ -96,10 +96,25 @@ export class Microgrammar<T> implements Term {
     public findMatches(input: string | InputStream,
                        parseContext?: {},
                        l?: Listeners,
-                       stopAfterMatch: (pm: PatternMatch) => boolean = pm => false): Array<T & PatternMatch> {
+                       stopAfterMatch: (pm: PatternMatch) => boolean = () => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch);
         lm.consume(input, parseContext, l);
         return lm.matches as Array<T & PatternMatch>;
+    }
+
+    /**
+     * Parallel to findMatches, but returns a Promise
+     * @param {string | InputStream} input
+     * @param {{}} parseContext
+     * @return {Promise<Array<T & PatternMatch>>}
+     */
+    public async findMatchesAsync(input: string | InputStream,
+                                  parseContext?: {}): Promise<Array<T & PatternMatch>> {
+        const matches = [];
+        for (const m of matchesIn(this.matcher, input, parseContext)) {
+            matches.push(m);
+        }
+        return matches as Array<T & PatternMatch>;
     }
 
     /**
@@ -138,11 +153,13 @@ export class Microgrammar<T> implements Term {
  * This enables us, for example, to parse XML, with the observer watching element
  * open and close to maintain the current path, while the matcher matches anything we want.
  */
-export abstract class MatchingMachine {
+export class MatchingMachine {
 
     protected matcher: MatchingLogic;
 
     protected observer: MatchingLogic;
+
+    private readonly omg: Microgrammar<any>;
 
     /**
      * Create a new stateful matching machine
@@ -151,9 +168,10 @@ export abstract class MatchingMachine {
      */
     constructor(initialMatcher: any, o?: any) {
         this.matcher = toMatchingLogic(initialMatcher);
-        if (o) {
+        if (!!o) {
             this.observer = toMatchingLogic(o);
         }
+        this.omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
     }
 
     /**
@@ -163,8 +181,6 @@ export abstract class MatchingMachine {
      * @param l listeners observing input characters as they are read
      */
     public consume(input: string | InputStream, parseContext = {}, l?: Listeners): void {
-        const omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
-
         let currentMatcher: MatchingLogic = this.matcher;
         const stream = toInputStream(input);
         const stateManager = new InputStateManager(stream);
@@ -196,8 +212,8 @@ export abstract class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (isSuccessfulMatch(tryMatch) && omg) {
-                    const matches = omg.findMatches(tryMatch.$matched);
+                if (isSuccessfulMatch(tryMatch) && this.omg) {
+                    const matches = this.omg.findMatches(tryMatch.$matched);
                     for (const m of matches) {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }
@@ -250,5 +266,48 @@ class LazyMatcher extends MatchingMachine {
     protected onMatch(pm: PatternMatch): MatchingLogic | undefined {
         this.matches.push(pm);
         return this.stopAfterMatch(pm) ? undefined : this.matcher;
+    }
+}
+
+/**
+ * Asynchronously match. Match the given input.
+ * @param matcher
+ * @param {string | InputStream} input
+ * @param {{}} parseContext
+ * @param {Listeners} l
+ * @return {Iterable<PatternMatch>}
+ */
+export function* matchesIn(matcher: any, input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
+    const matchingLogic = toMatchingLogic(matcher);
+    const stream = toInputStream(input);
+    const stateManager = new InputStateManager(stream);
+
+    let currentInputState: InputState = new DefaultInputState(stateManager, 0, l);
+    while (matchingLogic && !currentInputState.exhausted()) {
+        currentInputState = readyToMatch(currentInputState,
+            (matchingLogic as any).$consumeWhiteSpaceBetweenTokens === true,
+            matchingLogic).state;
+
+        const tryMatch = matchingLogic.matchPrefix(currentInputState, {}, parseContext);
+
+        // We can't accept empty matches as genuine at this level:
+        // For example, if the matcher is just a Rep or Alt
+        if (isSuccessfulMatch(tryMatch) && tryMatch.$matched !== "") {
+            const m = tryMatch.match;
+            // Enrich with the name
+            (m as any).$name = m.$matcherId;
+            yield m;
+            //  = toMatchingLogic(this.onMatch(match));
+            currentInputState = currentInputState.consume(m.$matched,
+                `Microgrammar after match on [${m.$matched} from [${m.$matcherId}]`);
+        } else {
+            // We didn't match. Discard the current input character and try again
+            if (!currentInputState.exhausted()) {
+                currentInputState = currentInputState.advance();
+            }
+        }
+
+        // We can advance the window
+        stateManager.dropLeft(currentInputState.offset);
     }
 }
