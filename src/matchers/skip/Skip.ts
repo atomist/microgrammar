@@ -21,6 +21,7 @@ export const RestOfInput: MatchingLogic = {
     matchPrefix(is: InputState) {
         const consumed = is.skipWhile(s => true, 1);
         return matchPrefixSuccess(
+            // tslint:disable:no-invalid-this
             new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped));
     },
 };

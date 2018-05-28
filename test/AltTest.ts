@@ -28,6 +28,7 @@ describe("Alt", () => {
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }
@@ -39,7 +40,7 @@ describe("Alt", () => {
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }
@@ -62,6 +63,7 @@ describe("Alt", () => {
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }
@@ -73,6 +75,7 @@ describe("Alt", () => {
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }

@@ -1,4 +1,4 @@
-import "mocha";
+
 import { Microgrammar } from "../src/Microgrammar";
 import { firstOf } from "../src/Ops";
 import { JAVA_IDENTIFIER } from "./integration/RealWorldTest2";

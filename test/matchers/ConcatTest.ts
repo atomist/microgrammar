@@ -13,7 +13,6 @@ import { Skipper } from "../../src/Config";
 describe("Concat", () => {
 
     it("reports initialized with normal use of Concat.of", () => {
-        const content = "foo ";
         const mg = Concat.of({
             name: "foo",
         });
@@ -258,7 +257,7 @@ describe("Concat", () => {
         const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         if (isSuccessfulMatch(result)) {
             const mmmm = result.match as any;
-            const r = mmmm as any;
+            const r = mmmm;
             expect(r.name).to.equal("Donald");
             expect(r.delim).to.equal(":");
             expect(r.hobbies).to.have.members(["golf", "tweeting"]);

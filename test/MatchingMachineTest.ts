@@ -232,7 +232,7 @@ export class XmlTracker extends MatchingMachine {
     }
 
     protected observeMatch(patternMatch) {
-        const pm: { name: string, slash } = patternMatch as any;
+        const pm: { name: string, slash } = patternMatch;
         if (pm.slash) {
             this.elementStack.pop();
             if (pm.name === "dependency") {

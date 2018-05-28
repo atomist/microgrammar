@@ -34,9 +34,9 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
     public $consumeWhiteSpaceBetweenTokens = true;
 
-    private matcher: MatchingLogic;
+    private readonly matcher: MatchingLogic;
 
-    private sepMatcher: MatchingLogic;
+    private readonly sepMatcher: MatchingLogic;
 
     /**
      * Generic rep support. Normally use subclasses.
@@ -103,7 +103,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                 if (isSuccessfulMatch(sepMatchResult)) {
                     const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched, `Rep separator [${sepMatch.$matched}]`);
-                    matched += (sepMatch as PatternMatch).$matched;
+                    matched += (sepMatch).$matched;
                 } else {
                     break;
                 }

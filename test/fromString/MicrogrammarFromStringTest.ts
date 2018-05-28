@@ -307,7 +307,7 @@ describe("MicrogrammarFromString", () => {
         };
         const content = "The recent movement in the AUD has gained you $762.49";
         const mg = Microgrammar.fromString<any>("The recent movement in the ${currency} has gained you $${amount}", dictionary);
-        const result = mg.findMatches(content) as any[];
+        const result = mg.findMatches(content);
         assert(result.length === 1);
         assert(result[0].currency === "AUD");
         assert(result[0].amount === 762.49);

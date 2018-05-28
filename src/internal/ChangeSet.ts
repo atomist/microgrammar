@@ -7,9 +7,9 @@ function replaceFirstAfter(content: string, offset: number, old: string, replace
 // TODO this should also support streaming
 export class ChangeSet {
 
-    private changes: Change[] = [];
+    private readonly changes: Change[] = [];
 
-    constructor(private initialContent: string) { }
+    constructor(private readonly initialContent: string) { }
 
     public change(match: PatternMatch, to: string) {
         const change = new Change(match, to);

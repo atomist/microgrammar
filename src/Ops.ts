@@ -15,7 +15,7 @@ export function optional(o: any): MatchingLogic {
 
 export class Opt implements MatchingLogic {
 
-    private matcher: MatchingLogic;
+    private readonly matcher: MatchingLogic;
 
     /**
      * Optional match

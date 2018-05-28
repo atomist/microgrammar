@@ -1,4 +1,4 @@
-import "mocha";
+
 import { JavaParenthesizedExpression } from "../src/matchers/lang/cfamily/java/JavaBody";
 import { Microgrammar } from "../src/Microgrammar";
 import { isPatternMatch } from "../src/PatternMatch";

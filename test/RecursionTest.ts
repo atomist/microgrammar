@@ -1,4 +1,4 @@
-import "mocha";
+
 import { Microgrammar } from "../src/Microgrammar";
 import { Alt, firstOf } from "../src/Ops";
 

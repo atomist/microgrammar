@@ -16,6 +16,8 @@ import {
     VersionedArtifact,
 } from "./MavenGrammars";
 
+/* tslint:disable:max-file-line-count */
+
 describe("Microgrammar", () => {
 
     it("literal", () => {
@@ -47,7 +49,6 @@ describe("Microgrammar", () => {
     });
 
     it("prevents invalid call to function", () => {
-        const content = "foo ";
         // This is invalid as we are not invoking the function
         try {
             Microgrammar.fromDefinitions({
@@ -168,6 +169,7 @@ describe("Microgrammar", () => {
         interface Named {
             name: string;
         }
+
         const mg = Microgrammar.fromDefinitions<Named>({
             name: /[A-Z][a-z]+/,
         });
@@ -187,6 +189,7 @@ describe("Microgrammar", () => {
         interface Named {
             name: string;
         }
+
         const mg = Microgrammar.fromDefinitions<Named>({
             name: /[A-Z][a-z]+/,
         });
@@ -208,6 +211,7 @@ describe("Microgrammar", () => {
                 return null;
             }
         }
+
         const lm = new LazyMatcher(mg.matcher);
         lm.consume("Greg Tony");
         const result2 = lm.matches as any;
@@ -400,7 +404,7 @@ describe("Microgrammar", () => {
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****Porker") as any[];
         assert(matches.length === 1);
-        const m = matches[0] as any;
+        const m = matches[0];
         expect(m.cats).to.have.members(["Felix", "Oscar"]);
         expect(m.pigs.pigs).to.have.members(["Porker"]);
     });
@@ -456,32 +460,28 @@ describe("Microgrammar", () => {
 
 });
 
-class StringGrammar {
+export const stringTextPattern =
+    new Rep(new Alt("\\\"", /[^"]/)); // (?:\\"|[^"])*/;
 
-    public static readonly stringTextPattern =
-        new Rep(new Alt("\\\"", /[^"]/)); // (?:\\"|[^"])*/;
-
-    public static readonly stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
-        foo: ctx => {
-            console.log("commence match");
-        },
-        _p1: '"',
-        foo2: ctx => {
-            console.log("1");
-        },
-        charArray: StringGrammar.stringTextPattern,
-        foo3: ctx => {
-            console.log(`3 + [${JSON.stringify(ctx.charArray)})]`);
-        },
-        _p2: '"',
-        foo4: ctx => {
-            console.log("4");
-        },
-        text: ctx => ctx.charArray.join(""),
-        $id: "stringText",
-    });
-
-}
+export const stringGrammar: Microgrammar<any> = Microgrammar.fromDefinitions<any>({
+    foo: ctx => {
+        console.log("commence match");
+    },
+    _p1: "\"",
+    foo2: ctx => {
+        console.log("1");
+    },
+    charArray: stringTextPattern,
+    foo3: ctx => {
+        console.log(`3 + [${JSON.stringify(ctx.charArray)})]`);
+    },
+    _p2: "\"",
+    foo4: ctx => {
+        console.log("4");
+    },
+    text: ctx => ctx.charArray.join(""),
+    $id: "stringText",
+});
 
 interface CatsDogsAndPigs {
     dogs: string[];

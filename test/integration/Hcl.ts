@@ -31,7 +31,7 @@ describe("Parsing HCL", () => {
     // Function so as not to trigger eager loading, which can fail tests
     function hclString() {
         return Microgrammar.fromString(`"\${stuffUntilNextQuote}"`, {
-            stuffUntilNextQuote: takeUntil('"'),
+            stuffUntilNextQuote: takeUntil("\""),
         });
     }
 
@@ -50,11 +50,6 @@ describe("Parsing HCL", () => {
     });
 
     it("should find number key/value pairs from definitions", () => {
-        const mg = Microgrammar.fromString("${key} = ${value}", {
-            key: /[a-z_]+/,
-            value: new Alt(new Alt(LowercaseBoolean, hclString()), hclNumber),
-        });
-
         const mg2 = Microgrammar.fromDefinitions({
             key: /[a-z_]+/,
             _equals: "=",

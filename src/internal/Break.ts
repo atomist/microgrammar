@@ -1,7 +1,7 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
-import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import { TerminalPatternMatch } from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
 /**
@@ -26,8 +26,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-                private consume: boolean = false,
-                private badMatcher?: MatchingLogic) {
+                private readonly consume: boolean = false,
+                private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {

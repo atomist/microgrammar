@@ -12,10 +12,10 @@ export class NestingDepthStateMachine extends AbstractStateMachine<LangState> {
 
     private readonly pop: string;
 
-    private stateMachine: LangStateMachine;
+    private readonly stateMachine: LangStateMachine;
 
-    constructor(private kind: "block" | "parens" = "block",
-                private factory: () => LangStateMachine = () => new CFamilyStateMachine(),
+    constructor(private readonly kind: "block" | "parens" = "block",
+                private readonly factory: () => LangStateMachine = () => new CFamilyStateMachine(),
                 state: LangState = Normal,
                 public depth = 0) {
         super(state);
