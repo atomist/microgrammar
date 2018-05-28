@@ -1,4 +1,3 @@
-import "mocha";
 
 import * as assert from "power-assert";
 import { Microgrammar } from "../src/Microgrammar";

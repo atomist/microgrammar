@@ -1,4 +1,4 @@
-import "mocha";
+
 import * as assert from "power-assert";
 import { ADD_DEPENDENCY, POM_WITH_DEPENDENCY_MANAGEMENT, XmlTracker } from "../MatchingMachineTest";
 

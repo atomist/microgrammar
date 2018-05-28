@@ -1,8 +1,6 @@
-import "mocha";
+
 import * as assert from "power-assert";
 import { ChangeControlledMethodGrammar } from "../integration/RealWorldTest2";
-
-import { CFamilyLangHelper } from "../../src/matchers/lang/cfamily/CFamilyLangHelper";
 
 describe("Java Benchmark", () => {
 

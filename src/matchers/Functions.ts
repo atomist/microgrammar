@@ -1,6 +1,6 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
-import { isSuccessfulMatch, MatchPrefixResult, matchPrefixSuccess, SuccessfulMatch } from "../MatchPrefixResult";
+import { isSuccessfulMatch, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
 import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
@@ -16,7 +16,7 @@ export function flatten(o: any): MatchingLogic {
 
 class FlatteningMatcher implements MatchingLogic {
 
-    constructor(private delegate: MatchingLogic) {
+    constructor(private readonly delegate: MatchingLogic) {
     }
 
     public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {

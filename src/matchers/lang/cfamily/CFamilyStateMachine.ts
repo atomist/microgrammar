@@ -30,7 +30,7 @@ export class CFamilyStateMachine extends LangStateMachine {
                 break;
             case Normal:
                 switch (ch) {
-                    case '"' :
+                    case "\"" :
                         this.state = DoubleString;
                         break;
                     case "/":
@@ -47,7 +47,7 @@ export class CFamilyStateMachine extends LangStateMachine {
                 }
                 break;
             case DoubleString:
-                if (ch === '"' && this.previousChar !== "\\") {
+                if (ch === "\"" && this.previousChar !== "\\") {
                     this.state = Normal;
                 }
                 break;

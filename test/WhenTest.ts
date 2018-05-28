@@ -21,6 +21,7 @@ describe("When", () => {
         const m = matcher.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }
@@ -49,6 +50,7 @@ describe("When", () => {
         const m = hatesFoo.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }
@@ -61,7 +63,7 @@ describe("When", () => {
         const m = requiresFoo.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
             const mmmm = m.match as any;
-
+            assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
         }

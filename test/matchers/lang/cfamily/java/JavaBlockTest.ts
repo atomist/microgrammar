@@ -20,15 +20,15 @@ describe("JavaBlock", () => {
     });
 
     it("match block ignoring terminating } in string", () => {
-        match('{ x = "}"; }');
+        match("{ x = \"}\"; }");
     });
 
     it("match block ignoring { in string", () => {
-        match('{ x = "}{{{{{"; }');
+        match("{ x = \"}{{{{{\"; }");
     });
 
     it("match nested ignoring terminating } in string", () => {
-        match('{ { x = "}"; } }');
+        match("{ { x = \"}\"; } }");
     });
 
     it("match nested ignoring terminating } in line comment", () => {

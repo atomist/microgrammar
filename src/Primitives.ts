@@ -55,7 +55,7 @@ export abstract class AbstractRegex implements MatchingLogic {
      * @param lookahead number of characters to pull from the input to try to match.
      * We'll keep grabbing more if a match is found for the whole string
      */
-    constructor(regex: RegExp, private lookahead: number = LOOK_AHEAD_SIZE) {
+    constructor(regex: RegExp, private readonly lookahead: number = LOOK_AHEAD_SIZE) {
         this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
     }
 

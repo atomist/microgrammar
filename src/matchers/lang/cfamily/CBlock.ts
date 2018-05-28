@@ -15,12 +15,13 @@ export class CBlock implements MatchingLogic {
 
     public $id: "C.BlockBody";
 
-    private push: string;
+    private readonly push: string;
 
-    private pop: string;
+    private readonly pop: string;
 
-    constructor(private stateMachineFactory: () => LangStateMachine,
-                private kind: "block" | "parens", private inner?: MatchingLogic) {
+    constructor(private readonly stateMachineFactory: () => LangStateMachine,
+                kind: "block" | "parens",
+                private readonly inner?: MatchingLogic) {
         switch (kind) {
             case "block":
                 [this.push, this.pop] = ["{", "}"];

@@ -23,7 +23,7 @@ export class Updatable<T> {
 
     public readonly matches: T[];
 
-    private cs: ChangeSet;
+    private readonly cs: ChangeSet;
 
     constructor(hits: Array<T & PatternMatch>, content: string) {
         const mut = new MicrogrammarUpdates();
@@ -243,7 +243,7 @@ class LazyMatcher extends MatchingMachine {
 
     public matches: PatternMatch[] = [];
 
-    constructor(ml: MatchingLogic, private stopAfterMatch: (pm: PatternMatch) => boolean) {
+    constructor(ml: MatchingLogic, private readonly stopAfterMatch: (pm: PatternMatch) => boolean) {
         super(ml);
     }
 

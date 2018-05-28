@@ -1,4 +1,3 @@
-import "mocha";
 
 import * as assert from "power-assert";
 import { InputState, InputStateListener } from "../src/InputState";
@@ -88,7 +87,7 @@ public class Foo {
         const matches = m.findMatches(DeeplyNested, {}, { depthCount: new NestingDepthStateMachine() });
         assert(matches.length === 1);
         assert(matches[0].toFlag.block, JSON.stringify(matches[0]));
-        assert(new CFamilyLangHelper().canonicalize(matches[0].toFlag.block) === 'println("too deeply nested");');
+        assert(new CFamilyLangHelper().canonicalize(matches[0].toFlag.block) === "println(\"too deeply nested\");");
     });
 
 });

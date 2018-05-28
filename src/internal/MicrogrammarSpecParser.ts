@@ -30,16 +30,16 @@ export class MicrogrammarSpecParser {
 
     public fromString(spec: string, components: object, options: FromStringOptions): Concat {
         const optionsToUse = completeWithDefaults(options);
-        spec = this.preprocess(spec, optionsToUse);
-        const match = exactMatch<MicrogrammarSpec>(specGrammar(optionsToUse), spec);
+        const specToUse = this.preprocess(spec, optionsToUse);
+        const match = exactMatch<MicrogrammarSpec>(specGrammar(optionsToUse), specToUse);
         if (!isPatternMatch(match)) {
-            throw new Error(`Unable to parse microgrammar: ${spec}`);
+            throw new Error(`Unable to parse microgrammar: ${specToUse}`);
         }
         const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,
             (components as WhiteSpaceHandler).$consumeWhiteSpaceBetweenTokens !== false);
         const matcherSequence2 = this.populateSpecifiedElements(components, matcherSequence1);
         const matcherSequence3 = this.inferUnspecifiedElements(matcherSequence2);
-        const definitions = this.definitionsFromSpecs(spec, matcherSequence3);
+        const definitions = this.definitionsFromSpecs(specToUse, matcherSequence3);
         const concat = Concat.of(definitions);
         // Copy config to Concat
         for (const key in components) {
@@ -85,17 +85,17 @@ export class MicrogrammarSpecParser {
 
     private populateSpecifiedElements(elements: any, definitionSpecs: DefinitionSpec[]): DefinitionSpec[] {
         return definitionSpecs.map(t => {
-                if (isReference(t) && elements[t.reference]) {
-                    return {
-                        named: {
-                            name: t.reference,
-                            matcher: toMatchingLogic(elements[t.reference]),
-                        },
-                    };
-                } else {
-                    return t;
-                }
-            });
+            if (isReference(t) && elements[t.reference]) {
+                return {
+                    named: {
+                        name: t.reference,
+                        matcher: toMatchingLogic(elements[t.reference]),
+                    },
+                };
+            } else {
+                return t;
+            }
+        });
     }
 
     private inferUnspecifiedElements(definitionSpecs: DefinitionSpec[]): SatisfiedDefinitionSpec[] {

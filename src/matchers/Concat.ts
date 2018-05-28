@@ -204,7 +204,7 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
         return undefined;
     }
     if (typeof o === "string") {
-        return new Literal(o as string);
+        return new Literal(o);
     } else if ((o as RegExp).exec) {
         return new Regex(o as RegExp);
     } else if ((o as MatchingLogic).matchPrefix) {

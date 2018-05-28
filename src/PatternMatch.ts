@@ -126,7 +126,7 @@ export class TreePatternMatch extends PatternMatch {
         }
     }
 
-    public submatches() {
+    public submatches(): object {
         const output = {};
         for (const key of Object.getOwnPropertyNames(this)) {
             if (key.charAt(0) !== "$") {

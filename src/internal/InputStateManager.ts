@@ -13,7 +13,7 @@ export class InputStateManager {
 
     private window: string = "";
 
-    constructor(private stream: InputStream, private bufsize: number = DEFAULT_BUFFER_SIZE) {
+    constructor(private readonly stream: InputStream, private readonly bufsize: number = DEFAULT_BUFFER_SIZE) {
     }
 
     public get(offset: number, n: number): string {
