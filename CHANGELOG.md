@@ -5,17 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased][]
+## [Unreleased](https://github.com/atomist/microgrammar/compare/0.8.0...HEAD)
 
-[Unreleased]: https://github.com/atomist/microgrammar/compare/0.7.0...HEAD
+### Fixed
 
-### [0.7.0][] - 2017-10-03
+-   TypeDoc generation
 
-[0.7.0]: https://github.com/atomist/microgrammar/compare/0.6.2...0.7.0
+### [0.8.0](https://github.com/atomist/microgrammar/compare/0.7.0...0.8.0) - 2018-08-07
+
+### Added
+
+-   Documentation
+-   Declaration map
+
+### Changed
+
+-   Allow multiple calls to `init()`.
+-   Update dependencies.
+-   Tighten up TSLint rules and de-lint.
+
+### [0.7.0](https://github.com/atomist/microgrammar/compare/0.6.2...0.7.0) - 2017-10-03
 
 Stricter release
 
-### Change
+### Changed
 
 -   Publish master and PR builds to Atomist NPM registry
 -   Make TypeScript compilation more strict

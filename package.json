@@ -1,6 +1,6 @@
 {
   "name": "@atomist/microgrammar",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Parsing library filling the gap between regular expressions and complete grammars",
   "author": "Atomist",
   "license": "SEE LICENSE IN LICENSE",
@@ -43,12 +43,13 @@
     "clean": "npm run clean-js ; rm -rf build *-v8.log profile.txt",
     "clean-js": "find src test -type f -name '*.js' -print0 | xargs -0 rm -f",
     "compile": "tsc -p .",
+    "doc": "typedoc --mode modules --excludeExternals --out build/typedoc src",
     "distclean": "npm run clean ; rm -rf node_modules",
     "fmt": "tsfmt --replace",
     "lint": "tslint --format verbose --project . --exclude '{build,node_modules}/**' '**/*.ts'",
     "lint:fix": "npm run lint -- --fix",
     "test": "mocha --compilers ts:espower-typescript/guess 'test/**/!(*Benchmark).ts'",
     "testone": "mocha --compilers ts:espower-typescript/guess \"test/**/${TEST:-*.ts}\"",
-    "typedoc": "typedoc --mode modules --excludeExternals"
+    "typedoc": "npm run doc"
   }
 }
