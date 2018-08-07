@@ -8,14 +8,8 @@ This page details all runtime OSS dependencies of `@atomist/microgrammar`.
 
 | License | Count |
 |---------|-------|
-|[MIT](#mit)|1|
 
-#### MIT
-MIT License - [http://www.opensource.org/licenses/MIT](http://www.opensource.org/licenses/MIT)
 
-| Name | Version | Publisher | Repository |
-|------|---------|-----------|------------|
-|`@types/lodash`|`4.14.112`||[https://github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)|
 
 ## Contact
 
