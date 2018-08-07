@@ -3,36 +3,35 @@
   "version": "0.8.0",
   "description": "Parsing library filling the gap between regular expressions and complete grammars",
   "author": "Atomist",
-  "license": "GPL-3.0",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/atomist/microgrammar.git"
   },
   "keywords": [
     "atomist",
+    "microgrammar",
     "parser"
   ],
   "homepage": "https://github.com/atomist/microgrammar#readme",
   "bugs": {
     "url": "https://github.com/atomist/microgrammar/issues"
   },
-  "dependencies": {
-    "@types/lodash": "^4.14.112"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^3.5.0",
-    "@types/mocha": "^2.2.48",
+    "@types/mocha": "^5.2.5",
     "@types/power-assert": "^1.5.0",
     "chai": "^4.1.2",
     "espower-typescript": "^8.1.4",
     "mocha": "^5.2.0",
     "power-assert": "^1.6.0",
     "supervisor": "^0.12.0",
-    "ts-node": "^3.3.0",
+    "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "typedoc": "^0.11.1",
-    "typescript": "2.9.*",
-    "typescript-formatter": "^6.1.0"
+    "typescript": "^2.9.2",
+    "typescript-formatter": "^7.2.2"
   },
   "directories": {
     "test": "test"
