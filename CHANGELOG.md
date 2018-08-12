@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/microgrammar/compare/0.8.1...HEAD)
 
+### Added
+
+-   Include "main" and "types" in package.json.
+
 ## [0.8.1](https://github.com/atomist/microgrammar/compare/0.8.0...0.8.1) - 2018-08-12
+
+### Added
+
+-   `index.ts` file
 
 ### Fixed
 
@@ -19,7 +27,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Documentation
 -   Declaration map
--   `index.ts` file
 
 ### Changed
 
@@ -27,7 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Update dependencies.
 -   Tighten up TSLint rules and de-lint.
 
-### [0.7.0](https://github.com/atomist/microgrammar/compare/0.6.2...0.7.0) - 2017-10-03
+## [0.7.0](https://github.com/atomist/microgrammar/compare/0.6.2...0.7.0) - 2017-10-03
 
 Stricter release
 
@@ -36,9 +43,7 @@ Stricter release
 -   Publish master and PR builds to Atomist NPM registry
 -   Make TypeScript compilation more strict
 
-### [0.6.2][] - 2017-09-24
-
-[0.6.2]: https://github.com/atomist/microgrammar/compare/0.6.1...0.6.2
+## [0.6.2](https://github.com/atomist/microgrammar/compare/0.6.1...0.6.2) - 2017-09-24
 
 Update bugfix release.
 
@@ -46,11 +51,9 @@ Update bugfix release.
 
 -   Guard for undefined access in some cases in microgrammar updates
 
-### [0.6.1][]
+## [0.6.1](https://github.com/atomist/microgrammar/compare/0.6.0...0.6.1) - 2017-09-16
 
 Circular reference support release.
-
-[0.6.1]: https://github.com/atomist/microgrammar/compare/0.6.0...0.6.1
 
 ### Added
 
@@ -62,11 +65,9 @@ Circular reference support release.
 -   `Concat` constructor is now private. Use `Concat.of` static
     function instead
 
-## [0.6.0][]
+## [0.6.0](https://github.com/atomist/microgrammar/compare/0.5.1...0.6.0) - 2017-07-30
 
 Listener and `fromString` improvement release.
-
-[0.6.0]: https://github.com/atomist/microgrammar/compare/0.5.1...0.6.0
 
 ### Added
 

@@ -17,6 +17,8 @@
   "bugs": {
     "url": "https://github.com/atomist/microgrammar/issues"
   },
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^3.5.0",
