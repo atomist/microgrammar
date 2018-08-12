@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Documentation
 -   Declaration map
+-   `index.ts` file
 
 ### Changed
 
