@@ -4,7 +4,7 @@
 
 Parsing library written in [TypeScript][ts], filling the large gap
 between the sweet spots of regular expressions and full-blown
-[BNF][bnf] or equivalent grammars.  Can parse and cleanly update
+[BNF][bnf] or equivalent grammars.  It can parse and cleanly update
 structured content.
 
 [ts]: https://www.typescriptlang.org/ (TypeScript)
