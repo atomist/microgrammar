@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-export * from "./lib/Microgrammar";
-export * from "./lib/Primitives";
+export * from "./lib/InputState";
 
 export * from "./lib/Matchers";
 
-export * from "./lib/InputState";
+export { Concat } from "./lib/matchers/Concat";
 
-export * from "./lib/Rep";
-
-export * from "./lib/Ops";
+export { flatten } from "./lib/matchers/Functions";
 
 export * from "./lib/matchers/skip/Skip";
 
 export * from "./lib/matchers/snobol/Span";
 
-export { flatten } from "./lib/matchers/Functions";
+export { isSuccessfulMatch } from "./lib/MatchPrefixResult";
+
+export * from "./lib/Microgrammar";
+
+export * from "./lib/Ops";
 
 export { isPatternMatch } from "./lib/PatternMatch";
 
-export { isSuccessfulMatch } from "./lib/MatchPrefixResult";
+export * from "./lib/Primitives";
+
+export * from "./lib/Rep";
