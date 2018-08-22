@@ -1,7 +1,7 @@
-import { Concat } from "../src/matchers/Concat";
-import { Microgrammar } from "../src/Microgrammar";
-import { Opt, when } from "../src/Ops";
-import { Rep, Rep1 } from "../src/Rep";
+import { Concat } from "../lib/matchers/Concat";
+import { Microgrammar } from "../lib/Microgrammar";
+import { Opt, when } from "../lib/Ops";
+import { Rep, Rep1 } from "../lib/Rep";
 
 export interface VersionedArtifact {
     group: string;

@@ -1,13 +1,12 @@
-import { JavaBlock, JavaParenthesizedExpression } from "../../src/matchers/lang/cfamily/java/JavaBody";
-import { isSuccessfulMatch } from "../../src/MatchPrefixResult";
-
-import { Microgrammar } from "../../src/Microgrammar";
-import { Opt } from "../../src/Ops";
-
 import * as assert from "power-assert";
-import { Rep, Rep1 } from "../../src/Rep";
-
-import { inputStateFromString } from "../../src/internal/InputStateFactory";
+import { inputStateFromString } from "../../lib/internal/InputStateFactory";
+import { isSuccessfulMatch } from "../../lib/MatchPrefixResult";
+import { Rep } from "../../lib/Rep";
+import {
+    AnyAnnotation,
+    ChangeControlledMethodGrammar,
+    GrammarWithOnlyARep,
+} from "./annotationGrammar";
 
 describe("AnyAnnotationGrammar", () => {
 
@@ -68,61 +67,3 @@ describe("GrammarWithOnlyARep", () => {
     });
 
 });
-
-export const JAVA_IDENTIFIER = /[a-zA-Z_$][a-zA-Z0-9_$]*/;
-
-export const AnyAnnotation = Microgrammar.fromDefinitions<RawAnnotation>({
-    _at: "@",
-    name: JAVA_IDENTIFIER,
-    _content: new Opt(JavaParenthesizedExpression),
-    content: ctx => {
-        const cont = ctx._content ? ctx._content.block : "";
-        return cont;
-    },
-});
-
-export interface RawAnnotation {
-
-    name: string;
-
-    /**
-     * Annotation content (within parentheses, not parsed). May be undefined
-     */
-    content: string;
-
-}
-
-export const ChangeControlledMethodGrammar = Microgrammar.fromDefinitions<ChangeControlledMethod>({
-    annotations: new Rep1(AnyAnnotation),
-    _check(ctx: any) {
-        const found = ctx.annotations.filter(a => a.name === "ChangeControlled");
-        if (found.length === 0) {
-            return false;
-        }
-        ctx.changeControlledAnnotation = found;
-        return true;
-    },
-    _visibilityModifier: "public",
-    type: JAVA_IDENTIFIER,
-    name: JAVA_IDENTIFIER,
-    parameterContent: JavaParenthesizedExpression,
-    body: JavaBlock,
-});
-
-export const GrammarWithOnlyARep = Microgrammar.fromDefinitions<any>({
-    annotations: new Rep(AnyAnnotation),
-});
-
-export interface ChangeControlledMethod {
-
-    annotations: RawAnnotation[];
-
-    changeControlledAnnotation: RawAnnotation;
-
-    name: string;
-
-    parameterContent: { block: string };
-
-    body: { block: string };
-
-}

@@ -1,12 +1,12 @@
 import assert = require("power-assert");
 
-import { Term } from "../../src/Matchers";
-import { Microgrammar } from "../../src/Microgrammar";
-import { Integer, LowercaseBoolean } from "../../src/Primitives";
+import { Term } from "../../lib/Matchers";
+import { Microgrammar } from "../../lib/Microgrammar";
+import { Integer, LowercaseBoolean } from "../../lib/Primitives";
 
-import { Alt } from "../../src/Ops";
+import { Alt } from "../../lib/Ops";
 
-import { takeUntil } from "../../src/matchers/skip/Skip";
+import { takeUntil } from "../../lib/matchers/skip/Skip";
 
 const sample = `# An AMI
 variable "ami" {

@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Include "main" and "types" in package.json.
 
+### Changed
+
+-   **BREAKING** Reorganize package to be have standard Node.js layout.
+-   Update TypeScript and its configuration.
+-   Removed TSLint rules that are already part of tslint:recommended.
+
 ## [0.8.1](https://github.com/atomist/microgrammar/compare/0.8.0...0.8.1) - 2018-08-12
 
 ### Added

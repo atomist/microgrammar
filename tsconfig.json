@@ -1,34 +1,41 @@
 {
-  "compilerOptions": {
-    "newLine": "LF",
-    "target": "ES6",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "jsx": "React",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "build",
-    "rootDir": ".",
-    "lib": [
-      "DOM",
-      "ES2017",
-      "DOM.Iterable",
-      "ScriptHost",
-      "esnext.asynciterable"
+    "compilerOptions": {
+        "newLine": "LF",
+        "target": "ES6",
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "jsx": "React",
+        "declaration": true,
+        "sourceMap": true,
+        "rootDir": ".",
+        "lib": [
+            "DOM",
+            "ES2017",
+            "DOM.Iterable",
+            "ScriptHost",
+            "esnext.asynciterable"
+        ],
+        "strict": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "exclude": [
+        "assets",
+        "build",
+        "doc",
+        "legal",
+        "log",
+        "node_modules",
+        ".#*"
     ],
-    "strict": false,
-    "strictNullChecks": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  },
-  "exclude": [
-    "build",
-    "node_modules"
-  ],
-  "compileOnSave": true,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  }
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
 }
