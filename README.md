@@ -1,26 +1,26 @@
 # @atomist/microgrammar
 
 [![npm version](https://badge.fury.io/js/%40atomist%2Fmicrogrammar.svg)](https://badge.fury.io/js/%40atomist%2Fmicrogrammar)
-[![Build Status](https://travis-ci.org/atomist/microgrammar.svg?branch=master)](https://travis-ci.org/atomist/microgrammar)
 
-Parsing library written in TypeScript, filling the large gap between the sweet spots of
-regular expressions and full-blown [BNF][bnf] or equivalent grammars.
-Can parse and cleanly update
-structured content. `npm` module page [here][npm-mod].
+Parsing library written in [TypeScript][ts], filling the large gap
+between the sweet spots of regular expressions and full-blown
+[BNF][bnf] or equivalent grammars.  Can parse and cleanly update
+structured content.
+
+[ts]: https://www.typescriptlang.org/ (TypeScript)
 
 ## Concepts
 
-**Microgrammars** are a powerful way of parsing structured
-content such as source code, described in this [Stanford paper][mg-paper].
-Microgrammars are designed to recognize
-structures in a string or stream and extract their content: For
-example, to recognize a Java method that has a particular annotation
-and to extract particular parameters. They are more powerful and [typically more
-readable][regex-hell] than [regular expressions][regex] for complex cases, although they can be
-built using regex.
+**Microgrammars** are a powerful way of parsing structured content
+such as source code, described in this [Stanford paper][mg-paper].
+Microgrammars are designed to recognize structures in a string or
+stream and extract their content: For example, to recognize a Java
+method that has a particular annotation and to extract particular
+parameters. They are more powerful and [typically more
+readable][regex-hell] than [regular expressions][regex] for complex
+cases, although they can be built using regular expressions.
 
 [mg-paper]: http://web.stanford.edu/~mlfbrown/paper.pdf (How to build static checking systems using orders of magnitude less code Brown et al., ASPLOS 2016)
-[npm-mod]: https://www.npmjs.com/package/@atomist/microgrammar (node module)
 
 Atomist microgrammars go beyond the Stanford paper example in that
 they permit _updating_ as well as matching, preserving positions. They
@@ -32,12 +32,14 @@ old [SNOBOL programming language][snobol].
 [regex]: https://en.wikipedia.org/wiki/Regular_expression
 
 ## Examples
+
 There are two styles of use:
 
-- From definitions: Defining a grammar in JavaScript objects
-- From strings: Defining a grammar in a string that resembles input that will be matched
+-   From definitions: Defining a grammar in JavaScript objects
+-   From strings: Defining a grammar in a string that resembles input
+    that will be matched
 
-### From Definitions Style
+### Definitions style
 
 Here's a simple example:
 
@@ -121,14 +123,23 @@ public class MySpringBootApplication
 
 Notes:
 
-- `JavaParenthesizedExpression` is a built-in matcher constant that matches any valid Java content within `(...)`. It uses a state
-machine. It's easy to write such custom matchers.
-- By default, microgrammars are tolerant of whitespace, treating it as a token separator. This is the behavior we want when
-parsing most languages or configuration formats.
-- Because the other properties have names beginning with `_`, only the class name (`MySpringBootApplication` in our example) is bound to the result. We care about the structure of the rest of the class declaration, but we don't need to extract other values in this particular case.
+-   `JavaParenthesizedExpression` is a built-in matcher constant that
+    matches any valid Java content within `(...)`. It uses a state
+    machine. It's easy to write such custom matchers.
+-   By default, microgrammars are tolerant of whitespace, treating it
+    as a token separator. This is the behavior we want when parsing
+    most languages or configuration formats.
+-   Because the other properties have names beginning with `_`, only
+    the class name (`MySpringBootApplication` in our example) is bound
+    to the result. We care about the structure of the rest of the
+    class declaration, but we don't need to extract other values in
+    this particular case.
 
-### From String Style
-This is a higher level usage model in which a string resembling the desired input but with variable placeholders is used to define the grammar.
+### String style
+
+This is a higher level usage model in which a string resembling the
+desired input but with variable placeholders is used to define the
+grammar.
 
 This style is ideally suited for simpler grammars. For example:
 
@@ -136,7 +147,10 @@ This style is ideally suited for simpler grammars. For example:
 const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
     "@${name}='${value}'");
 ```
-It can be combined with the definitional style through providing optional definitions for the named fields. For example, to constrain the match on a name in the above example using a regular expression:
+
+It can be combined with the definitional style through providing
+optional definitions for the named fields. For example, to constrain
+the match on a name in the above example using a regular expression:
 
 ```typescript
 const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
@@ -144,14 +158,14 @@ const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
     	name: /[a-z]+/
     });
 ```
+
 As with the object definitional style, whitespace is ignored by default.
 
+Further documentation can be found in the
+[reference](docs/reference.md).  You can also take a look at the tests
+in this repository.
 
-Further documentation can be found in
-the [reference](docs/reference.md).  You can also take a
-look at the tests in this repository.
-
-## Alternatives and When To Use Microgrammars
+## Alternatives and when to use microgrammars
 
 Microgrammars have obvious similarities to [BNF grammars][bnf], but
 differ in some important respects:
@@ -189,39 +203,66 @@ for complex cases.
 
 ## Usage
 
-The `@atomist/microgrammar` module contains both the TypeScript
-typings and compiled JavaScript.  You can use this project by
-adding the dependency in your `package.json`.
+The [`@atomist/microgrammar` package][mg-npm] contains both the
+TypeScript typings and compiled JavaScript.  You can use this project
+by adding the dependency in your `package.json`.
 
 ```
-$ npm install @atomist/microgrammar --save
+$ npm install --save @atomist/microgrammar
 ```
 
-[mg-doc]: http://docs.atomist.com/user-guide/rug/microgrammars/ (Atomist Documentation - Microgrammars)
+[mg-npm]: https://www.npmjs.com/package/@atomist/microgrammar (@atomist/microgrammar Node.js Package)
 
 ## Performance considerations
+
 See [Writing efficient microgrammars][efficiency].
 
 [efficiency]: docs/performance.md (Writing efficient microgrammars)
 
+## Support
+
+General support questions should be discussed in the `#support`
+channel in the [Atomist community Slack workspace][slack].
+
+If you find a problem, please create an [issue][].
+
+[issue]: https://github.com/atomist/microgrammar/issues
+
 ## Development
 
-See the [contribution guidelines](CONTRIBUTING.md).
+You will need to install [node][] to build and test this project.
 
-### Running tests
+[node]: https://nodejs.org/ (Node.js)
 
-Run all the tests in mocha:
+### Build and test
 
-`npm test`
+Use the following package scripts to build, test, and perform other
+development tasks.
 
-Run one test file:
+Command | Reason
+------- | ------
+`npm install` | install project dependencies
+`npm run build` | compile, test, lint, and generate docs
+`npm start` | start the Atomist API client
+`npm run autostart` | run the client, refreshing when files change
+`npm run lint` | run TSLint against the TypeScript
+`npm run compile` | generate types from GraphQL and compile TypeScript
+`npm test` | run tests
+`npm run autotest` | run tests every time a file changes
+`npm run benchmark` | run benchmarking tests, results in `profile.txt`
+`npm run clean` | remove files generated during the build
 
-`TEST=MyTestFile.ts npm testone`
+### Release
 
-Run benchmarks with profiling, leaving a `profile.txt` file to view:
+Releases are managed by the [Atomist SDM][atomist-sdm].  Press the
+release button in the Atomist dashboard or Slack.
 
-`npm run benchmark`
+[atomist-sdm]: https://github.com/atomist/atomist-sdm (Atomist Software Delivery Machine)
 
-Clean (including deleting any profiling data):
+---
 
-`npm run clean`
+Created by [Atomist][atomist].
+Need Help?  [Join our Slack workspace][slack].
+
+[atomist]: https://atomist.com/ (Atomist - How Teams Deliver Software)
+[slack]: https://join.atomist.com/ (Atomist Community Slack)

@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 -   Update TypeScript and its configuration.
 -   Removed TSLint rules that are already part of tslint:recommended.
 
+### Fixed
+
+-   Do not run tests more than once.
+
 ## [0.8.1](https://github.com/atomist/microgrammar/compare/0.8.0...0.8.1) - 2018-08-12
 
 ### Added
