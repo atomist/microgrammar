@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/microgrammar/compare/0.9.1...HEAD)
 
+### Changed
+
+-   Prepare for 1.0.0 release.
+
 ## [0.9.1](https://github.com/atomist/microgrammar/compare/0.9.0...0.9.1) - 2018-08-22
+
+### Added
+
+-   Add Concat to index.
 
 ## [0.9.0](https://github.com/atomist/microgrammar/compare/0.8.1...0.9.0) - 2018-08-22
 
