@@ -1,5 +1,6 @@
 # @atomist/microgrammar
 
+[![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/microgrammar/92d2035b-575e-41c4-9088-996dc70d69c2)](https://app.atomist.com/workspace/T29E48P34)
 [![npm version](https://img.shields.io/npm/v/@atomist/microgrammar.svg)](https://www.npmjs.com/package/@atomist/microgrammar)
 
 Parsing library written in [TypeScript][ts], filling the large gap
