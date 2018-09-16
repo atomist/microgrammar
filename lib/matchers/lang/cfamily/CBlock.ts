@@ -1,7 +1,10 @@
 import { InputState } from "../../../InputState";
 import { inputStateFromString } from "../../../internal/InputStateFactory";
 import { MatchingLogic } from "../../../Matchers";
-import { MatchPrefixResult, matchPrefixSuccess } from "../../../MatchPrefixResult";
+import {
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../../PatternMatch";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";

@@ -1,8 +1,16 @@
 import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
-import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "./MatchPrefixResult";
-import { PatternMatch, TerminalPatternMatch } from "./PatternMatch";
+import {
+    isSuccessfulMatch,
+    MatchFailureReport,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "./MatchPrefixResult";
+import {
+    PatternMatch,
+    TerminalPatternMatch,
+} from "./PatternMatch";
 
 import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";

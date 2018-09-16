@@ -1,7 +1,14 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
-import { isSuccessfulMatch, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
-import { isTreePatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import {
+    isSuccessfulMatch,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../MatchPrefixResult";
+import {
+    isTreePatternMatch,
+    TerminalPatternMatch,
+} from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
 /**

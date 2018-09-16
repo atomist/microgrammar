@@ -1,5 +1,13 @@
-import { LangState, LangStateMachine } from "../LangStateMachine";
-import {DoubleString, Normal, SlashSlashComment, SlashStarComment } from "./States";
+import {
+    LangState,
+    LangStateMachine,
+} from "../LangStateMachine";
+import {
+    DoubleString,
+    Normal,
+    SlashSlashComment,
+    SlashStarComment,
+} from "./States";
 
 /**
  * State machine for recognizing C family strings and comments.

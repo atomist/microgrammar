@@ -1,6 +1,9 @@
 
 import { Microgrammar } from "../../lib/Microgrammar";
-import { Alt, Opt } from "../../lib/Ops";
+import {
+    Alt,
+    Opt,
+} from "../../lib/Ops";
 import { RepSep } from "../../lib/Rep";
 
 import * as assert from "power-assert";

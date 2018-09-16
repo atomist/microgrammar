@@ -2,7 +2,10 @@ import assert = require("power-assert");
 import { fail } from "power-assert";
 import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
 
-import { Alt, firstOf } from "../lib/Ops";
+import {
+    Alt,
+    firstOf,
+} from "../lib/Ops";
 
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 

@@ -1,4 +1,8 @@
-import { InputState, Listeners, Skipped } from "../InputState";
+import {
+    InputState,
+    Listeners,
+    Skipped,
+} from "../InputState";
 import { InputStateManager } from "./InputStateManager";
 
 /**

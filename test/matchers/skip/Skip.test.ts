@@ -4,7 +4,12 @@ import { Alt } from "../../../lib/Ops";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../../../lib/Config";
 import { inputStateFromString } from "../../../lib/internal/InputStateFactory";
-import { RestOfLine, skipTo, yadaYadaThen, yadaYadaThenThisButNotThat } from "../../../lib/matchers/skip/Skip";
+import {
+    RestOfLine,
+    skipTo,
+    yadaYadaThen,
+    yadaYadaThenThisButNotThat,
+} from "../../../lib/matchers/skip/Skip";
 import { isSuccessfulMatch } from "../../../lib/MatchPrefixResult";
 
 describe("Skip", () => {

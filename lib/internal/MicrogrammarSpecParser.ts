@@ -1,14 +1,23 @@
 import { MatchingLogic } from "../Matchers";
-import { Concat, toMatchingLogic } from "../matchers/Concat";
+import {
+    Concat,
+    toMatchingLogic,
+} from "../matchers/Concat";
 import { Literal } from "../Primitives";
 
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
 import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
-import { CompleteFromStringOptions, completeWithDefaults } from "./CompleteFromStringOptions";
+import {
+    CompleteFromStringOptions,
+    completeWithDefaults,
+} from "./CompleteFromStringOptions";
 import { exactMatch } from "./ExactMatch";
-import { MicrogrammarSpec, specGrammar } from "./SpecGrammar";
+import {
+    MicrogrammarSpec,
+    specGrammar,
+} from "./SpecGrammar";
 
 /**
  * Convenient function to create a microgrammar from a spec within another grammar

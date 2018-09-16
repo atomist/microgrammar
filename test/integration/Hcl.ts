@@ -2,7 +2,10 @@ import assert = require("power-assert");
 
 import { Term } from "../../lib/Matchers";
 import { Microgrammar } from "../../lib/Microgrammar";
-import { Integer, LowercaseBoolean } from "../../lib/Primitives";
+import {
+    Integer,
+    LowercaseBoolean,
+} from "../../lib/Primitives";
 
 import { Alt } from "../../lib/Ops";
 

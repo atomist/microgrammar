@@ -1,13 +1,20 @@
 
 import * as assert from "power-assert";
-import { InputState, InputStateListener } from "../lib/InputState";
+import {
+    InputState,
+    InputStateListener,
+} from "../lib/InputState";
 import { MatchingLogic } from "../lib/Matchers";
 import { CFamilyLangHelper } from "../lib/matchers/lang/cfamily/CFamilyLangHelper";
 import { CFamilyStateMachine } from "../lib/matchers/lang/cfamily/CFamilyStateMachine";
 import { JavaBlock } from "../lib/matchers/lang/cfamily/java/JavaBody";
 import { NestingDepthStateMachine } from "../lib/matchers/lang/cfamily/NestingDepthStateMachine";
 import { DoubleString } from "../lib/matchers/lang/cfamily/States";
-import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../lib/MatchPrefixResult";
+import {
+    MatchFailureReport,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../lib/MatchPrefixResult";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
 import { TerminalPatternMatch } from "../lib/PatternMatch";

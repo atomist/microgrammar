@@ -1,5 +1,8 @@
 import { Microgrammar } from "../lib/Microgrammar";
-import { Alt, firstOf } from "../lib/Ops";
+import {
+    Alt,
+    firstOf,
+} from "../lib/Ops";
 
 import { fail } from "power-assert";
 import { Concat } from "../lib/matchers/Concat";

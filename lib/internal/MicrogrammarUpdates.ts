@@ -1,6 +1,9 @@
 import { ChangeSet } from "./ChangeSet";
 
-import { isTreePatternMatch, PatternMatch } from "../PatternMatch";
+import {
+    isTreePatternMatch,
+    PatternMatch,
+} from "../PatternMatch";
 
 export interface MatchUpdater {
     newContent(): string;

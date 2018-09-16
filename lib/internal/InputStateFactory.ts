@@ -1,4 +1,7 @@
-import { InputState, Listeners } from "../InputState";
+import {
+    InputState,
+    Listeners,
+} from "../InputState";
 import { StringInputStream } from "../spi/StringInputStream";
 
 import { InputStream } from "../spi/InputStream";

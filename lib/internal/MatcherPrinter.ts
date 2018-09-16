@@ -1,5 +1,12 @@
-import { Matcher, MatchingLogic } from "../Matchers";
-import { Concat, isNamedMatcher, MatchStep } from "../matchers/Concat";
+import {
+    Matcher,
+    MatchingLogic,
+} from "../Matchers";
+import {
+    Concat,
+    isNamedMatcher,
+    MatchStep,
+} from "../matchers/Concat";
 import { isLiteral } from "../Primitives";
 import { isBreak } from "./Break";
 

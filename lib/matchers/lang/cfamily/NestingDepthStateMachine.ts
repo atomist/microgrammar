@@ -1,5 +1,8 @@
 import { AbstractStateMachine } from "../../../support/AbstractStateMachine";
-import { LangState, LangStateMachine } from "../LangStateMachine";
+import {
+    LangState,
+    LangStateMachine,
+} from "../LangStateMachine";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";
 import { Normal } from "./States";
 

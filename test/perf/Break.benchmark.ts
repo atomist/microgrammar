@@ -1,5 +1,8 @@
 import * as assert from "power-assert";
-import { skipTo, takeUntil } from "../../lib/matchers/skip/Skip";
+import {
+    skipTo,
+    takeUntil,
+} from "../../lib/matchers/skip/Skip";
 import { Microgrammar } from "../../lib/Microgrammar";
 import {
     comment,

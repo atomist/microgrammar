@@ -1,6 +1,11 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
-import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
+import {
+    isSuccessfulMatch,
+    MatchFailureReport,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../MatchPrefixResult";
 import { TerminalPatternMatch } from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 

@@ -1,6 +1,9 @@
 import { Concat } from "../lib/matchers/Concat";
 import { Microgrammar } from "../lib/Microgrammar";
-import { Opt, when } from "../lib/Ops";
+import {
+    Opt,
+    when,
+} from "../lib/Ops";
 import { Rep, Rep1 } from "../lib/Rep";
 
 export interface VersionedArtifact {

@@ -3,7 +3,7 @@ import * as assert from "power-assert";
 import { Span } from "../../../lib/matchers/snobol/Span";
 
 import { inputStateFromString } from "../../../lib/internal/InputStateFactory";
-import {isSuccessfulMatch} from "../../../lib/MatchPrefixResult";
+import { isSuccessfulMatch } from "../../../lib/MatchPrefixResult";
 
 describe("Span", () => {
 

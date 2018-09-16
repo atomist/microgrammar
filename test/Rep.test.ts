@@ -5,7 +5,10 @@ import { atLeastOne, Rep, Rep1, Rep1Sep, RepSep, zeroOrMore } from "../lib/Rep";
 import { LEGAL_VALUE } from "./MavenGrammars";
 
 import { Microgrammar } from "../lib/Microgrammar";
-import { Alt, Opt } from "../lib/Ops";
+import {
+    Alt,
+    Opt,
+} from "../lib/Ops";
 import { RealWorldPom } from "./Fixtures";
 
 import * as assert from "power-assert";

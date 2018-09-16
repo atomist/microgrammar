@@ -1,6 +1,9 @@
 import assert = require("power-assert");
 
-import { JavaBlock, JavaParenthesizedExpression } from "../../../../../lib/matchers/lang/cfamily/java/JavaBody";
+import {
+    JavaBlock,
+    JavaParenthesizedExpression,
+} from "../../../../../lib/matchers/lang/cfamily/java/JavaBody";
 import { Microgrammar } from "../../../../../lib/Microgrammar";
 
 describe("JavaBlock microgrammars", () => {

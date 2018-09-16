@@ -1,11 +1,31 @@
 import { InputState } from "../InputState";
-import { LazyMatchingLogic, Matcher, MatchingLogic, Term } from "../Matchers";
-import { isSuccessfulMatch, MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../MatchPrefixResult";
+import {
+    LazyMatchingLogic,
+    Matcher,
+    MatchingLogic,
+    Term,
+} from "../Matchers";
+import {
+    isSuccessfulMatch,
+    MatchFailureReport,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
-import { isSpecialMember, PatternMatch, TreePatternMatch } from "../PatternMatch";
-import { Literal, Regex } from "../Primitives";
+import {
+    isSpecialMember,
+    PatternMatch,
+    TreePatternMatch,
+} from "../PatternMatch";
+import {
+    Literal,
+    Regex,
+} from "../Primitives";
 
-import { SkipCapable, WhiteSpaceHandler } from "../Config";
+import {
+    SkipCapable,
+    WhiteSpaceHandler,
+} from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
 

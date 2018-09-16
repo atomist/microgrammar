@@ -1,8 +1,11 @@
 import assert = require("power-assert");
 import { DefaultFromStringOptions } from "../../lib/internal/CompleteFromStringOptions";
 import { exactMatch } from "../../lib/internal/ExactMatch";
-import { MicrogrammarSpec, specGrammar } from "../../lib/internal/SpecGrammar";
-import {isPatternMatch} from "../../lib/PatternMatch";
+import {
+    MicrogrammarSpec,
+    specGrammar,
+} from "../../lib/internal/SpecGrammar";
+import { isPatternMatch } from "../../lib/PatternMatch";
 
 describe("SpecGrammar", () => {
 

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { JavaBlock, JavaParenthesizedExpression } from "../../lib/matchers/lang/cfamily/java/JavaBody";
+import {
+    JavaBlock,
+    JavaParenthesizedExpression,
+} from "../../lib/matchers/lang/cfamily/java/JavaBody";
 import { Microgrammar } from "../../lib/Microgrammar";
 import { Opt } from "../../lib/Ops";
 import { Rep, Rep1 } from "../../lib/Rep";

@@ -1,8 +1,20 @@
-import { InputState, Listeners } from "./InputState";
-import { MatchingLogic, Term } from "./Matchers";
-import { Concat, toMatchingLogic } from "./matchers/Concat";
+import {
+    InputState,
+    Listeners,
+} from "./InputState";
+import {
+    MatchingLogic,
+    Term,
+} from "./Matchers";
+import {
+    Concat,
+    toMatchingLogic,
+} from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
-import { DismatchReport, PatternMatch } from "./PatternMatch";
+import {
+    DismatchReport,
+    PatternMatch,
+} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
@@ -13,7 +25,10 @@ import { DefaultInputState } from "./internal/DefaultInputState";
 import { exactMatch } from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
-import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
+import {
+    MatchUpdater,
+    MicrogrammarUpdates,
+} from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
 
 /**

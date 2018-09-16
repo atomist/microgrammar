@@ -3,7 +3,10 @@ import { InputStream } from "../../lib/spi/InputStream";
 import { DEPENDENCY_GRAMMAR } from "../MavenGrammars";
 
 import * as assert from "power-assert";
-import { inputStateFromStream, inputStateFromString } from "../../lib/internal/InputStateFactory";
+import {
+    inputStateFromStream,
+    inputStateFromString,
+} from "../../lib/internal/InputStateFactory";
 
 describe("InputState", () => {
 

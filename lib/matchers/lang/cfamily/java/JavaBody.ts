@@ -1,5 +1,9 @@
 import { Concat } from "../../../Concat";
-import { block, blockContaining, parenthesizedExpression } from "../CBlock";
+import {
+    block,
+    blockContaining,
+    parenthesizedExpression,
+} from "../CBlock";
 import { CFamilyStateMachine } from "../CFamilyStateMachine";
 
 /**

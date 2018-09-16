@@ -2,8 +2,14 @@ import { Listeners } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import { Concat } from "../matchers/Concat";
 import { RestOfInput } from "../matchers/skip/Skip";
-import { isSuccessfulMatch, MatchFailureReport } from "../MatchPrefixResult";
-import { DismatchReport, PatternMatch } from "../PatternMatch";
+import {
+    isSuccessfulMatch,
+    MatchFailureReport,
+} from "../MatchPrefixResult";
+import {
+    DismatchReport,
+    PatternMatch,
+} from "../PatternMatch";
 import { InputStream } from "../spi/InputStream";
 import { StringInputStream } from "../spi/StringInputStream";
 import { inputStateFromStream } from "./InputStateFactory";

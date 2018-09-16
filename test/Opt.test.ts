@@ -1,7 +1,10 @@
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
 import { Microgrammar } from "../lib/Microgrammar";
-import { Opt, optional } from "../lib/Ops";
+import {
+    Opt,
+    optional,
+} from "../lib/Ops";
 import { PatternMatch } from "../lib/PatternMatch";
 import { Literal } from "../lib/Primitives";
 

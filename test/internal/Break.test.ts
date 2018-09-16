@@ -1,6 +1,10 @@
 import { Concat } from "../../lib/matchers/Concat";
 import { PatternMatch } from "../../lib/PatternMatch";
-import { Integer, Literal, Regex } from "../../lib/Primitives";
+import {
+    Integer,
+    Literal,
+    Regex,
+} from "../../lib/Primitives";
 
 import { Break } from "../../lib/internal/Break";
 

@@ -1,4 +1,7 @@
-import { InputState, Skipped } from "../InputState";
+import {
+    InputState,
+    Skipped,
+} from "../InputState";
 import { MatchingLogic } from "../Matchers";
 
 /**

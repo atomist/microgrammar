@@ -1,7 +1,12 @@
 
 import { LangHelper } from "../LangHelper";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";
-import { DoubleString, Normal, SlashSlashComment, SlashStarComment } from "./States";
+import {
+    DoubleString,
+    Normal,
+    SlashSlashComment,
+    SlashStarComment,
+} from "./States";
 
 export class CFamilyLangHelper implements LangHelper {
 

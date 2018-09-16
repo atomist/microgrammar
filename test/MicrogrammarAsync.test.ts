@@ -1,7 +1,10 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
-import { matchesIn, Microgrammar } from "../lib/Microgrammar";
+import {
+    matchesIn,
+    Microgrammar,
+} from "../lib/Microgrammar";
 
 /* tslint:disable:max-file-line-count */
 

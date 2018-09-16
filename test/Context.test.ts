@@ -1,10 +1,16 @@
 import * as assert from "power-assert";
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 import { Concat } from "../lib/matchers/Concat";
-import { isSuccessfulMatch, SuccessfulMatch } from "../lib/MatchPrefixResult";
+import {
+    isSuccessfulMatch,
+    SuccessfulMatch,
+} from "../lib/MatchPrefixResult";
 import { Microgrammar } from "../lib/Microgrammar";
 
-import { Integer, LowercaseBoolean } from "../lib/Primitives";
+import {
+    Integer,
+    LowercaseBoolean,
+} from "../lib/Primitives";
 
 describe("ContextTest", () => {
 
