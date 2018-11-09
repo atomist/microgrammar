@@ -1,4 +1,4 @@
-# @atomist/microgrammar
+# `@atomist/microgrammar`
 
 This page details all runtime OSS dependencies of `@atomist/microgrammar`.
 
