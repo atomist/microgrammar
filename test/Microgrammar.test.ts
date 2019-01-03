@@ -3,9 +3,18 @@ import * as assert from "power-assert";
 import { fail } from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
 import { MatchingLogic } from "../lib/Matchers";
-import { MatchingMachine, Microgrammar } from "../lib/Microgrammar";
-import { Alt, Opt } from "../lib/Ops";
-import { isPatternMatch, PatternMatch } from "../lib/PatternMatch";
+import {
+    MatchingMachine,
+    Microgrammar,
+} from "../lib/Microgrammar";
+import {
+    Alt,
+    Opt,
+} from "../lib/Ops";
+import {
+    isPatternMatch,
+    PatternMatch,
+} from "../lib/PatternMatch";
 import { Rep, Rep1Sep, RepSep } from "../lib/Rep";
 import { RealWorldPom } from "./Fixtures";
 import {

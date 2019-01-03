@@ -1,6 +1,9 @@
 import assert = require("power-assert");
 import { Microgrammar } from "../../lib/Microgrammar";
-import { Integer, LowercaseBoolean } from "../../lib/Primitives";
+import {
+    Integer,
+    LowercaseBoolean,
+} from "../../lib/Primitives";
 
 import { Alt } from "../../lib/Ops";
 
