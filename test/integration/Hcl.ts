@@ -1,11 +1,6 @@
 import assert = require("power-assert");
-
-import { Term } from "../../lib/Matchers";
 import { Microgrammar } from "../../lib/Microgrammar";
-import {
-    Integer,
-    LowercaseBoolean,
-} from "../../lib/Primitives";
+import { Integer, LowercaseBoolean } from "../../lib/Primitives";
 
 import { Alt } from "../../lib/Ops";
 
@@ -53,11 +48,11 @@ describe("Parsing HCL", () => {
     });
 
     it("should find number key/value pairs from definitions", () => {
-        const mg2 = Microgrammar.fromDefinitions({
+        const mg2 = Microgrammar.fromDefinitions<{key: string, value: string}>({
             key: /[a-z_]+/,
             _equals: "=",
             value: hclNumber,
-        } as Term);
+        });
 
         const matches = mg2.findMatches(sample);
         // matches.forEach((m: any) => console.log(`${m.key} = ${m.value}`))

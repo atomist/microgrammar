@@ -46,6 +46,7 @@ export interface RawAnnotation {
 }
 
 export const ChangeControlledMethodGrammar = Microgrammar.fromDefinitions<ChangeControlledMethod>({
+    // TODO this fails due to not setting changeControlledAnnotations computed property
     annotations: new Rep1(AnyAnnotation),
     _check(ctx: any) {
         const found = ctx.annotations.filter(a => a.name === "ChangeControlled");
@@ -60,7 +61,7 @@ export const ChangeControlledMethodGrammar = Microgrammar.fromDefinitions<Change
     name: JAVA_IDENTIFIER,
     parameterContent: JavaParenthesizedExpression,
     body: JavaBlock,
-});
+} as any);
 
 export const GrammarWithOnlyARep = Microgrammar.fromDefinitions<any>({
     annotations: new Rep(AnyAnnotation),

@@ -1,34 +1,20 @@
-import {
-    InputState,
-    Listeners,
-} from "./InputState";
-import {
-    MatchingLogic,
-    Term,
-} from "./Matchers";
-import {
-    Concat,
-    toMatchingLogic,
-} from "./matchers/Concat";
+import { InputState, Listeners } from "./InputState";
+import { MatchingLogic, Term } from "./Matchers";
+import { Concat, TermDef, toMatchingLogic } from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
-import {
-    DismatchReport,
-    PatternMatch,
-} from "./PatternMatch";
+import { DismatchReport, PatternMatch } from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
+import { SkipCapable, WhiteSpaceHandler } from "./Config";
 import { FromStringOptions } from "./FromStringOptions";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
 import { exactMatch } from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
-import {
-    MatchUpdater,
-    MicrogrammarUpdates,
-} from "./internal/MicrogrammarUpdates";
+import { MatchUpdater, MicrogrammarUpdates } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
 
 /**
@@ -50,6 +36,12 @@ export class Updatable<T> {
         return this.cs.updated();
     }
 }
+
+export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
+
+export type TermsDefinition<PARAMS, K extends keyof PARAMS = keyof PARAMS> =
+    Record<K, AllowableTermDef<PARAMS>> & Partial<WhiteSpaceHandler> & Partial<SkipCapable>
+    & { [index: string]: any };
 
 /**
  * Central class for microgrammar usage.
@@ -81,7 +73,7 @@ export class Microgrammar<T> implements Term {
         return new Updatable<T>(matches, content);
     }
 
-    public static fromDefinitions<T>(definitions: {}): Microgrammar<T> {
+    public static fromDefinitions<T = any>(definitions: TermsDefinition<T>): Microgrammar<T> {
         return new Microgrammar<T>(Concat.of(definitions));
     }
 
@@ -186,7 +178,7 @@ export class MatchingMachine {
         if (!!o) {
             this.observer = toMatchingLogic(o);
         }
-        this.omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
+        this.omg = this.observer ? Microgrammar.fromDefinitions(this.observer as any) : undefined;
     }
 
     /**
