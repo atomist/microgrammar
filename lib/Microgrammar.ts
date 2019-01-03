@@ -77,9 +77,9 @@ export class Microgrammar<T> implements Term {
         return new Microgrammar<T>(Concat.of(definitions));
     }
 
-    public static fromString<T>(spec: string,
-                                components: object = {},
-                                options: FromStringOptions = {}): Microgrammar<T> {
+    public static fromString<T = any>(spec: string,
+                                      components: TermsDefinition<T> = {} as any,
+                                      options: FromStringOptions = {}): Microgrammar<T> {
         return new Microgrammar<T>(
             new MicrogrammarSpecParser().fromString(spec, components, options));
     }

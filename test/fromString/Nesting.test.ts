@@ -9,7 +9,7 @@ describe("Nesting in Microgrammar.fromString", () => {
 
     it("nest simple", () => {
         const content = "cats can suffer from fleas and can suffer from worms";
-        const mg = Microgrammar.fromString<{ num: number }>("cats ${catStatement}", {
+        const mg = Microgrammar.fromString<{ catStatement: any }>("cats ${catStatement}", {
             catStatement: new RepSep(fromString("can suffer from ${bug}", {
                 bug: /[a-z]+/,
             }), "and"),
@@ -27,11 +27,12 @@ describe("Nesting in Microgrammar.fromString", () => {
             activity: new Alt("playing", "grooming"),
         };
         const content = "cats can suffer from fleas and can suffer from worms but enjoy grooming & playing";
-        const mg = Microgrammar.fromString<{ num: number }>("cats ${catProblems} but enjoy ${catActivities}", {
-            catProblems: new Rep1Sep(fromString("can suffer from ${bug}", dictionary), "and"),
-            catActivities: new Rep1Sep(dictionary.activity, "&"),
-        });
-        const result = mg.findMatches(content) as any[];
+        const mg = Microgrammar.fromString<{ catProblems: Array<{ bug: string }>, catActivities: string }>(
+            "cats ${catProblems} but enjoy ${catActivities}", {
+                catProblems: new Rep1Sep(fromString("can suffer from ${bug}", dictionary), "and"),
+                catActivities: new Rep1Sep(dictionary.activity, "&"),
+            });
+        const result = mg.findMatches(content);
         assert(result.length === 1);
         assert(result[0].catProblems.length === 2);
         assert(result[0].catProblems[0].bug = "fleas");
