@@ -75,8 +75,34 @@ describe("Microgrammar async", () => {
         // expect(r1.name.matched).to.equal("bar");
     }
 
+    async function testTwoXmlElementsWithMatchIterator(content: string, first: string, second: string) {
+        const mg = Microgrammar.fromDefinitions({
+            _lx: "<",
+            name: /[a-zA-Z0-9]+/,
+            _rx: ">",
+        });
+        const result = [];
+        const matches = mg.matchIterator(content);
+        for await (const m of matches) {
+            result.push(m);
+        }
+        // console.log("Result is " + JSON.stringify(result));
+        expect(result.length).to.equal(2);
+        const r0 = result[0];
+        expect(r0.name).to.equal(first);
+        // expect(r0.matched).to.equal("<foo>")
+        const r1 = result[1];
+        expect(r1.name).to.equal(second);
+        expect(r1.$matched).to.equal("<bar>");
+        // expect(r1.name.matched).to.equal("bar");
+    }
+
     it("2 XML elements without intervening whitespace via microgrammar", async () => {
         await testTwoXmlElements("<foo><bar>", "foo", "bar");
+    });
+
+    it("2 XML elements with matchIterator", async () => {
+        await testTwoXmlElementsWithMatchIterator("<foo><bar>", "foo", "bar");
     });
 
     it("2 XML elements with intervening whitespace via microgrammar", async () => {

@@ -111,6 +111,17 @@ export class Microgrammar<T> implements Term {
     }
 
     /**
+     * Generator for matching the given input.
+     * @param {string | InputStream} input
+     * @param {{}} parseContext
+     * @param {Listeners} l
+     * @return {Iterable<PatternMatch>}
+     */
+    public matchIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
+        return matchesIn(this, input, parseContext, l);
+    }
+
+    /**
      * Convenience method to find matches without the ability to update them
      * @param input
      * @param stopAfterMatch() function that can cause matching to stop after a given match.
@@ -296,7 +307,7 @@ class LazyMatcher extends MatchingMachine {
 }
 
 /**
- * Asynchronously match. Match the given input.
+ * Generator for matching the given input.
  * @param matcher
  * @param {string | InputStream} input
  * @param {{}} parseContext
