@@ -37,3 +37,7 @@ export { isPatternMatch } from "./lib/PatternMatch";
 export * from "./lib/Primitives";
 
 export * from "./lib/Rep";
+
+export { JavaBlock } from "./lib/matchers/lang/cfamily/java/JavaBody";
+
+export { parenthesizedExpression, blockContaining } from "./lib/matchers/lang/cfamily/CBlock";
