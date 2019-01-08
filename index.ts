@@ -18,7 +18,7 @@ export * from "./lib/InputState";
 
 export * from "./lib/Matchers";
 
-export { Concat } from "./lib/matchers/Concat";
+export { Concat } from "./lib/matchers/Concat"; // Using this can cause extraneous type errors. Prefer MatchingLogic (an interface)
 
 export { flatten } from "./lib/matchers/Functions";
 

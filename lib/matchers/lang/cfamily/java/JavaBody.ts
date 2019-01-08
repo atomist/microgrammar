@@ -1,10 +1,10 @@
-import { Concat } from "../../../Concat";
 import {
     block,
     blockContaining,
     parenthesizedExpression,
 } from "../CBlock";
 import { CFamilyStateMachine } from "../CFamilyStateMachine";
+import { MatchingLogic } from "../../../..";
 
 /**
  * Match a Java block with balanced curlies
@@ -12,7 +12,7 @@ import { CFamilyStateMachine } from "../CFamilyStateMachine";
  */
 export const JavaBlock = block(() => new CFamilyStateMachine());
 
-export function javaBlockContaining(m: Concat) {
+export function javaBlockContaining(m: MatchingLogic) {
     return blockContaining(m);
 }
 
