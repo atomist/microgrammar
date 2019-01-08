@@ -23,8 +23,8 @@ export class CBlock implements MatchingLogic {
     private readonly pop: string;
 
     constructor(private readonly stateMachineFactory: () => LangStateMachine,
-                kind: "block" | "parens",
-                private readonly inner?: MatchingLogic) {
+        kind: "block" | "parens",
+        private readonly inner?: MatchingLogic) {
         switch (kind) {
             case "block":
                 [this.push, this.pop] = ["{", "}"];
@@ -88,8 +88,8 @@ export function block(stateMachineFactory: () => LangStateMachine) {
     });
 }
 
-export function blockContaining(m: Concat,
-                                stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
+export function blockContaining(m: MatchingLogic,
+    stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
     return Concat.of({
         $id: "{...}",
         _lp: "{",
