@@ -1,11 +1,8 @@
 import { expect } from "chai";
-import { fail } from "power-assert";
 import * as assert from "power-assert";
+import { fail } from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
-import {
-    MatchingLogic,
-    Term,
-} from "../lib/Matchers";
+import { MatchingLogic } from "../lib/Matchers";
 import {
     MatchingMachine,
     Microgrammar,
@@ -166,7 +163,7 @@ describe("Microgrammar", () => {
 
     it("2 elements: whitespace sensitive", () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = Microgrammar.fromDefinitions<{namex: string}>({
             ...WhiteSpaceSensitive,
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
@@ -297,11 +294,11 @@ describe("Microgrammar", () => {
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         };
-        const mg = Microgrammar.fromDefinitions({
+        const mg = Microgrammar.fromDefinitions<{first: string, second: string, $id: string}>({
             first: element,
             second: element,
             $id: "element",
-        } as Term);
+        });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);

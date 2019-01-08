@@ -136,7 +136,7 @@ describe("Microgrammar async", () => {
 
     it("2 elements: whitespace sensitive", async () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = Microgrammar.fromDefinitions<{namex: string, notxml: string}>({
             ...WhiteSpaceSensitive,
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,

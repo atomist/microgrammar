@@ -49,7 +49,7 @@ describe("Per file context", () => {
 describe("Per match context", () => {
 
     it("should be available within nested object and communicate back", () => {
-        const mg = Microgrammar.fromDefinitions<{ name: string, zip: string }>({
+        const mg = Microgrammar.fromDefinitions<{ name: string, address: { zip: string } }>({
             name: /[A-Z][a-z]+/,
             _addToMatchContext: (_, matchContext) => matchContext.something = "magic",
             address: {

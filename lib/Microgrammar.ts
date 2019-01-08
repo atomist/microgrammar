@@ -8,6 +8,7 @@ import {
 } from "./Matchers";
 import {
     Concat,
+    TermDef,
     toMatchingLogic,
 } from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
@@ -19,6 +20,10 @@ import {
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
+import {
+    SkipCapable,
+    WhiteSpaceHandler,
+} from "./Config";
 import { FromStringOptions } from "./FromStringOptions";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
@@ -51,6 +56,12 @@ export class Updatable<T> {
     }
 }
 
+export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
+
+export type TermsDefinition<PARAMS, K extends keyof PARAMS = keyof PARAMS> =
+    Record<K, AllowableTermDef<PARAMS>> & Partial<WhiteSpaceHandler> & Partial<SkipCapable>
+    & { [index: string]: any };
+
 /**
  * Central class for microgrammar usage.
  * Represents a microgrammar that we can use to match input
@@ -81,13 +92,13 @@ export class Microgrammar<T> implements Term {
         return new Updatable<T>(matches, content);
     }
 
-    public static fromDefinitions<T>(definitions: {}): Microgrammar<T> {
+    public static fromDefinitions<T = any>(definitions: TermsDefinition<T>): Microgrammar<T> {
         return new Microgrammar<T>(Concat.of(definitions));
     }
 
-    public static fromString<T>(spec: string,
-                                components: object = {},
-                                options: FromStringOptions = {}): Microgrammar<T> {
+    public static fromString<T = any>(spec: string,
+                                      components: TermsDefinition<T> = {} as any,
+                                      options: FromStringOptions = {}): Microgrammar<T> {
         return new Microgrammar<T>(
             new MicrogrammarSpecParser().fromString(spec, components, options));
     }
@@ -186,7 +197,7 @@ export class MatchingMachine {
         if (!!o) {
             this.observer = toMatchingLogic(o);
         }
-        this.omg = this.observer ? Microgrammar.fromDefinitions(this.observer) : undefined;
+        this.omg = this.observer ? Microgrammar.fromDefinitions(this.observer as any) : undefined;
     }
 
     /**
