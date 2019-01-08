@@ -62,6 +62,8 @@ export type TermsDefinition<PARAMS, K extends keyof PARAMS = keyof PARAMS> =
     Record<K, AllowableTermDef<PARAMS>> & Partial<WhiteSpaceHandler> & Partial<SkipCapable>
     & { [index: string]: any };
 
+export type AnyKeysOf<T, K extends keyof T = keyof T> = Record<K, any>;
+
 /**
  * Central class for microgrammar usage.
  * Represents a microgrammar that we can use to match input
@@ -92,10 +94,36 @@ export class Microgrammar<T> implements Term {
         return new Updatable<T>(matches, content);
     }
 
+    /**
+     * Create a microgrammar with typed properties according
+     * to the given interface.
+     * If the definitions aren't nested, infer string type
+     * @param {TermsDefinition<T>} definitions
+     * @return {Microgrammar<T>}
+     */
     public static fromDefinitions<T = any>(definitions: TermsDefinition<T>): Microgrammar<T> {
         return new Microgrammar<T>(Concat.of(definitions));
     }
 
+    /**
+     * Create a microgrammar with inferred interface taking properties of type "any" from definitions.
+     * Use fromDefinitions for stronger typing.
+     * If the definitions aren't nested, infer string type
+     * @param {TermsDefinition<T>} definitions
+     * @return {Microgrammar<T>}
+     */
+    public static fromDefinitionsAs<T = any>(definitions: TermsDefinition<T>): Microgrammar<AnyKeysOf<T>> {
+        return this.fromDefinitions(definitions);
+    }
+
+    /**
+     * Create a microgrammar with string variables.
+     * String is of form "method ${name}(): ${returnType}".
+     * Definitions should be provided for each string variable.
+     * Use fromDefinitions to achieve nesting or non-string typing.
+     * If the definitions aren't nested, infer string type
+     * @return {Microgrammar<T>}
+     */
     public static fromString<T = any>(spec: string,
                                       components: TermsDefinition<T> = {} as any,
                                       options: FromStringOptions = {}): Microgrammar<T> {
@@ -103,11 +131,26 @@ export class Microgrammar<T> implements Term {
             new MicrogrammarSpecParser().fromString(spec, components, options));
     }
 
-    public $id: string;
+    /**
+     * Create a microgrammar with string variables with automatic typing as in
+     * fromDefinitionsAs.
+     * String is of form "method ${name}(): ${returnType}".
+     * Definitions should be provided for each string variable.
+     * Use fromDefinitions to achieve nesting or non-string typing.
+     * If the definitions aren't nested, infer string type
+     * @return {Microgrammar<T>}
+     */
+    public static fromStringAs<T = any>(spec: string,
+                                        components: TermsDefinition<T> = {} as any,
+                                        options: FromStringOptions = {}): Microgrammar<AnyKeysOf<T>> {
+        return this.fromString(spec, components, options);
+    }
 
-    public definitions = this.matcher.definitions;
+    public readonly $id: string;
 
-    constructor(public matcher: Concat) {
+    public readonly definitions = this.matcher.definitions;
+
+    constructor(public readonly matcher: Concat) {
     }
 
     /**

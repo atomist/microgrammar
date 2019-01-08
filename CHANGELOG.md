@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/microgrammar/compare/1.0.1...HEAD)
 
+### Added
+
+- Added `Microgrammar.matchIterator` convenience generator method
+- Added `Microgrammar.fromDefinitionsAs` and `fromStringsAs` methods for convenient type inference
+
+### Changed
+
+- Stronger type inference to ensure that `Microgrammar` definitions match returned match interfaces
+
 ## [1.0.1](https://github.com/atomist/microgrammar/compare/1.0.0-M.4...1.0.1) - 2018-11-09
 
 ## [1.0.0-M.4](https://github.com/atomist/microgrammar/compare/1.0.0-M.1...1.0.0-M.4) - 2018-09-16

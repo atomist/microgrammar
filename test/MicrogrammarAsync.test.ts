@@ -83,7 +83,7 @@ describe("Microgrammar async", () => {
         });
         const result = [];
         const matches = mg.matchIterator(content);
-        for await (const m of matches) {
+        for (const m of matches) {
             result.push(m);
         }
         // console.log("Result is " + JSON.stringify(result));

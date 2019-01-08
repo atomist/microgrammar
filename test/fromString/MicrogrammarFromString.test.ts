@@ -17,6 +17,21 @@ import { Float } from "../../lib/Primitives";
 
 describe("MicrogrammarFromString", () => {
 
+    describe("type inference", () => {
+
+        it("should infer from definitions", () => {
+            const mg = Microgrammar.fromStringAs("my ${forename} and ${surname}",
+                { forename: "forename", surname: /.*/ });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+    });
+
     it("literal", () => {
         const content = "foo ";
         const mg = Microgrammar.fromString("foo");
@@ -141,6 +156,7 @@ describe("MicrogrammarFromString", () => {
         interface Named {
             name: string;
         }
+
         const mg = Microgrammar.fromString<Named>("${name}", {
             name: /[A-Z][a-z]+/,
         });

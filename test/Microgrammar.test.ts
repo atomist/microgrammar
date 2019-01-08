@@ -29,6 +29,20 @@ import {
 
 describe("Microgrammar", () => {
 
+    describe("type inference", () => {
+
+        it("should infer from definitions", () => {
+            const mg = Microgrammar.fromDefinitionsAs({ forename: "forename", surname: /.*/ });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+    });
+
     it("literal", () => {
         const content = "foo ";
         const mg = Microgrammar.fromDefinitions({
@@ -163,7 +177,7 @@ describe("Microgrammar", () => {
 
     it("2 elements: whitespace sensitive", () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions<{namex: string}>({
+        const mg = Microgrammar.fromDefinitions<{ namex: string }>({
             ...WhiteSpaceSensitive,
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
@@ -294,7 +308,7 @@ describe("Microgrammar", () => {
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         };
-        const mg = Microgrammar.fromDefinitions<{first: string, second: string, $id: string}>({
+        const mg = Microgrammar.fromDefinitions<{ first: string, second: string, $id: string }>({
             first: element,
             second: element,
             $id: "element",
