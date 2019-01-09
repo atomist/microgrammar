@@ -15,7 +15,7 @@ This project provides many matchers out of the box. Here's a list of the key one
 
 ## Compositional matchers
 
-The concepts in these will be familiar from BNF grammars or parser combinator frameworks.
+These matchers enable the composition of more complex microgrammars. The concepts will be familiar from BNF grammars or parser combinator frameworks.
 
 | Matcher  |  Source file |  Matches | Notes  |
 |---|---|---|---|
@@ -25,5 +25,26 @@ The concepts in these will be familiar from BNF grammars or parser combinator fr
 |   Rep1Sep|  `Rep` | At least one of a repeated production, separated by another production  |   | 
 |  optional | `Ops`  | Optional production  |   | 
 | firstOf | `Ops` | The first of a list of matchers
+
+## SNOBOL-inspired matchers
+
+The concepts in these are borrowed from the SNOBOL programming language.
+
+| Matcher  |  Source file |  Matches | Notes  |
+|---|---|---|---|
+| takeUntil | `Skip` | Take until the specified matcher, not including its value
+| skipTo | `Skip` | Skip until the specified matching, consuming and binding its value
+| RestOfLine  | `Skip`  | Rest of line   |   | 
+|  RestOfInput |  `Skip` | Remainder of input |   | 
+
+## C Family language matchers
+These matches have been tested with Java, but should be useful for any C family language.
+
+| Matcher  |  Source file |  Matches | Notes  |
+|---|---|---|---|
+| JavaBlock  | `index`  | Java block, including `{` and `}`  | Handles nesting  | 
+|  parenthesizedExpression |  `index` | Java parenthesized expression in `()` | Handles nesting  |   | 
+| blockContaining | `index` | Java block containing a match of the given matcher
+
 
 It is also easy to [define your own matchers](customMatchers.md).

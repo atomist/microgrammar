@@ -36,9 +36,39 @@ old [SNOBOL programming language][snobol].
 
 There are two styles of use:
 
--   From definitions: Defining a grammar in JavaScript objects
+-   From *definitions*: Defining a grammar in JavaScript objects representing the subcomponents (lower level productions)
 -   From strings: Defining a grammar in a string that resembles input
     that will be matched
+        
+A microgrammar has a return type defined by its definitions. Each match implements this interface and also the `PatternMatch` interface, which exposes the offset within the input and matched value, which may differ from the exposed typed value. (For example, a `Person` might have a `forename` and `surname`, but its `$matched` value might include the entire matched string with whitespace.) The fields of the `PatternMatch` interface begin with a `$` to ensure that they are out of band.
+
+When you've defined a microgrammar, you can use it to match input: usually a string.
+
+Generator-style iteration is usually most efficient, and looks like this:
+
+```typescript
+const matches = myMicrogrammar.matchIterator(inputString);
+for (const match of matches) {
+	// Do with match. You can jump out of the generator here.
+}
+```
+You can also get all matches in one pass, like this:
+
+```typescript
+const matches = myMicrogrammar.findMatches(inputString);
+for (const match of matches) {
+	// Do with match
+}
+```
+
+If you are seeking only one match, you can use a method that returns a match or `undefined`, as follows:
+
+```typescript
+const match = myMicrogrammar.firstMatch(inputString);
+if (match) {
+	// Do with match
+}
+```
 
 ### Definitions style
 
