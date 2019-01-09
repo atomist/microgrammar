@@ -9,12 +9,30 @@ When a match is attempted, it may fail at any point, resulting in back tracking 
 
 Thus the worst case--a matcher that can match unpredictably, and lots of back tracking--can be expensive.
 
-On the positive side, microgrammars do not need to build a full AST, so they can cope with extremely large files 
+On the positive side, microgrammars do not need to build a full AST, so they can cope with large files 
 better than traditional grammars. There is also a lot of leeway in their authoring, compared with traditional grammars, because they are not 
 building a definitive AST: Often 
 you can express the same thing in a number of ways, with different performance characteristics.
 
 ### Performance Tips
+
+#### Prefer generator style matching when using a microgrammar
+
+If you loop over input in a generator rather than using `findMatches`, you are kinder to the event loop by breaking up CPU-intensive actions, and may be able to cease work after you find what you're looking for.
+
+For example, consider these two alternatives:
+
+```typescript
+const matches = microgrammar.findMatches(content);
+```
+
+```typescript
+const matches = microgrammar.matchIterator(content);
+for (const m of matches) {
+    // Do work
+}
+```
+The first will find all matches in one operation. The second will consume the input one match at a time, and if you break out of the loop processing will cease. 
 
 #### Prefer grammars that begin with a literal string
 This enables _prefix scanning_: an important optimization where the parser can discard input until

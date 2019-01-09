@@ -1,6 +1,8 @@
 # String Definitions
 This is a higher level usage model in which a string resembling the desired input but with variable placeholders is used to define the grammar.
 
+Variable placeholders follow TypeScript style for variable placheholders in interpolated strings, e.g. `static ${embeddedVariable} more static`.
+
 This style is ideally suited for simpler grammars. For example:
 
 ```typescript
@@ -19,4 +21,6 @@ const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
         name: /[a-z]+/
     });
 ```
+
+When troubleshooting a problem with string-defined microgrammars, adding explicit definitions is often helpful.
 

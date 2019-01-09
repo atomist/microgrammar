@@ -214,6 +214,12 @@ $ npm install --save @atomist/microgrammar
 
 [mg-npm]: https://www.npmjs.com/package/@atomist/microgrammar (@atomist/microgrammar Node.js Package)
 
+## Troubleshooting
+
+If you struggle to make your microgrammars match, please refer to the [troubleshooting page][efficiency].
+
+[trouble]: docs/trouble (Troubleshooting microgrammars)
+
 ## Performance considerations
 
 See [Writing efficient microgrammars][efficiency].
