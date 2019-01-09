@@ -216,9 +216,9 @@ $ npm install --save @atomist/microgrammar
 
 ## Troubleshooting
 
-If you struggle to make your microgrammars match, please refer to the [troubleshooting page][efficiency].
+If you struggle to make your microgrammars match, please refer to the [troubleshooting page][trouble].
 
-[trouble]: docs/trouble (Troubleshooting microgrammars)
+[trouble]: docs/trouble.md (Troubleshooting microgrammars)
 
 ## Performance considerations
 
