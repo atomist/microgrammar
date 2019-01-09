@@ -10,7 +10,7 @@ import {
     Concat,
     TermDef,
     toMatchingLogic,
-    ConcatEnough,
+    Concatenation,
 } from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
 import {
@@ -162,7 +162,7 @@ export class Microgrammar<T> implements Term {
         return matchesIn(this, input, parseContext, l);
     }
 
-    constructor(public matcher: ConcatEnough) {
+    constructor(public matcher: Concatenation) {
     }
 
     /**

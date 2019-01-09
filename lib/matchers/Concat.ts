@@ -57,7 +57,11 @@ export type MatchStep = Matcher | MatchVeto | ContextComputation;
 const methodsOnEveryMatchingLogic = ["$id", "matchPrefix", "canStartWith", "requiredPrefix"];
 
 export type ConcatDefinitions = any; // maybe we can tighten this. For now, giving it a name
-export interface ConcatEnough extends MatchingLogic {
+
+/**
+ * The externally useful interface of Concat.
+ */
+export interface Concatenation extends MatchingLogic {
 
     definitions: ConcatDefinitions;
 
@@ -71,7 +75,7 @@ export interface ConcatEnough extends MatchingLogic {
  * Users should only create Concats directly in the unusual case where they need
  * to control whitespace handling in a unique way for that particular Concat.
  */
-export class Concat implements ConcatEnough, LazyMatchingLogic, WhiteSpaceHandler, SkipCapable {
+export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandler, SkipCapable {
 
     /**
      * Normal way to create a Concat. If a $lazy field
