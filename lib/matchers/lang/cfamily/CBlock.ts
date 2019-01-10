@@ -88,7 +88,7 @@ export function block(stateMachineFactory: () => LangStateMachine) {
     });
 }
 
-export function blockContaining(m: Concat,
+export function blockContaining(m: MatchingLogic,
                                 stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
     return Concat.of({
         $id: "{...}",

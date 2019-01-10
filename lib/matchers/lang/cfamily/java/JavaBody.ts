@@ -1,4 +1,4 @@
-import { Concat } from "../../../Concat";
+import { MatchingLogic } from "../../../..";
 import {
     block,
     blockContaining,
@@ -12,7 +12,7 @@ import { CFamilyStateMachine } from "../CFamilyStateMachine";
  */
 export const JavaBlock = block(() => new CFamilyStateMachine());
 
-export function javaBlockContaining(m: Concat) {
+export function javaBlockContaining(m: MatchingLogic) {
     return blockContaining(m);
 }
 

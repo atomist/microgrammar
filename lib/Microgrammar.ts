@@ -8,6 +8,7 @@ import {
 } from "./Matchers";
 import {
     Concat,
+    Concatenation,
     TermDef,
     toMatchingLogic,
 } from "./matchers/Concat";
@@ -141,17 +142,14 @@ export class Microgrammar<T> implements Term {
      * @return {Microgrammar<T>}
      */
     public static fromStringAs<T = any>(spec: string,
-                                        components: TermsDefinition<T> = {} as any,
-                                        options: FromStringOptions = {}): Microgrammar<AnyKeysOf<T>> {
+        components: TermsDefinition<T> = {} as any,
+        options: FromStringOptions = {}): Microgrammar<AnyKeysOf<T>> {
         return this.fromString(spec, components, options);
     }
 
     public readonly $id: string;
 
     public readonly definitions = this.matcher.definitions;
-
-    constructor(public readonly matcher: Concat) {
-    }
 
     /**
      * Generator for matching the given input.
@@ -162,6 +160,9 @@ export class Microgrammar<T> implements Term {
      */
     public matchIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
         return matchesIn(this, input, parseContext, l);
+    }
+
+    constructor(public matcher: Concatenation) {
     }
 
     /**
