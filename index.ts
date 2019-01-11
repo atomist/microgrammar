@@ -30,6 +30,8 @@ export { isSuccessfulMatch } from "./lib/MatchPrefixResult";
 
 export * from "./lib/Microgrammar";
 
+export * from "./lib/Grammar";
+
 export * from "./lib/Ops";
 
 export { isPatternMatch } from "./lib/PatternMatch";

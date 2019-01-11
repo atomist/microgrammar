@@ -2,6 +2,7 @@ import { expect } from "chai";
 import * as assert from "power-assert";
 import { fail } from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
+import { microgrammar, simpleMicrogrammar } from "../lib/Grammar";
 import { MatchingLogic } from "../lib/Matchers";
 import {
     MatchingMachine,
@@ -33,6 +34,31 @@ describe("Microgrammar", () => {
 
         it("should infer from definitions", () => {
             const mg = Microgrammar.fromDefinitionsAs({ forename: "forename", surname: /.*/ });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+    });
+
+    describe("interface construction", () => {
+
+        it("should infer from definitions", () => {
+            const mg = simpleMicrogrammar({ terms: { forename: "forename", surname: /.*/ } });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+        it("should infer from definitions", () => {
+            const mg = microgrammar<{ forename: string, surname: string }>(
+                { expression: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
             // This will never match, but is just to test for compilation
             const match = mg.firstMatch("");
             if (match) {
