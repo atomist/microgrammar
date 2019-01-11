@@ -2,7 +2,10 @@ import { expect } from "chai";
 import * as assert from "power-assert";
 import { fail } from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
-import { microgrammar, simpleMicrogrammar } from "../lib/Grammar";
+import {
+    microgrammar,
+    simpleMicrogrammar,
+} from "../lib/Grammar";
 import { MatchingLogic } from "../lib/Matchers";
 import {
     MatchingMachine,
