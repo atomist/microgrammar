@@ -1,10 +1,6 @@
 import { Concat } from "../lib/matchers/Concat";
 import { Microgrammar } from "../lib/Microgrammar";
-import {
-    Opt,
-    when,
-} from "../lib/Ops";
-import { Rep, Rep1 } from "../lib/Rep";
+import { Opt } from "../lib/Ops";
 
 export interface VersionedArtifact {
     group: string;
@@ -76,29 +72,6 @@ export const ALL_PLUGIN_GRAMMAR =
         version: ctx => ctx._version ? ctx._version.version : undefined,
     });
 
-const property = {
-    _gt: "<",
-    name: LEGAL_VALUE,
-    _close: ">",
-    value: /[^<]+/,
-    _gt2: "</",
-    _closing: LEGAL_VALUE,
-    _done: ">",
-};
-
-export const PROPERTIES_GRAMMAR = Microgrammar.fromDefinitions<PropertiesBlock>({
-    _po: "<properties>",
-    properties: new Rep(property),
-    // _pe: "</properties>"
-});
-
-/**
- * Interface for returned property
- */
-export interface PropertiesBlock {
-    properties: Array<{ name: string, value: string }>;
-}
-
 export const XML_TAG_WITH_SIMPLE_VALUE = Concat.of({
     _l: "<",
     name: LEGAL_VALUE,
@@ -114,11 +87,6 @@ export interface XmlTag {
     name: string;
     value: string;
 }
-
-export const GAV_CONCAT = when(Concat.of({
-    tags: new Rep1(XML_TAG_WITH_SIMPLE_VALUE),
-}), pm => (pm as any).tags.filter(t => t.name === "groupId").length > 0 &&
-    (pm as any).tags.filter(t => t.name === "artifactId").length > 0);
 
 export class GAV {
 

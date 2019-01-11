@@ -75,7 +75,7 @@ if (match) {
 Here's a simple example:
 
 ```typescript
-const mg = Microgrammar.fromDefinitions<{name: string, age: number}>({
+const mg = microgrammar<{name: string, age: number}>({
     name: /[a-zA-Z0-9]+/,
     _col: ":",
     age: Integer
@@ -133,7 +133,7 @@ const DiscardedAnnotation = {
     _content: optional(JavaParenthesizedExpression),
 };
 
-const SpringBootApp = Microgrammar.fromDefinitions<{ name: string }>({
+const SpringBootApp = microgrammar<{ name: string }>({
     _app: "@SpringBootApplication",
     _content: optional(JavaParenthesizedExpression),
     _otherAnnotations: zeroOrMore(DiscardedAnnotation),
@@ -175,8 +175,8 @@ grammar.
 This style is ideally suited for simpler grammars. For example:
 
 ```typescript
-const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
-    "@${name}='${value}'");
+const ValuePredicateGrammar = microgrammar<Predicate>({
+    phrase: "@${name}='${value}'"});
 ```
 
 It can be combined with the definitional style through providing
@@ -184,10 +184,12 @@ optional definitions for the named fields. For example, to constrain
 the match on a name in the above example using a regular expression:
 
 ```typescript
-const ValuePredicateGrammar = Microgrammar.fromString<Predicate>(
-    "@${name}='${value}'", {
+const ValuePredicateGrammar = microgrammar<Predicate>({
+    phrase: "@${name}='${value}'", 
+    terms: {
     	name: /[a-z]+/
-    });
+    }
+});
 ```
 
 As with the object definitional style, whitespace is ignored by default.

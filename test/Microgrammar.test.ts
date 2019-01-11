@@ -28,6 +28,7 @@ import {
     PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "./MavenGrammars";
+import { Integer } from "../lib";
 
 /* tslint:disable:max-file-line-count */
 
@@ -59,7 +60,7 @@ describe("Microgrammar", () => {
             }
         });
 
-        it("should infer from definitions", () => {
+        it("should infer from definitions and string", () => {
             const mg = microgrammar<{ forename: string, surname: string }>(
                 { phrase: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
             // This will never match, but is just to test for compilation
@@ -68,6 +69,23 @@ describe("Microgrammar", () => {
                 const s = match.forename + match.surname;
                 assert(!!s);
             }
+        });
+
+        it("should support composition", () => {
+            interface Person { forename: string; surname: string; }
+            const person = microgrammar<Person>(
+                { phrase: "${forename} ${surname}", terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ } });
+            const employee = microgrammar<{person: Person, id: number}>({
+                person,
+                id: Integer,
+            });
+            const pmatch = person.firstMatch("Warren Buffet 3003");
+            assert(!!pmatch);
+            assert.strictEqual(pmatch.surname, "Buffet");
+            const ematch = employee.firstMatch("Warren Buffet 3003");
+            assert(!!ematch);
+            assert.strictEqual(ematch.person.surname, "Buffet");
+            assert.strictEqual(ematch.id, 3003);
         });
 
     });
