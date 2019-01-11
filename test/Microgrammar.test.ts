@@ -3,15 +3,15 @@ import * as assert from "power-assert";
 import { fail } from "power-assert";
 import { Integer } from "../lib";
 import { WhiteSpaceSensitive } from "../lib/Config";
-import {
-    microgrammar,
-    simpleMicrogrammar,
-} from "../lib/Grammar";
 import { MatchingLogic } from "../lib/Matchers";
 import {
     MatchingMachine,
     Microgrammar,
 } from "../lib/Microgrammar";
+import {
+    microgrammar,
+    simpleMicrogrammar,
+} from "../lib/microgrammarConstruction";
 import {
     Alt,
     Opt,

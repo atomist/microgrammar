@@ -1,18 +1,11 @@
 import { Listeners } from "./InputState";
 import { Term } from "./Matchers";
 import { TermDef } from "./matchers/Concat";
-import {
-    DismatchReport,
-    PatternMatch,
-} from "./PatternMatch";
+import { DismatchReport, PatternMatch } from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 
-import {
-    SkipCapable,
-    WhiteSpaceHandler,
-} from "./Config";
-import { Microgrammar } from "./Microgrammar";
+import { SkipCapable, WhiteSpaceHandler } from "./Config";
 
 export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
 
@@ -73,48 +66,4 @@ export interface Grammar<T> extends Term {
      */
     exactMatch(input: string | InputStream, parseContext?: object, l ?: Listeners): PatternMatch & T | DismatchReport;
 
-}
-
-/**
- * Object used to define a microgrammar
- */
-export interface MicrogrammarDefinition<T> {
-
-    /**
-     * Phrase defining how the terms should appear, including
-     * literals, if specified.
-     * A phrase is of form "method ${name}(): ${returnType}".
-     */
-    phrase?: string;
-
-    /**
-     * Definitions of the productions in this grammar
-     */
-    terms?: TermsDefinition<T>;
-}
-
-/**
- * Create a microgrammar return matches with properties according
- * to the given interface.
- * @param definition full definition, including a phrase string, or terms definition
- * @return {Grammar<T>}
- */
-export function microgrammar<T>(definition: MicrogrammarDefinition<T> | TermsDefinition<T>): Grammar<T> {
-    if (!definition.phrase && !definition.terms) {
-        return Microgrammar.fromDefinitions(definition as any);
-    }
-    if (!!definition.phrase) {
-        return Microgrammar.fromString(definition.phrase, definition.terms);
-    }
-    return Microgrammar.fromDefinitions(definition.terms);
-}
-
-/**
- * Create a microgrammar with return matches implementing an inferred interface
- * taking properties of type "any" from definitions.
- * Use microgrammar for stronger typing.
- * @return {Grammar<T>}
- */
-export function simpleMicrogrammar<T>(definition: MicrogrammarDefinition<T> | TermsDefinition<T>): Grammar<AnyKeysOf<T>> {
-    return microgrammar(definition);
 }
