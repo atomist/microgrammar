@@ -13,5 +13,5 @@
 - [Handling circular references](circularity.md) via lazy matchers
 - Implementing [custom matchers](customMatchers.md)
 - Maintaining [state](state.md) while matching
-- [Troubleshooting](trouble.md) tips
+1. - [Troubleshooting](trouble.md) tips
 - [Performance](performance.md) tips

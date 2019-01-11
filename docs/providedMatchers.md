@@ -47,4 +47,4 @@ These matches have been tested with Java, but should be useful for any C family 
 | blockContaining | `index` | Java block containing a match of the given matcher
 
 
-It is also easy to [define your own matchers](customMatchers.md).
+You can also [define your own matchers](customMatchers.md).

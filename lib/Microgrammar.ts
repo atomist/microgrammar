@@ -2,14 +2,10 @@ import {
     InputState,
     Listeners,
 } from "./InputState";
-import {
-    MatchingLogic,
-    Term,
-} from "./Matchers";
+import { MatchingLogic } from "./Matchers";
 import {
     Concat,
     Concatenation,
-    TermDef,
     toMatchingLogic,
 } from "./matchers/Concat";
 import { isSuccessfulMatch } from "./MatchPrefixResult";
@@ -18,14 +14,12 @@ import {
     PatternMatch,
 } from "./PatternMatch";
 
-import { InputStream } from "./spi/InputStream";
-import { StringInputStream } from "./spi/StringInputStream";
-
-import {
-    SkipCapable,
-    WhiteSpaceHandler,
-} from "./Config";
 import { FromStringOptions } from "./FromStringOptions";
+import {
+    AnyKeysOf,
+    Grammar,
+    TermsDefinition,
+} from "./Grammar";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
 import { exactMatch } from "./internal/ExactMatch";
@@ -36,6 +30,8 @@ import {
     MicrogrammarUpdates,
 } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
+import { InputStream } from "./spi/InputStream";
+import { StringInputStream } from "./spi/StringInputStream";
 
 /**
  * Holds a set of updatable matches
@@ -57,14 +53,6 @@ export class Updatable<T> {
     }
 }
 
-export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
-
-export type TermsDefinition<PARAMS, K extends keyof PARAMS = keyof PARAMS> =
-    Record<K, AllowableTermDef<PARAMS>> & Partial<WhiteSpaceHandler> & Partial<SkipCapable>
-    & { [index: string]: any };
-
-export type AnyKeysOf<T, K extends keyof T = keyof T> = Record<K, any>;
-
 /**
  * Central class for microgrammar usage.
  * Represents a microgrammar that we can use to match input
@@ -72,7 +60,7 @@ export type AnyKeysOf<T, K extends keyof T = keyof T> = Record<K, any>;
  * Modifications are tracked and we can get an updated string
  * afterwards.
  */
-export class Microgrammar<T> implements Term {
+export class Microgrammar<T> implements Grammar<T> {
 
     /**
      * Make this match transparently updatable using property mutation

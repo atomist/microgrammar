@@ -1,12 +1,17 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { fail } from "power-assert";
+import { Integer } from "../lib";
 import { WhiteSpaceSensitive } from "../lib/Config";
 import { MatchingLogic } from "../lib/Matchers";
 import {
     MatchingMachine,
     Microgrammar,
 } from "../lib/Microgrammar";
+import {
+    microgrammar,
+    simpleMicrogrammar,
+} from "../lib/microgrammarConstruction";
 import {
     Alt,
     Opt,
@@ -39,6 +44,48 @@ describe("Microgrammar", () => {
                 const s = match.forename + match.surname;
                 assert(!!s);
             }
+        });
+
+    });
+
+    describe("interface construction", () => {
+
+        it("should infer from definitions", () => {
+            const mg = simpleMicrogrammar({ terms: { forename: "forename", surname: /.*/ } });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+        it("should infer from definitions and string", () => {
+            const mg = microgrammar<{ forename: string, surname: string }>(
+                { phrase: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
+            // This will never match, but is just to test for compilation
+            const match = mg.firstMatch("");
+            if (match) {
+                const s = match.forename + match.surname;
+                assert(!!s);
+            }
+        });
+
+        it("should support composition", () => {
+            interface Person { forename: string; surname: string; }
+            const person = microgrammar<Person>(
+                { phrase: "${forename} ${surname}", terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ } });
+            const employee = microgrammar<{person: Person, id: number}>({
+                person,
+                id: Integer,
+            });
+            const pmatch = person.firstMatch("Warren Buffet 3003");
+            assert(!!pmatch);
+            assert.strictEqual(pmatch.surname, "Buffet");
+            const ematch = employee.firstMatch("Warren Buffet 3003");
+            assert(!!ematch);
+            assert.strictEqual(ematch.person.surname, "Buffet");
+            assert.strictEqual(ematch.id, 3003);
         });
 
     });
@@ -85,7 +132,7 @@ describe("Microgrammar", () => {
 
     it("XML element", () => {
         const content = "<foo>";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             lx: "<",
             name: /[a-zA-Z0-9]+/,
             rx: ">",
@@ -165,7 +212,7 @@ describe("Microgrammar", () => {
 
     it("2 elements: whitespace insensitive", () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
             _rx: ">",
@@ -286,13 +333,17 @@ describe("Microgrammar", () => {
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         };
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             first: element,
             second: new Opt(element),
         });
-        const result = mg.findMatches(content);
+        const it = mg.matchIterator(content);
+        const result = [];
+        for (const m of it) {
+            result.push(m);
+        }
         expect(result.length).to.equal(1);
-        const r0 = result[0] as any;
+        const r0 = result[0];
         assert(isPatternMatch(r0));
         assert(r0.$matched === content);
         assert(r0.first);
