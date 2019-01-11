@@ -61,7 +61,7 @@ describe("Microgrammar", () => {
 
         it("should infer from definitions", () => {
             const mg = microgrammar<{ forename: string, surname: string }>(
-                { expression: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
+                { phrase: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
             // This will never match, but is just to test for compilation
             const match = mg.firstMatch("");
             if (match) {

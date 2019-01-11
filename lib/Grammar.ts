@@ -36,7 +36,7 @@ export interface Grammar<T> extends Term {
      * @param {Listeners} l
      * @return {Iterable<PatternMatch>}
      */
-    matchIterator(input: string | InputStream, parseContext?, l?: Listeners): Iterable<PatternMatch>;
+    matchIterator(input: string | InputStream, parseContext?: object, l?: Listeners): Iterable<PatternMatch>;
 
     /**
      * Convenient method to find the first match, or null if not found.
@@ -56,7 +56,7 @@ export interface Grammar<T> extends Term {
      * @param l listeners observing input characters as they are read
      * @return {PatternMatch&T}
      */
-    exactMatch(input: string | InputStream, parseContext?, l ?: Listeners): PatternMatch & T | DismatchReport;
+    exactMatch(input: string | InputStream, parseContext?: object, l ?: Listeners): PatternMatch & T | DismatchReport;
 
 }
 
@@ -66,9 +66,11 @@ export interface Grammar<T> extends Term {
 export interface MicrogrammarDefinition<T> {
 
     /**
-     * Expression is of form "method ${name}(): ${returnType}".
+     * Phrase defining how the terms should appear, including
+     * literals, if specified.
+     * A phrase is of form "method ${name}(): ${returnType}".
      */
-    expression?: string;
+    phrase?: string;
 
     /**
      * Definitions of the productions in this grammar
@@ -84,11 +86,11 @@ export interface MicrogrammarDefinition<T> {
  * @return {Grammar<T>}
  */
 export function microgrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<T> {
-    if (!definition.expression && !definition.terms) {
+    if (!definition.phrase && !definition.terms) {
         throw new Error("At leat one of string and terms must be supplied to construct a microgrammar");
     }
-    if (!!definition.expression) {
-        return Microgrammar.fromString(definition.expression, definition.terms);
+    if (!!definition.phrase) {
+        return Microgrammar.fromString(definition.phrase, definition.terms);
     }
     return Microgrammar.fromDefinitions(definition.terms);
 }
@@ -99,7 +101,6 @@ export function microgrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<
  * If the definitions aren't nested, infer string type
  * @return {Grammar<T>}
  */
-
 export function simpleMicrogrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<AnyKeysOf<T>> {
     return microgrammar(definition);
 }
