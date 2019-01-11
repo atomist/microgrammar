@@ -39,6 +39,17 @@ export interface Grammar<T> extends Term {
     matchIterator(input: string | InputStream, parseContext?: object, l?: Listeners): Iterable<PatternMatch>;
 
     /**
+     * Convenience method to find matches. Note that this will parse the entire input in one pass.
+     * Use matchIterator if you are likely to try to stop part-way through, or want to be
+     * kinder to the event loop.
+     * @param input
+     * @param parseContext context for the whole parsing operation
+     * @param l listeners observing input characters as they are read
+     * @return {PatternMatch[]}
+     */
+    findMatches(input: string | InputStream, parseContext?: object, l?: Listeners): Array<T & PatternMatch>;
+
+    /**
      * Convenient method to find the first match, or null if not found.
      * Stops searching after the first match.
      * @param input
@@ -79,15 +90,14 @@ export interface MicrogrammarDefinition<T> {
 }
 
 /**
- * Create a microgrammar with typed properties according
+ * Create a microgrammar return matches with properties according
  * to the given interface.
- * If the definitions aren't nested, infer string type
- * @param definition
+ * @param definition full definition or terms definition
  * @return {Grammar<T>}
  */
-export function microgrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<T> {
+export function microgrammar<T>(definition: MicrogrammarDefinition<T> | TermsDefinition<T>): Grammar<T> {
     if (!definition.phrase && !definition.terms) {
-        throw new Error("At leat one of string and terms must be supplied to construct a microgrammar");
+        return Microgrammar.fromDefinitions(definition as any);
     }
     if (!!definition.phrase) {
         return Microgrammar.fromString(definition.phrase, definition.terms);
@@ -96,11 +106,11 @@ export function microgrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<
 }
 
 /**
- * Create a microgrammar with inferred interface taking properties of type "any" from definitions.
- * Use fromDefinitions for stronger typing.
- * If the definitions aren't nested, infer string type
+ * Create a microgrammar with return matches implementing an inferred interface
+ * taking properties of type "any" from definitions.
+ * Use microgrammar for stronger typing.
  * @return {Grammar<T>}
  */
-export function simpleMicrogrammar<T>(definition: MicrogrammarDefinition<T>): Grammar<AnyKeysOf<T>> {
+export function simpleMicrogrammar<T>(definition: MicrogrammarDefinition<T> | TermsDefinition<T>): Grammar<AnyKeysOf<T>> {
     return microgrammar(definition);
 }

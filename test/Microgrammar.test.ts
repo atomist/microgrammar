@@ -114,7 +114,7 @@ describe("Microgrammar", () => {
 
     it("XML element", () => {
         const content = "<foo>";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             lx: "<",
             name: /[a-zA-Z0-9]+/,
             rx: ">",
@@ -194,7 +194,7 @@ describe("Microgrammar", () => {
 
     it("2 elements: whitespace insensitive", () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
             _rx: ">",
@@ -315,13 +315,17 @@ describe("Microgrammar", () => {
             name: /[a-zA-Z0-9]+/,
             rx: ">",
         };
-        const mg = Microgrammar.fromDefinitions({
+        const mg = microgrammar({
             first: element,
             second: new Opt(element),
         });
-        const result = mg.findMatches(content);
+        const it = mg.matchIterator(content);
+        const result = [];
+        for (const m of it) {
+            result.push(m);
+        }
         expect(result.length).to.equal(1);
-        const r0 = result[0] as any;
+        const r0 = result[0];
         assert(isPatternMatch(r0));
         assert(r0.$matched === content);
         assert(r0.first);
