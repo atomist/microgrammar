@@ -1,6 +1,6 @@
 {
   "name": "@atomist/microgrammar",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Parsing library filling the gap between regular expressions and complete grammars",
   "author": {
     "name": "Atomist",
