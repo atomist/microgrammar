@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { fail } from "power-assert";
+import { Integer } from "../lib";
 import { WhiteSpaceSensitive } from "../lib/Config";
 import {
     microgrammar,
@@ -28,7 +29,6 @@ import {
     PLUGIN_GRAMMAR,
     VersionedArtifact,
 } from "./MavenGrammars";
-import { Integer } from "../lib";
 
 /* tslint:disable:max-file-line-count */
 
