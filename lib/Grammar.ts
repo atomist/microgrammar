@@ -20,6 +20,10 @@ export type TermsDefinition<PARAMS, K extends keyof PARAMS = keyof PARAMS> =
     Record<K, AllowableTermDef<PARAMS>> & Partial<WhiteSpaceHandler> & Partial<SkipCapable>
     & { [index: string]: any };
 
+/**
+ * Record with values of any type for every key K found in T.
+ * Convenient inferred return type for microgrammar.
+ */
 export type AnyKeysOf<T, K extends keyof T = keyof T> = Record<K, any>;
 
 /**
@@ -92,7 +96,7 @@ export interface MicrogrammarDefinition<T> {
 /**
  * Create a microgrammar return matches with properties according
  * to the given interface.
- * @param definition full definition or terms definition
+ * @param definition full definition, including a phrase string, or terms definition
  * @return {Grammar<T>}
  */
 export function microgrammar<T>(definition: MicrogrammarDefinition<T> | TermsDefinition<T>): Grammar<T> {

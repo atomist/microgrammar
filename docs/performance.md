@@ -46,7 +46,7 @@ among other annotations, it's impossible to express that in the grammar itself. 
 annotation was present and veto the match if it wasn't.
 
 ```typescript
-Microgrammar.fromDefinitions<ChangeControlledMethod>({
+microgrammar<ChangeControlledMethod>({
     annotations: new Rep1(AnyAnnotation),
     _check(ctx: any) {
         const found = ctx.annotations.filter(a => a.name === "ChangeControlled");

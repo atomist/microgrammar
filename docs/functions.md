@@ -7,10 +7,10 @@ Often
 A common pattern is to match a property with a `_` prefix--which causes the property not to be bound to the resulting match--and then compute a property that *will* be exposed. For example, the `_it` property in the following grammar will not be exposed, and is used to compute the `test` property.
 
 ```typescript
-const NodeTestGrammar = {
+const NodeTestGrammar = microgrammar({
     _it: firstOf("*", NodeName),
     test: ctx => ctx._it === "*" ? AllNodeTest : new NamedNodeTest(ctx._it),
-};
+});
 ```
 
 ## Validation functions
@@ -21,7 +21,7 @@ A validation function is any function that returns `boolean` whose name begins w
 For example:
 
 ```typescript
-Microgrammar.fromDefinitions<ChangeControlledMethod>({
+microgrammar<ChangeControlledMethod>({
     annotations: new Rep1(AnyAnnotation),
     _check(ctx: any) {
         const found = ctx.annotations.filter(a => a.name === "ChangeControlled");

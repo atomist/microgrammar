@@ -6,7 +6,7 @@ In this style, microgrammars are defined in JavaScript objects, with the matcher
 For example:
 
 ```typescript
-const mg = Microgrammar.fromDefinitions<{name: string, age: number}>({
+const mg = microgrammar(<{name: string, age: number}>({
     name: /[a-zA-Z0-9]+/,
     _col: ":",
     age: Integer
@@ -32,14 +32,14 @@ Object definitions can be composed.
 The above example can be rewritten as follows:
 
 ```typescript
-const mg = Microgrammar.fromDefinitionsAs({
+const mg = simpleMicrogrammar({
     name: /[a-zA-Z0-9]+/,
     _col: ":",
     age: Integer
 });
 ```
 
-By using the `fromDefinitionsAs` static method to construct a `Microgrammar` instance you sacrifice control over the result type for convenience. Here we don't specify a result type, but it is inferred from the definitions. The inferred result type would look as follows:
+By using the `simpleMicogrammar` method to construct a microgrammar instance you sacrifice control over the result type for convenience. Here we don't specify a result type, but it is inferred from the definitions. The inferred result type would look as follows:
 
 ```typescript
 { name: any, _col: any, age: any }
