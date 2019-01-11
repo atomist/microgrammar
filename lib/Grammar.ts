@@ -1,11 +1,17 @@
 import { Listeners } from "./InputState";
 import { Term } from "./Matchers";
 import { TermDef } from "./matchers/Concat";
-import { DismatchReport, PatternMatch } from "./PatternMatch";
+import {
+    DismatchReport,
+    PatternMatch,
+} from "./PatternMatch";
 
 import { InputStream } from "./spi/InputStream";
 
-import { SkipCapable, WhiteSpaceHandler } from "./Config";
+import {
+    SkipCapable,
+    WhiteSpaceHandler,
+} from "./Config";
 
 export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
 

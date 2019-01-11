@@ -1,4 +1,8 @@
-import { AnyKeysOf, Grammar, TermsDefinition } from "./Grammar";
+import {
+    AnyKeysOf,
+    Grammar,
+    TermsDefinition,
+} from "./Grammar";
 import { Microgrammar } from "./Microgrammar";
 
 /**
