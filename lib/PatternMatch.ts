@@ -31,8 +31,8 @@ export abstract class PatternMatch {
      * @param $offset offset from 0 in input
      */
     constructor(public readonly $matcherId: string,
-                public $matched: string,
-                public readonly $offset: number) {
+        public $matched: string,
+        public readonly $offset: number) {
     }
 
     /**
@@ -46,7 +46,7 @@ export abstract class PatternMatch {
 }
 
 export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
-    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$matched !== undefined;
+    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$value !== undefined;
 }
 
 /**
@@ -55,9 +55,9 @@ export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is Patte
 export class TerminalPatternMatch extends PatternMatch {
 
     constructor(matcherId: string,
-                matched: string,
-                offset: number,
-                public readonly $value: any) {
+        matched: string,
+        offset: number,
+        public readonly $value: any) {
         super(matcherId, matched, offset);
     }
 
@@ -71,7 +71,7 @@ export class UndefinedPatternMatch extends PatternMatch {
     public $value = undefined;
 
     constructor(matcherId: string,
-                offset: number) {
+        offset: number) {
         super(matcherId, "", offset);
     }
 }
@@ -90,11 +90,11 @@ export class TreePatternMatch extends PatternMatch {
     public readonly $value: {};
 
     constructor(matcherId: string,
-                matched: string,
-                offset: number,
-                matchers: Matcher[],
-                subMatches: PatternMatch[],
-                capturedStructure: {}) {
+        matched: string,
+        offset: number,
+        matchers: Matcher[],
+        subMatches: PatternMatch[],
+        capturedStructure: {}) {
         super(matcherId, matched, offset);
         this.$value = {};
 
