@@ -39,7 +39,7 @@ export class MatchFailureReport implements MatchPrefixResult {
     public constructor(public readonly $matcherId: string,
         public readonly $offset: number,
         public readonly $matched: string,
-        private readonly cause?: string | MatchFailureReport,
+        public readonly cause?: string,
         public readonly children?: MatchFailureReport[]) {
     }
 
