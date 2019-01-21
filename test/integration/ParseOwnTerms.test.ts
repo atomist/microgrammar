@@ -11,13 +11,14 @@ import { firstOf, MatchingLogic, InputState } from "../../lib";
 import { isTreePatternMatch, PatternMatch, TerminalPatternMatch } from "../../lib/PatternMatch";
 import { LangStateMachine, LangState } from "../../lib/matchers/lang/LangStateMachine";
 import { Normal, EscapeNextCharacter } from "../../lib/matchers/lang/cfamily/States";
+import _ = require("lodash");
 
 describe("Task of parsing mg terms", () => {
     it("Can parse two terms with regex", async () => {
 
         const input = `{
     first:  /[a-zA-Z0-9]+/,
-    second: /[a-zA-Z0-9]+/
+    second: "exactly this"
 }`;
 
         const termGrammar = microgrammar({
@@ -26,11 +27,7 @@ describe("Task of parsing mg terms", () => {
                     termName: /[a-zA-Z0-9]+/,
                     _colon: ":",
                     termGrammar: firstOf(regexLiteral(),
-                        {
-                            // $id: "stringLiteral"
-                            open: '"'
-                        }
-                    ),
+                        new DelimitedLiteral('"')),
                     _possibleComma: optional(",")
                 }),
             }
@@ -103,13 +100,11 @@ class DelimitedLiteral implements MatchingLogic {
                     cause: `End of input before the closing ${delimiter}`,
                 });
             }
-            console.log("Consuming: " + next);
             sm.consume(next);
             matched += next;
             currentIs = currentIs.consume(next, "Looking for the end of a regexp");
         }
 
-        console.log("Returning happy pattern match")
         return matchPrefixSuccess(new TerminalPatternMatch(
             "JS Regexp", matched, is.offset, matched))
     }
@@ -171,12 +166,19 @@ class MicrogrammarBackedTreeNode implements TreeNode {
             });
         if (isTreePatternMatch(m)) {
             const subs = m.submatches();
-            this.$children = Object.getOwnPropertyNames(subs)
+            this.$children = _.flatten(Object.getOwnPropertyNames(subs)
                 .map(prop => {
                     const sub = subs[prop];
-                    // console.log("Exposing child %s.%s as [%s]", $name, prop, stringify(sub));
-                    return new MicrogrammarBackedTreeNode(prop, sub);
-                });
+                    if (Array.isArray(sub)) {
+                        // ROD: I need to know whether children from a Rep should be added to 
+                        // the array of children, or wrapped in tree node with multiple children
+                        console.log("Found multiple values for " + prop);
+                        return sub.map((s, i) =>
+                            new MicrogrammarBackedTreeNode(prop + "[" + i + "]", s))
+                    }
+                    console.log("Exposing child %s.%s as [%s]", $name, prop, "stringify(sub)");
+                    return [new MicrogrammarBackedTreeNode(prop, sub)];
+                }));
         } else {
             // console.log("Exposing terminal %s as [%s]: value=[%s]", $name, stringify(m), m.$matched);
             this.$value = String(m.$value);
