@@ -31,8 +31,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-                private readonly consume: boolean = false,
-                private readonly badMatcher?: MatchingLogic) {
+        private readonly consume: boolean = false,
+        private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {
@@ -66,7 +66,7 @@ export class Break implements MatchingLogic {
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
-                    return new MatchFailureReport(this.$id, is.offset);
+                    return new MatchFailureReport(this.$id, is.offset, matched);
                 }
             }
             matched += currentIs.peek(1);

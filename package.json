@@ -23,7 +23,9 @@
   ],
   "main": "./index.js",
   "types": "./index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "stringify-tree": "^1.0.2"
+  },
   "devDependencies": {
     "@types/chai": "^3.5.0",
     "@types/mocha": "^5.2.5",

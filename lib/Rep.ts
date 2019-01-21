@@ -84,19 +84,21 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
+        let allResults: MatchPrefixResult[] = [];
         while (!currentInputState.exhausted()) {
             const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
             currentInputState = eat.state;
             matched += eat.skipped;
 
             const result = this.matcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
+            allResults.push(result);
             if (!isSuccessfulMatch(result)) {
                 break;
             } else {
                 const match = result.match;
                 if (match.$matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
-                     `I do not think this grammar means what you think it means`);
+                        `I do not think this grammar means what you think it means`);
                 }
                 currentInputState = currentInputState.consume(match.$matched, `Rep matched [${match.$matched}]`);
                 matches.push(match);
@@ -108,6 +110,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
                 const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
+                allResults.push(sepMatchResult);
                 if (isSuccessfulMatch(sepMatchResult)) {
                     const sepMatch = sepMatchResult.match;
                     currentInputState = currentInputState.consume(sepMatch.$matched, `Rep separator [${sepMatch.$matched}]`);
@@ -129,7 +132,12 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                 matched,
                 is.offset,
                 values)) :
-            new MatchFailureReport(this.$id, is.offset, {});
+            MatchFailureReport.from({
+                $matcherId: this.$id,
+                $offset: is.offset,
+                $matched: matched,
+                children: allResults,
+            });
     }
 }
 

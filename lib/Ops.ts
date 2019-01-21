@@ -81,16 +81,18 @@ export class Alt implements MatchingLogic {
 
     public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
         if (is.exhausted()) {
-            return new MatchFailureReport(this.$id, is.offset, {});
+            return new MatchFailureReport(this.$id, is.offset, "");
         }
 
+        const failedMatches: MatchPrefixResult[] = [];
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
             if (isSuccessfulMatch(m)) {
                 return m;
             }
+            failedMatches.push(m);
         }
-        return new MatchFailureReport(this.$id, is.offset, {});
+        return MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches });
     }
 }
 
@@ -118,12 +120,32 @@ export function when(
     }
 
     function conditionalMatch(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
-        const result = inputStateTest(is) ?
-            matcher.matchPrefix(is, thisMatchContext, parseContext) :
-            undefined;
-        return (result && isSuccessfulMatch(result) && matchTest(result.match)) ?
-            result :
-            new MatchFailureReport(conditionalMatcher.$id, is.offset, context);
+        if (!inputStateTest(is)) {
+            return MatchFailureReport.from({
+                $matcherId: conditionalMatcher.$id,
+                $offset: is.offset,
+                cause: "Input state test returned false"
+            });
+        }
+        const result = matcher.matchPrefix(is, thisMatchContext, parseContext)
+        if (!isSuccessfulMatch(result)) {
+            return MatchFailureReport.from({
+                $matcherId: conditionalMatcher.$id,
+                $offset: is.offset,
+                children: [result],
+                cause: (result as MatchFailureReport).description
+            })
+        }
+        if (!matchTest(result.match)) {
+            return MatchFailureReport.from({
+                $matcherId: conditionalMatcher.$id,
+                $offset: is.offset,
+                $matched: result.$matched,
+                children: [result],
+                cause: "Match test returned false"
+            });
+        }
+        return result;
     }
 
     conditionalMatcher.matchPrefix = conditionalMatch;
