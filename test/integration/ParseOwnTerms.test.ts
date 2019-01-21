@@ -4,16 +4,13 @@
  */
 
 import * as assert from "assert";
-import { microgrammar, zeroOrMore, optional, isPatternMatch, atLeastOne, Concat } from "../..";
+import { microgrammar, optional, isPatternMatch, atLeastOne } from "../..";
 import { stringifyTree } from "stringify-tree";
 import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../lib/MatchPrefixResult";
-import { firstOf, MatchingLogic, InputState, Regex } from "../../lib";
+import { firstOf, MatchingLogic, InputState } from "../../lib";
 import { isTreePatternMatch, PatternMatch, TerminalPatternMatch } from "../../lib/PatternMatch";
 import { LangStateMachine, LangState } from "../../lib/matchers/lang/LangStateMachine";
-import { Normal, SlashSlashComment, SlashStarComment, DoubleString, EscapeNextCharacter } from "../../lib/matchers/lang/cfamily/States";
-import { CFamilyStateMachine } from "../../lib/matchers/lang/cfamily/CFamilyStateMachine";
-import { toMatchingLogic } from "../../lib/matchers/Concat";
-import { inputStateFromString } from "../../lib/internal/InputStateFactory";
+import { Normal, EscapeNextCharacter } from "../../lib/matchers/lang/cfamily/States";
 
 describe("Task of parsing mg terms", () => {
     it("Can parse two terms with regex", async () => {
@@ -64,18 +61,26 @@ describe("Task of parsing mg terms", () => {
 });
 
 function regexLiteral(): MatchingLogic {
-    return new JavascriptRegexLiteral();
+    return new DelimitedLiteral("/");
 }
 
-// TODO: pass in an inner matcher
-class JavascriptRegexLiteral implements MatchingLogic {
-    public readonly $id = "JS Regex";
+// TODO: pass in an inner matcher, support nesting
+class DelimitedLiteral implements MatchingLogic {
+    public readonly $id = `${this.delimiter} ... ${this.delimiter}`;
 
-    constructor() {
+    constructor(public readonly delimiter: string,
+        public readonly escapeChar: string = "\\"
+    ) {
+        if (delimiter.length !== 1) {
+            throw new Error("That is not gonna work. Delimiters are 1 char");
+        }
+        if (escapeChar.length !== 1) {
+            throw new Error("That is not gonna work. escapeChar must be 1 char");
+        }
     }
     public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
         MatchPrefixResult {
-        const delimiter = "/";
+        const delimiter = this.delimiter;
         const initialOffset = is.offset;
         let currentIs = is; // is this needed? seems likely.
         if (is.peek(1) !== delimiter) {
@@ -87,7 +92,7 @@ class JavascriptRegexLiteral implements MatchingLogic {
         }
         currentIs = currentIs.consume(delimiter, "Opening delimiter");
         let matched = delimiter;
-        const sm = new JavaRegexStateMachine();
+        const sm = new DelimiterWithEscapeChar(delimiter, this.escapeChar);
         while (sm.state !== Done) {
             const next = currentIs.peek(1);
             if (next.length === 0) {
@@ -111,14 +116,16 @@ class JavascriptRegexLiteral implements MatchingLogic {
 }
 
 const Done = new LangState("DONE", false, false);
-export class JavaRegexStateMachine extends LangStateMachine {
+export class DelimiterWithEscapeChar extends LangStateMachine {
 
-    constructor(state: LangState = Normal) {
+    constructor(public readonly endChar: string,
+        public readonly escapeChar: string,
+        state: LangState = Normal) {
         super(state);
     }
 
-    public clone(): JavaRegexStateMachine {
-        return new JavaRegexStateMachine(this.state);
+    public clone(): DelimiterWithEscapeChar {
+        return new DelimiterWithEscapeChar(this.endChar, this.escapeChar, this.state);
     }
 
     public consume(ch: string): void {
@@ -130,10 +137,10 @@ export class JavaRegexStateMachine extends LangStateMachine {
                 break;
             case Normal:
                 switch (ch) {
-                    case "\\":
+                    case this.escapeChar:
                         this.state = EscapeNextCharacter;
                         break;
-                    case "/":
+                    case this.endChar:
                         this.state = Done;
                         break;
                     default:
