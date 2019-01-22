@@ -6,8 +6,14 @@ import {
     matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../../PatternMatch";
-import { LangState, LangStateMachine } from "../LangStateMachine";
-import { EscapeNextCharacter, Normal } from "./States";
+import {
+    LangState,
+    LangStateMachine,
+} from "../LangStateMachine";
+import {
+    EscapeNextCharacter,
+    Normal,
+} from "./States";
 
 // TODO: pass in an inner matcher, support nesting
 export class DelimitedLiteral implements MatchingLogic {
