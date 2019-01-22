@@ -31,8 +31,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-        private readonly consume: boolean = false,
-        private readonly badMatcher?: MatchingLogic) {
+                private readonly consume: boolean = false,
+                private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {

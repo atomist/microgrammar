@@ -4,12 +4,12 @@
  */
 
 import * as assert from "assert";
-import { microgrammar, optional, isPatternMatch, atLeastOne } from "../..";
 import { stringifyTree } from "stringify-tree";
-import { MatchFailureReport } from "../../lib/MatchPrefixResult";
+import { atLeastOne, isPatternMatch, microgrammar, optional } from "../..";
 import { firstOf } from "../../lib";
-import { regexLiteral } from "../../lib/matchers/lang/cfamily/javascript/regexpLiteral";
 import { DelimitedLiteral } from "../../lib/matchers/lang/cfamily/DelimitedLiteral";
+import { regexLiteral } from "../../lib/matchers/lang/cfamily/javascript/regexpLiteral";
+import { MatchFailureReport } from "../../lib/MatchPrefixResult";
 
 describe("Task of parsing mg terms", () => {
     it("Can parse two terms with regex", async () => {
@@ -26,26 +26,27 @@ describe("Task of parsing mg terms", () => {
                     _colon: ":",
                     termGrammar: firstOf(regexLiteral(),
                         new DelimitedLiteral('"')),
-                    _possibleComma: optional(",")
+                    _possibleComma: optional(","),
                 }),
-            }
+            },
         });
 
         const match = termGrammar.exactMatch(input);
 
         if (!isPatternMatch(match)) {
             const mfr = match as MatchFailureReport;
+            // tslint:disable-next-line
             console.log(stringifyTree(mfr, m => {
                 let output = m.$matcherId;
                 if (m.$matched) {
-                    output += " --> " + m.$matched
+                    output += " --> " + m.$matched;
                 }
                 if (m.cause) {
                     output += " cuz: " + m.cause;
                 }
-                return output
+                return output;
             }
-                , m => m.children))
+                , m => m.children));
             assert.fail(match.description);
             return;
         }

@@ -200,7 +200,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         $offset: initialInputState.offset,
                         $matched: matched,
                         cause: `Failed at step '${step.name}' due to ${(reportResult as any).description}`,
-                        children: allReportResults
+                        children: allReportResults,
                     });
                 }
             } else {

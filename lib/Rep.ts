@@ -84,7 +84,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
-        let allResults: MatchPrefixResult[] = [];
+        const allResults: MatchPrefixResult[] = [];
         while (!currentInputState.exhausted()) {
             const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
             currentInputState = eat.state;

@@ -124,17 +124,17 @@ export function when(
             return MatchFailureReport.from({
                 $matcherId: conditionalMatcher.$id,
                 $offset: is.offset,
-                cause: "Input state test returned false"
+                cause: "Input state test returned false",
             });
         }
-        const result = matcher.matchPrefix(is, thisMatchContext, parseContext)
+        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
         if (!isSuccessfulMatch(result)) {
             return MatchFailureReport.from({
                 $matcherId: conditionalMatcher.$id,
                 $offset: is.offset,
                 children: [result],
-                cause: (result as MatchFailureReport).description
-            })
+                cause: (result as MatchFailureReport).description,
+            });
         }
         if (!matchTest(result.match)) {
             return MatchFailureReport.from({
@@ -142,7 +142,7 @@ export function when(
                 $offset: is.offset,
                 $matched: result.$matched,
                 children: [result],
-                cause: "Match test returned false"
+                cause: "Match test returned false",
             });
         }
         return result;

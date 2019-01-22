@@ -1,20 +1,20 @@
+import { InputState } from "../../../InputState";
+import { MatchingLogic } from "../../../Matchers";
 import {
-    MatchPrefixResult,
     MatchFailureReport,
-    matchPrefixSuccess
+    MatchPrefixResult,
+    matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../../PatternMatch";
 import { LangState, LangStateMachine } from "../LangStateMachine";
-import { Normal, EscapeNextCharacter } from "./States";
-import { MatchingLogic } from "../../../Matchers";
-import { InputState } from "../../../InputState";
+import { EscapeNextCharacter, Normal } from "./States";
 
 // TODO: pass in an inner matcher, support nesting
 export class DelimitedLiteral implements MatchingLogic {
     public readonly $id = `${this.delimiter} ... ${this.delimiter}`;
 
     constructor(public readonly delimiter: string,
-        public readonly escapeChar: string = "\\"
+                public readonly escapeChar: string = "\\",
     ) {
         if (delimiter.length !== 1) {
             throw new Error("That is not gonna work. Delimiters are 1 char");
@@ -32,7 +32,7 @@ export class DelimitedLiteral implements MatchingLogic {
             return MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: initialOffset,
-                cause: `No opening ${delimiter}; saw ${is.peek(1)} instead`
+                cause: `No opening ${delimiter}; saw ${is.peek(1)} instead`,
             });
         }
         currentIs = currentIs.consume(delimiter, "Opening delimiter");
@@ -54,7 +54,7 @@ export class DelimitedLiteral implements MatchingLogic {
         }
 
         return matchPrefixSuccess(new TerminalPatternMatch(
-            this.$id, matched, is.offset, matched))
+            this.$id, matched, is.offset, matched));
     }
 }
 
@@ -62,8 +62,8 @@ const Done = new LangState("DONE", false, false);
 class DelimiterWithEscapeChar extends LangStateMachine {
 
     constructor(public readonly endChar: string,
-        public readonly escapeChar: string,
-        state: LangState = Normal) {
+                public readonly escapeChar: string,
+                state: LangState = Normal) {
         super(state);
     }
 

@@ -37,10 +37,10 @@ export class MatchFailureReport implements MatchPrefixResult {
     }
 
     public constructor(public readonly $matcherId: string,
-        public readonly $offset: number,
-        public readonly $matched: string,
-        public readonly cause?: string,
-        public readonly children?: MatchFailureReport[]) {
+                       public readonly $offset: number,
+                       public readonly $matched: string,
+                       public readonly cause?: string,
+                       public readonly children?: MatchFailureReport[]) {
     }
 
     get description(): string {
@@ -56,7 +56,7 @@ export class MatchFailureReport implements MatchPrefixResult {
 export class SuccessfulMatch implements MatchPrefixResult {
 
     public constructor(public readonly match: PatternMatch,
-        public readonly capturedStructure?: {}) {
+                       public readonly capturedStructure?: {}) {
         if (match === undefined) {
             throw new Error("You can't be successful with an undefined match");
         }
