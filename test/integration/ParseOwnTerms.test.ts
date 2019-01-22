@@ -4,13 +4,36 @@
  */
 
 import * as assert from "assert";
-import { microgrammar, optional, isPatternMatch, atLeastOne } from "../..";
+import {
+    atLeastOne,
+    isPatternMatch,
+    microgrammar,
+    optional,
+} from "../..";
 import { stringifyTree } from "stringify-tree";
-import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../lib/MatchPrefixResult";
-import { firstOf, MatchingLogic, InputState } from "../../lib";
-import { isTreePatternMatch, PatternMatch, TerminalPatternMatch } from "../../lib/PatternMatch";
-import { LangStateMachine, LangState } from "../../lib/matchers/lang/LangStateMachine";
-import { Normal, EscapeNextCharacter } from "../../lib/matchers/lang/cfamily/States";
+import {
+    MatchFailureReport,
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../../lib/MatchPrefixResult";
+import {
+    firstOf,
+    InputState,
+    MatchingLogic,
+} from "../../lib";
+import {
+    isTreePatternMatch,
+    PatternMatch,
+    TerminalPatternMatch,
+} from "../../lib/PatternMatch";
+import {
+    LangState,
+    LangStateMachine,
+} from "../../lib/matchers/lang/LangStateMachine";
+import {
+    EscapeNextCharacter,
+    Normal,
+} from "../../lib/matchers/lang/cfamily/States";
 import _ = require("lodash");
 
 describe("Task of parsing mg terms", () => {
