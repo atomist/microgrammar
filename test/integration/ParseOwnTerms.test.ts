@@ -8,10 +8,9 @@ import { microgrammar, optional, isPatternMatch, atLeastOne } from "../..";
 import { stringifyTree } from "stringify-tree";
 import { MatchFailureReport, MatchPrefixResult, matchPrefixSuccess } from "../../lib/MatchPrefixResult";
 import { firstOf, MatchingLogic, InputState } from "../../lib";
-import { isTreePatternMatch, PatternMatch, TerminalPatternMatch } from "../../lib/PatternMatch";
+import { TerminalPatternMatch } from "../../lib/PatternMatch";
 import { LangStateMachine, LangState } from "../../lib/matchers/lang/LangStateMachine";
 import { Normal, EscapeNextCharacter } from "../../lib/matchers/lang/cfamily/States";
-import _ = require("lodash");
 
 describe("Task of parsing mg terms", () => {
     it("Can parse two terms with regex", async () => {
@@ -51,9 +50,6 @@ describe("Task of parsing mg terms", () => {
             assert.fail(match.description);
             return;
         }
-
-        const treeNode = new MicrogrammarBackedTreeNode("hi", match);
-        console.log(stringifyTree(treeNode, tn => tn.$name, tn => tn.$children as any))
     });
 });
 
@@ -143,55 +139,4 @@ export class DelimiterWithEscapeChar extends LangStateMachine {
                 }
         }
     }
-}
-/**
- * TreeNode implementation backed by a microgrammar match
- */
-class MicrogrammarBackedTreeNode implements TreeNode {
-
-    public readonly $children: TreeNode[];
-
-    public $value: string;
-
-    public readonly $offset: number;
-
-    constructor(public $name: string, m: PatternMatch) {
-        this.$offset = m.$offset;
-        this.$value = m.$matched;
-        // Copy properties from the match
-        Object.getOwnPropertyNames(m)
-            .filter(prop => !prop.startsWith("$"))
-            .forEach(prop => {
-                this[prop] = m[prop];
-            });
-        if (isTreePatternMatch(m)) {
-            const subs = m.submatches();
-            this.$children = Object.getOwnPropertyNames(subs)
-                .map(prop => {
-                    const sub = subs[prop];
-                    console.log("Exposing child %s.%s as [%s]", $name, prop, "stringify(sub)");
-                    return new MicrogrammarBackedTreeNode(prop, sub);
-                });
-        } else {
-            if (Array.isArray(m.$value)) {
-                // ROD: I need to know whether children from a Rep should be added to 
-                // the array of children, or wrapped in tree node with multiple children
-                // also this is rather a scary hack around the part that we don't have an
-                // ArrayPatternMatch type and we should.
-                console.log("Found multiple values for " + $name);
-                this.$children = m.$value.map((s, i) =>
-                    new MicrogrammarBackedTreeNode("" + i, s))
-            }
-            // console.log("Exposing terminal %s as [%s]: value=[%s]", $name, stringify(m), m.$matched);
-            this.$value = String(m.$value);
-        }
-    }
-
-}
-
-export interface TreeNode {
-    readonly $name: string;
-    $children: TreeNode[];
-    $value?: string;
-    readonly $offset: number;
 }
