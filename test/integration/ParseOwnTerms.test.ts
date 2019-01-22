@@ -166,20 +166,22 @@ class MicrogrammarBackedTreeNode implements TreeNode {
             });
         if (isTreePatternMatch(m)) {
             const subs = m.submatches();
-            this.$children = _.flatten(Object.getOwnPropertyNames(subs)
+            this.$children = Object.getOwnPropertyNames(subs)
                 .map(prop => {
                     const sub = subs[prop];
-                    if (Array.isArray(sub)) {
-                        // ROD: I need to know whether children from a Rep should be added to 
-                        // the array of children, or wrapped in tree node with multiple children
-                        console.log("Found multiple values for " + prop);
-                        return sub.map((s, i) =>
-                            new MicrogrammarBackedTreeNode(prop + "[" + i + "]", s))
-                    }
                     console.log("Exposing child %s.%s as [%s]", $name, prop, "stringify(sub)");
-                    return [new MicrogrammarBackedTreeNode(prop, sub)];
-                }));
+                    return new MicrogrammarBackedTreeNode(prop, sub);
+                });
         } else {
+            if (Array.isArray(m.$value)) {
+                // ROD: I need to know whether children from a Rep should be added to 
+                // the array of children, or wrapped in tree node with multiple children
+                // also this is rather a scary hack around the part that we don't have an
+                // ArrayPatternMatch type and we should.
+                console.log("Found multiple values for " + $name);
+                this.$children = m.$value.map((s, i) =>
+                    new MicrogrammarBackedTreeNode("" + i, s))
+            }
             // console.log("Exposing terminal %s as [%s]: value=[%s]", $name, stringify(m), m.$matched);
             this.$value = String(m.$value);
         }
