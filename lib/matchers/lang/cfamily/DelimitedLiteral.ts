@@ -1,11 +1,17 @@
 import {
-    MatchPrefixResult,
     MatchFailureReport,
-    matchPrefixSuccess
+    MatchPrefixResult,
+    matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
 import { TerminalPatternMatch } from "../../../PatternMatch";
-import { LangState, LangStateMachine } from "../LangStateMachine";
-import { Normal, EscapeNextCharacter } from "./States";
+import {
+    LangState,
+    LangStateMachine,
+} from "../LangStateMachine";
+import {
+    EscapeNextCharacter,
+    Normal,
+} from "./States";
 import { MatchingLogic } from "../../../Matchers";
 import { InputState } from "../../../InputState";
 

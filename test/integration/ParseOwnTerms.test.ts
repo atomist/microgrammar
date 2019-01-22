@@ -4,7 +4,12 @@
  */
 
 import * as assert from "assert";
-import { microgrammar, optional, isPatternMatch, atLeastOne } from "../..";
+import {
+    atLeastOne,
+    isPatternMatch,
+    microgrammar,
+    optional,
+} from "../..";
 import { stringifyTree } from "stringify-tree";
 import { MatchFailureReport } from "../../lib/MatchPrefixResult";
 import { firstOf } from "../../lib";
