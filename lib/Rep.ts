@@ -60,7 +60,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
     }
 
     get $id() {
-        return `Rep[${this.matcher}:min=${this.min},sep=[${this.sep}]`;
+        return `Rep[${this.matcher.$id}:min=${this.min},sep=[${this.sep}]`;
     }
 
     public consumeWhiteSpace(consumeWhiteSpaceBetweenTokens: boolean): this {
