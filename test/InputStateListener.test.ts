@@ -45,7 +45,7 @@ describe("InputStateListener", () => {
                 if (is.peek(1) === "{" && l.seen.match(/\$$/)) {
                     return matchPrefixSuccess(new TerminalPatternMatch("mc", "{", is.offset, "{"));
                 }
-                return new MatchFailureReport("id", is.offset, {}, "wrong");
+                return new MatchFailureReport("id", is.offset, "", "wrong");
             }
         }
         const m = Microgrammar.fromDefinitions({
@@ -65,7 +65,7 @@ describe("InputStateListener", () => {
                 if (is.peek(1) === "@" && mpl.state !== DoubleString) {
                     return matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@"));
                 }
-                return new MatchFailureReport("id", is.offset, {}, "wrong");
+                return new MatchFailureReport("id", is.offset, "", "wrong");
             }
         }
 

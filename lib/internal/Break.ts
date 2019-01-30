@@ -66,7 +66,7 @@ export class Break implements MatchingLogic {
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
-                    return new MatchFailureReport(this.$id, is.offset);
+                    return new MatchFailureReport(this.$id, is.offset, matched);
                 }
             }
             matched += currentIs.peek(1);

@@ -29,7 +29,7 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-           matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs) ) :
-            new MatchFailureReport(this.$id, is.offset, context);
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs)) :
+            new MatchFailureReport(this.$id, is.offset, matched);
     }
 }

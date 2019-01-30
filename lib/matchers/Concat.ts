@@ -172,6 +172,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
         let matched = "";
+        const allReportResults: MatchPrefixResult[] = [];
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
@@ -179,6 +180,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 matched += eat.skipped;
 
                 const reportResult = step.matchPrefix(currentInputState, thisMatchContext, parseContext);
+                allReportResults.push(reportResult);
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult.match;
                     matches.push(report);
@@ -193,8 +195,13 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         bindingTarget[step.$id] = report.$value;
                     }
                 } else {
-                    return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
-                        `Failed at step '${step.name}' due to ${(reportResult as any).description}`);
+                    return MatchFailureReport.from({
+                        $matcherId: this.$id,
+                        $offset: initialInputState.offset,
+                        $matched: matched,
+                        cause: `Failed at step '${step.name}' due to ${(reportResult as any).description}`,
+                        children: allReportResults,
+                    });
                 }
             } else {
                 // It's a function taking the contexts.
@@ -202,7 +209,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return new MatchFailureReport(this.$id, initialInputState.offset, bindingTarget,
+                        return new MatchFailureReport(this.$id, initialInputState.offset, matched,
                             `Match vetoed by ${step.$id}`);
                     }
                 } else {

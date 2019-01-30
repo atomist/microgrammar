@@ -15,14 +15,32 @@ export interface MatchPrefixResult {
      */
     readonly $matcherId: string;
 
+    /**
+     * The matched string, if any
+     */
+    readonly $matched: string;
+
 }
 
 export class MatchFailureReport implements MatchPrefixResult {
 
+    public static from(params: {
+        $matcherId: string,
+        $offset: number,
+        $matched?: string,
+        cause?: string,
+        children?: MatchPrefixResult[],
+    }): MatchFailureReport {
+        const { $matcherId, $offset, $matched, cause, children } = params;
+        return new MatchFailureReport($matcherId, $offset, $matched || "", cause,
+            (children as MatchFailureReport[]));
+    }
+
     public constructor(public readonly $matcherId: string,
                        public readonly $offset: number,
-                       capturedStructure?: {},
-                       private readonly cause?: string | MatchFailureReport) {
+                       public readonly $matched: string,
+                       public readonly cause?: string,
+                       public readonly children?: MatchFailureReport[]) {
     }
 
     get description(): string {
@@ -38,7 +56,7 @@ export class MatchFailureReport implements MatchPrefixResult {
 export class SuccessfulMatch implements MatchPrefixResult {
 
     public constructor(public readonly match: PatternMatch,
-                       public readonly capturedStructure?: {} ) {
+                       public readonly capturedStructure?: {}) {
         if (match === undefined) {
             throw new Error("You can't be successful with an undefined match");
         }
@@ -49,7 +67,8 @@ export class SuccessfulMatch implements MatchPrefixResult {
     get $matcherId() { return this.match.$matcherId; }
 
     get $matched() {
-        return this.match.$matched; } // convenience
+        return this.match.$matched;
+    } // convenience
 
     get $value() { return this.match.$value; } // convenience
 }

@@ -20,7 +20,7 @@
         "noImplicitAny": false,
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
-        "noUnusedLocals": true,
+        // "noUnusedLocals": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
     },

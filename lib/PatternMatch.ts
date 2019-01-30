@@ -46,7 +46,7 @@ export abstract class PatternMatch {
 }
 
 export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
-    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$matched !== undefined;
+    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$value !== undefined;
 }
 
 /**

@@ -20,8 +20,8 @@ export class Literal implements MatchingLogic {
     public matchPrefix(is: InputState): MatchPrefixResult {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal) ) :
-            new MatchFailureReport(this.$id, is.offset, {},
+            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal)) :
+            new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
                 `Did not match literal [${this.literal}]: saw [${peek}]`);
     }
 
@@ -96,7 +96,7 @@ export abstract class AbstractRegex implements MatchingLogic {
                 is.offset,
                 this.toValue(matched)));
         } else {
-            return new MatchFailureReport(this.$id, is.offset, {},
+            return new MatchFailureReport(this.$id, is.offset, "",
                 `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
         }
     }
