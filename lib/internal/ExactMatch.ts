@@ -15,8 +15,8 @@ import { StringInputStream } from "../spi/StringInputStream";
 import { inputStateFromStream } from "./InputStateFactory";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-                              parseContext = {},
-                              l?: Listeners): PatternMatch & T | DismatchReport {
+    parseContext = {},
+    l?: Listeners): PatternMatch & T | DismatchReport {
 
     const wrapped = Concat.of({
         desired: matcher,
@@ -27,8 +27,10 @@ export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStrea
     if (isSuccessfulMatch(result)) {
         const detyped = result.match as any;
         if (detyped.trailingJunk !== "") {
-            return {description:
-                `Not all input was consumed: Left over [${detyped.trailingJunk.$matched}]`};
+            return {
+                description:
+                    `Not all input was consumed: Left over [${detyped.trailingJunk}]`
+            };
         } else {
             return detyped.desired as (PatternMatch & T);
         }
