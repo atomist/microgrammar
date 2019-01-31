@@ -31,7 +31,8 @@
         "legal",
         "log",
         "node_modules",
-        ".#*"
+        ".#*",
+        "*.d.ts"
     ],
     "compileOnSave": true,
     "buildOnSave": false,

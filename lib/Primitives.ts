@@ -5,6 +5,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
 import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
@@ -23,6 +24,15 @@ export class Literal implements MatchingLogic {
             matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal)) :
             new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
                 `Did not match literal [${this.literal}]: saw [${peek}]`);
+    }
+
+    public matchPrefixReport(is: InputState): MatchReport {
+        const peek = is.peek(this.literal.length);
+        return (peek === this.literal) ?
+            matchReportFromSuccessfulMatch(matchPrefixSuccess(
+                new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal))) :
+            matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
+                `Did not match literal [${this.literal}]: saw [${peek}]`));
     }
 
     public canStartWith(char: string): boolean {
@@ -64,6 +74,10 @@ export abstract class AbstractRegex implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is));
+    }
+
+    public matchPrefixReport(is: InputState): MatchReport {
         let results: RegExpExecArray;
         let lookAt: string;
         let charactersToSee = 0;
@@ -90,14 +104,14 @@ export abstract class AbstractRegex implements MatchingLogic {
 
         if (theRegexMatchedSomething()) {
             const matched = results[0];
-            return matchPrefixSuccess(new TerminalPatternMatch(
+            return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(
                 this.$id,
                 matched,
                 is.offset,
-                this.toValue(matched)));
+                this.toValue(matched))));
         } else {
-            return new MatchFailureReport(this.$id, is.offset, "",
-                `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
+            return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, "",
+                `Did not match regex /${this.regex.source}/ in [${lookAt}]`));
         }
     }
 

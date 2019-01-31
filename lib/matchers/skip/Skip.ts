@@ -6,7 +6,8 @@ import { Break } from "../../internal/Break";
 import { MatchingLogic } from "../../Matchers";
 
 import { InputState } from "../../InputState";
-import { matchPrefixSuccess } from "../../MatchPrefixResult";
+import { MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
+import { matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../../MatchReport";
 import { TerminalPatternMatch } from "../../PatternMatch";
 import { Literal } from "../../Primitives";
 import { toMatchingLogic } from "../Concat";
@@ -18,13 +19,20 @@ export const RestOfInput: MatchingLogic = {
 
     $id: "RestOfInput",
 
-    matchPrefix(is: InputState) {
-        const consumed = is.skipWhile(s => true, 1);
-        return matchPrefixSuccess(
-            // tslint:disable:no-invalid-this
-            new TerminalPatternMatch(this.$id, consumed.skipped, is.offset, consumed.skipped));
+    matchPrefix(is: InputState):
+        MatchPrefixResult {
+        return toMatchPrefixResult(restOfInputMatchPrefixReport(is));
     },
+
+    matchPrefixReport: restOfInputMatchPrefixReport,
 };
+
+function restOfInputMatchPrefixReport(is: InputState) {
+    const consumed = is.skipWhile(s => true, 1);
+    return matchReportFromSuccessfulMatch(matchPrefixSuccess(
+        // tslint:disable:no-invalid-this
+        new TerminalPatternMatch("RestOfInput", consumed.skipped, is.offset, consumed.skipped)));
+}
 
 /**
  * Match the rest of the current line

@@ -28,7 +28,7 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixReport } from "../MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -235,7 +235,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        return toMatchPrefixReport(this.matchPrefixReport(initialInputState, thisMatchContext, parseContext));
+        return toMatchPrefixResult(this.matchPrefixReport(initialInputState, thisMatchContext, parseContext));
     }
 
 }
@@ -278,7 +278,11 @@ export class NamedMatcher implements Matcher {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        return this.ml.matchPrefix(is, thisMatchContext, parseContext) as PatternMatch;
+        return toMatchPrefixResult(this.ml.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
+        return this.ml.matchPrefixReport(is, thisMatchContext, parseContext);
     }
 
     public canStartWith(char: string): boolean {

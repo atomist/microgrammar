@@ -11,6 +11,7 @@ import {
     PatternMatch,
     UndefinedPatternMatch,
 } from "./PatternMatch";
+import { toMatchPrefixResult, MatchReport, matchReportFromSuccessfulMatch, matchReportFromFailureReport } from "./MatchReport";
 
 /**
  * Optional match on the given matcher
@@ -37,17 +38,22 @@ export class Opt implements MatchingLogic {
         return `Opt[${this.matcher.$id}]`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
-            return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
+            return matchReportFromSuccessfulMatch(matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
         }
 
         const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
         if (isSuccessfulMatch(maybe)) {
-            return maybe;
+            return matchReportFromSuccessfulMatch(maybe);
         }
-        return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
+        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
     }
 }
 
@@ -79,20 +85,25 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
-            return new MatchFailureReport(this.$id, is.offset, "");
+            return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, ""));
         }
 
         const failedMatches: MatchPrefixResult[] = [];
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
             if (isSuccessfulMatch(m)) {
-                return m;
+                return matchReportFromSuccessfulMatch(m);
             }
             failedMatches.push(m);
         }
-        return MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches });
+        return matchReportFromFailureReport(MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches }));
     }
 }
 

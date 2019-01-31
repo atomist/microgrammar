@@ -14,6 +14,7 @@ import {
 
 import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
+import { toMatchPrefixResult, MatchReport, matchReportFromSuccessfulMatch, matchReportFromFailureReport } from "./MatchReport";
 
 /**
  * Match zero or more of these
@@ -80,7 +81,12 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
             this.matcher.requiredPrefix;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentInputState = is;
         const matches: PatternMatch[] = [];
         let matched = "";
@@ -128,16 +134,16 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
         );
 
         return (matches.length >= this.min) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id,
+            matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
-                values)) :
-            MatchFailureReport.from({
+                values))) :
+            matchReportFromFailureReport(MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: is.offset,
                 $matched: matched,
                 children: allResults,
-            });
+            }));
     }
 }
 

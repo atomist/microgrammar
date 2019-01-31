@@ -6,6 +6,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../MatchPrefixResult";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
 import { TerminalPatternMatch } from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
@@ -31,8 +32,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-                private readonly consume: boolean = false,
-                private readonly badMatcher?: MatchingLogic) {
+        private readonly consume: boolean = false,
+        private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {
@@ -52,6 +53,10 @@ export class Break implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentIs = is;
         let matched = "";
 
@@ -66,7 +71,7 @@ export class Break implements MatchingLogic {
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
-                    return new MatchFailureReport(this.$id, is.offset, matched);
+                    return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, matched));
                 }
             }
             matched += currentIs.peek(1);
@@ -78,9 +83,9 @@ export class Break implements MatchingLogic {
         // We have found the terminal if we get here
         if (this.consume && isSuccessfulMatch(terminalMatch)) {
             terminalMatch.match.$matched = matched + terminalMatch.match.$matched;
-            return matchPrefixSuccess(terminalMatch.match);
+            return matchReportFromSuccessfulMatch(matchPrefixSuccess(terminalMatch.match));
         }
-        return matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched));
+        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
     }
 }
 

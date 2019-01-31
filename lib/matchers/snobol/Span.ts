@@ -5,6 +5,10 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../../MatchPrefixResult";
+import {
+    MatchReport, matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch, toMatchPrefixResult,
+} from "../../MatchReport";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
 /**
@@ -21,7 +25,12 @@ export class Span implements MatchingLogic {
         return `Span[${this.characters}]`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentIs = is;
         let matched = "";
         while (!currentIs.exhausted() && this.characters.indexOf(currentIs.peek(1)) > -1) {
@@ -29,7 +38,7 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs)) :
-            new MatchFailureReport(this.$id, is.offset, matched);
+            matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs))) :
+            matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, matched));
     }
 }

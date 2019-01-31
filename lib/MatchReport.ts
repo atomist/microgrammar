@@ -48,7 +48,7 @@ export function toTreeNodeCompatible(mr: MatchReport): TreeNodeCompatible {
     return null;
 }
 
-export function toMatchPrefixReport(mr: MatchReport): MatchPrefixResult {
+export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
     switch (mr.kind) {
         case "wrappedDismatchReport":
             throw new Error("But the match failed: " + mr.dismatchReport.description);
