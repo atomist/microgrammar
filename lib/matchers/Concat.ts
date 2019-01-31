@@ -7,7 +7,6 @@ import {
 } from "../Matchers";
 import {
     isSuccessfulMatch,
-    MatchFailureReport,
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../MatchPrefixResult";
@@ -21,6 +20,7 @@ import {
     Literal,
     Regex,
 } from "../Primitives";
+import { MatchFailureReport } from "./../MatchPrefixResult";
 
 import {
     SkipCapable,
@@ -28,6 +28,7 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixReport } from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -167,7 +168,9 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
         return this.firstMatcher.requiredPrefix;
     }
 
-    public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefixReport(initialInputState: InputState,
+                             thisMatchContext,
+                             parseContext): MatchReport {
         const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -195,13 +198,13 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         bindingTarget[step.$id] = report.$value;
                     }
                 } else {
-                    return MatchFailureReport.from({
+                    return matchReportFromFailureReport(MatchFailureReport.from({
                         $matcherId: this.$id,
                         $offset: initialInputState.offset,
                         $matched: matched,
                         cause: `Failed at step '${step.name}' due to ${(reportResult as any).description}`,
                         children: allReportResults,
-                    });
+                    }));
                 }
             } else {
                 // It's a function taking the contexts.
@@ -209,26 +212,30 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return MatchFailureReport.from({
+                        return matchReportFromFailureReport(MatchFailureReport.from({
                             $matcherId: this.$id,
                             $offset: initialInputState.offset,
                             $matched: matched,
                             cause: `Match vetoed by ${step.$id}`,
                             children: allReportResults,
-                        });
+                        }));
                     }
                 } else {
                     bindingTarget[step.$id] = step.compute(bindingTarget);
                 }
             }
         }
-        return matchPrefixSuccess(new TreePatternMatch(
+        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TreePatternMatch(
             this.$id,
             matched,
             initialInputState.offset,
             this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
             matches,
-            bindingTarget), bindingTarget);
+            bindingTarget), bindingTarget));
+    }
+
+    public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        return toMatchPrefixReport(this.matchPrefixReport(initialInputState, thisMatchContext, parseContext));
     }
 
 }

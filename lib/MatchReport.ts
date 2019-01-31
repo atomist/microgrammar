@@ -1,6 +1,6 @@
+import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
-import { MatchFailureReport } from "./MatchPrefixResult";
 
 /**
  * All the data about the match, enough to generate either a PatternMatch
@@ -16,6 +16,12 @@ export type MatchReport = {
 } | {
     kind: "wrappedDismatchReport",
     dismatchReport: DismatchReport,
+} | {
+    kind: "wrappedMatchFailureReport",
+    matchFailureReport: MatchFailureReport,
+} | {
+    kind: "wrappedSuccessfulMatch",
+    successfulMatch: SuccessfulMatch,
 };
 
 export function toPatternMatch(mr: MatchReport): PatternMatch {
@@ -27,13 +33,32 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     switch (mr.kind) {
         case "wrappedDismatchReport":
             return mr.dismatchReport;
+        case "wrappedMatchFailureReport":
+            return mr.matchFailureReport;
         case "wrappedPatternMatch":
             return mr.patternMatch as PatternMatch & T;
+        case "wrappedSuccessfulMatch":
+            // it is not normal to call this
+            // return mr.successfulMatch.match as PatternMatch & T;
+            throw new Error("I didn't think this kind of match would get this called on it.");
     }
 }
 
 export function toTreeNodeCompatible(mr: MatchReport): TreeNodeCompatible {
     return null;
+}
+
+export function toMatchPrefixReport(mr: MatchReport): MatchPrefixResult {
+    switch (mr.kind) {
+        case "wrappedDismatchReport":
+            throw new Error("But the match failed: " + mr.dismatchReport.description);
+        case "wrappedMatchFailureReport":
+            return mr.matchFailureReport;
+        case "wrappedPatternMatch":
+            return mr.patternMatch as PatternMatch;
+        case "wrappedSuccessfulMatch":
+            return mr.successfulMatch;
+    }
 }
 
 /**
@@ -57,10 +82,20 @@ export function matchReportFromPatternMatch(pm: PatternMatch): MatchReport {
     return mr;
 }
 
+// replace: matchReportFromFailureReport(MatchFailureReport.from
 export function matchReportFromFailureReport(mfr: MatchFailureReport): MatchReport {
     const mr: MatchReport = {
-        kind: "wrappedDismatchReport",
-        dismatchReport: mfr,
+        kind: "wrappedMatchFailureReport",
+        matchFailureReport: mfr,
+    };
+    return mr;
+}
+
+// replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
+export function matchReportFromSuccessfulMatch(sm: SuccessfulMatch) {
+    const mr: MatchReport = {
+        kind: "wrappedSuccessfulMatch",
+        successfulMatch: sm,
     };
     return mr;
 }
