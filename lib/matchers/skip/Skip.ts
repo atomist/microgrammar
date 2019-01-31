@@ -29,7 +29,7 @@ export const RestOfInput: MatchingLogic = {
 
 function restOfInputMatchPrefixReport(is: InputState) {
     const consumed = is.skipWhile(s => true, 1);
-    return matchReportFromSuccessfulMatch(matchPrefixSuccess(
+    return matchReportFromSuccessfulMatch(RestOfInput, matchPrefixSuccess(
         // tslint:disable:no-invalid-this
         new TerminalPatternMatch("RestOfInput", consumed.skipped, is.offset, consumed.skipped)));
 }

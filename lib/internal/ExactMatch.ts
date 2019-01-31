@@ -19,14 +19,14 @@ import { StringInputStream } from "../spi/StringInputStream";
 import { inputStateFromStream } from "./InputStateFactory";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-                              parseContext = {},
-                              l?: Listeners): PatternMatch & T | DismatchReport {
+    parseContext = {},
+    l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(exactMatchReport(matcher, input, parseContext, l));
 }
 
 export function exactMatchReport(matcher: MatchingLogic, input: string | InputStream,
-                                 parseContext = {},
-                                 l?: Listeners): MatchReport {
+    parseContext = {},
+    l?: Listeners): MatchReport {
 
     const wrapped = Concat.of({
         desired: matcher,
@@ -37,13 +37,13 @@ export function exactMatchReport(matcher: MatchingLogic, input: string | InputSt
     if (isSuccessfulMatch(result)) {
         const detyped = result.match as any;
         if (detyped.trailingJunk !== "") {
-            return matchReportFromError(
+            return matchReportFromError(matcher,
                 `Not all input was consumed: Left over [${detyped.trailingJunk}]`);
         } else {
-            return matchReportFromPatternMatch(detyped.desired);
+            return matchReportFromPatternMatch(matcher, detyped.desired);
         }
     }
-    return matchReportFromFailureReport(result as MatchFailureReport);
+    return matchReportFromFailureReport(matcher, result as MatchFailureReport);
 }
 
 function toInputStream(input: string | InputStream): InputStream {

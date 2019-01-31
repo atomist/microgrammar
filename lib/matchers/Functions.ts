@@ -62,12 +62,12 @@ class FlatteningMatcher implements MatchingLogic {
                 const relevantSubMatch = r.match.$valueMatches[onlyPropertyName];
                 // TODO how do we update this?
                 const match = new TerminalPatternMatch(r.$matcherId, r.$matched, r.$offset, relevantSubMatch.$value);
-                return matchReportFromSuccessfulMatch(matchPrefixSuccess(match));
+                return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(match));
             } else {
-                return matchReportFromSuccessfulMatch(r);
+                return matchReportFromSuccessfulMatch(this, r);
             }
         }
-        return matchReportFromFailureReport(r as MatchFailureReport);
+        return matchReportFromFailureReport(this, r as MatchFailureReport);
     }
 
 }

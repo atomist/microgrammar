@@ -38,7 +38,7 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs))) :
-            matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, matched));
+            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs))) :
+            matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, matched));
     }
 }

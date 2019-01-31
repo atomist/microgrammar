@@ -15,6 +15,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../lib/MatchPrefixResult";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
 import { TerminalPatternMatch } from "../lib/PatternMatch";
@@ -40,12 +41,17 @@ describe("InputStateListener", () => {
 
         class MatchCurlyButNotAfter$ implements MatchingLogic {
 
-            public matchPrefix(is: InputState, mc, parseContext): MatchPrefixResult {
+            public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+                MatchPrefixResult {
+                return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+            }
+
+            public matchPrefixReport(is: InputState, mc, parseContext): MatchReport {
                 const l = is.listeners.l as Listener;
                 if (is.peek(1) === "{" && l.seen.match(/\$$/)) {
-                    return matchPrefixSuccess(new TerminalPatternMatch("mc", "{", is.offset, "{"));
+                    return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch("mc", "{", is.offset, "{")));
                 }
-                return new MatchFailureReport("id", is.offset, "", "wrong");
+                return matchReportFromFailureReport(this, new MatchFailureReport("id", is.offset, "", "wrong"));
             }
         }
         const m = Microgrammar.fromDefinitions({
@@ -60,12 +66,18 @@ describe("InputStateListener", () => {
     it("uses state machine", () => {
         class AtNotInString implements MatchingLogic {
 
-            public matchPrefix(is: InputState, mc, parseContext): MatchPrefixResult {
+            public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+                MatchPrefixResult {
+                return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+            }
+
+            public matchPrefixReport(is: InputState, mc, parseContext): MatchReport {
                 const mpl = is.listeners.l as CFamilyStateMachine;
                 if (is.peek(1) === "@" && mpl.state !== DoubleString) {
-                    return matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@"));
+                    return matchReportFromSuccessfulMatch(this,
+                        matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@")));
                 }
-                return new MatchFailureReport("id", is.offset, "", "wrong");
+                return matchReportFromFailureReport(this, new MatchFailureReport("id", is.offset, "", "wrong"));
             }
         }
 

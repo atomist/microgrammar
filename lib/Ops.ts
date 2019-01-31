@@ -46,14 +46,14 @@ export class Opt implements MatchingLogic {
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
-            return matchReportFromSuccessfulMatch(matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
+            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
         }
 
         const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
         if (isSuccessfulMatch(maybe)) {
-            return matchReportFromSuccessfulMatch(maybe);
+            return matchReportFromSuccessfulMatch(this, maybe);
         }
-        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
+        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
     }
 }
 
@@ -92,18 +92,18 @@ export class Alt implements MatchingLogic {
 
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
-            return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, ""));
+            return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, ""));
         }
 
         const failedMatches: MatchPrefixResult[] = [];
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
             if (isSuccessfulMatch(m)) {
-                return matchReportFromSuccessfulMatch(m);
+                return matchReportFromSuccessfulMatch(this, m);
             }
             failedMatches.push(m);
         }
-        return matchReportFromFailureReport(MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches }));
+        return matchReportFromFailureReport(this, MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches }));
     }
 }
 

@@ -1,3 +1,4 @@
+import { Matcher, MatchingLogic } from "./Matchers";
 import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
@@ -10,7 +11,7 @@ import { TreeNodeCompatible } from "./TreeNodeCompatible";
  * structures are different. So, let's output one structure that can
  * be turned into any of them.
  */
-export type MatchReport = {
+export type MatchReport = { matcher: MatchingLogic } & ({
     kind: "wrappedPatternMatch",
     patternMatch: PatternMatch,
 } | {
@@ -22,7 +23,7 @@ export type MatchReport = {
 } | {
     kind: "wrappedSuccessfulMatch",
     successfulMatch: SuccessfulMatch,
-};
+});
 
 export function toPatternMatch(mr: MatchReport): PatternMatch {
     return null;
@@ -62,10 +63,11 @@ export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
 }
 
 /**
- * Cases
+ * Current Cases
  */
-export function matchReportFromError(description: string): MatchReport {
+export function matchReportFromError(matcher: MatchingLogic, description: string): MatchReport {
     const mr: MatchReport = {
+        matcher,
         kind: "wrappedDismatchReport",
         dismatchReport: {
             description,
@@ -74,8 +76,9 @@ export function matchReportFromError(description: string): MatchReport {
     return mr;
 }
 
-export function matchReportFromPatternMatch(pm: PatternMatch): MatchReport {
+export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch): MatchReport {
     const mr: MatchReport = {
+        matcher,
         kind: "wrappedPatternMatch",
         patternMatch: pm,
     };
@@ -83,8 +86,9 @@ export function matchReportFromPatternMatch(pm: PatternMatch): MatchReport {
 }
 
 // replace: matchReportFromFailureReport(MatchFailureReport.from
-export function matchReportFromFailureReport(mfr: MatchFailureReport): MatchReport {
+export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchFailureReport): MatchReport {
     const mr: MatchReport = {
+        matcher,
         kind: "wrappedMatchFailureReport",
         matchFailureReport: mfr,
     };
@@ -92,10 +96,32 @@ export function matchReportFromFailureReport(mfr: MatchFailureReport): MatchRepo
 }
 
 // replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
-export function matchReportFromSuccessfulMatch(sm: SuccessfulMatch) {
+export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch) {
     const mr: MatchReport = {
+        matcher,
         kind: "wrappedSuccessfulMatch",
         successfulMatch: sm,
     };
     return mr;
+}
+
+/**
+ * Desired cases
+ */
+export function successfulTreeMatchReport(params:
+    {
+        matcher: MatchingLogic,
+        name: string,
+        matched: string,
+        offset: number,
+        children: { [k: string]: MatchReport },
+        childrenToExposeAsProperties: string[],
+        additionalProperties: { [k: string]: any },
+    },
+) {
+
+    // theory: this is enough data to replace TreePatternMatch.
+
+    //
+
 }

@@ -29,9 +29,9 @@ export class Literal implements MatchingLogic {
     public matchPrefixReport(is: InputState): MatchReport {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            matchReportFromSuccessfulMatch(matchPrefixSuccess(
+            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(
                 new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal))) :
-            matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
+            matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
                 `Did not match literal [${this.literal}]: saw [${peek}]`));
     }
 
@@ -104,13 +104,13 @@ export abstract class AbstractRegex implements MatchingLogic {
 
         if (theRegexMatchedSomething()) {
             const matched = results[0];
-            return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(
+            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(
                 this.$id,
                 matched,
                 is.offset,
                 this.toValue(matched))));
         } else {
-            return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, "",
+            return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, "",
                 `Did not match regex /${this.regex.source}/ in [${lookAt}]`));
         }
     }

@@ -169,8 +169,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): MatchReport {
+        thisMatchContext,
+        parseContext): MatchReport {
         const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -198,7 +198,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         bindingTarget[step.$id] = report.$value;
                     }
                 } else {
-                    return matchReportFromFailureReport(MatchFailureReport.from({
+                    return matchReportFromFailureReport(this, MatchFailureReport.from({
                         $matcherId: this.$id,
                         $offset: initialInputState.offset,
                         $matched: matched,
@@ -212,7 +212,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return matchReportFromFailureReport(MatchFailureReport.from({
+                        return matchReportFromFailureReport(this, MatchFailureReport.from({
                             $matcherId: this.$id,
                             $offset: initialInputState.offset,
                             $matched: matched,
@@ -225,7 +225,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 }
             }
         }
-        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TreePatternMatch(
+        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TreePatternMatch(
             this.$id,
             matched,
             initialInputState.offset,
@@ -241,7 +241,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 }
 
 function isMatcher(s: MatchStep): s is Matcher {
-    return (s as Matcher).matchPrefix !== undefined;
+    return (s as Matcher).matchPrefixReport !== undefined;
 }
 
 /**
@@ -258,7 +258,7 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
         return new Literal(o);
     } else if ((o as RegExp).exec) {
         return new Regex(o as RegExp);
-    } else if ((o as MatchingLogic).matchPrefix) {
+    } else if ((o as MatchingLogic).matchPrefixReport) {
         return o as MatchingLogic;
     } else if ((o as Microgrammar<any>).findMatches) {
         return (o as Microgrammar<any>).matcher;

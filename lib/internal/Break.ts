@@ -71,7 +71,7 @@ export class Break implements MatchingLogic {
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
-                    return matchReportFromFailureReport(new MatchFailureReport(this.$id, is.offset, matched));
+                    return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, matched));
                 }
             }
             matched += currentIs.peek(1);
@@ -83,9 +83,9 @@ export class Break implements MatchingLogic {
         // We have found the terminal if we get here
         if (this.consume && isSuccessfulMatch(terminalMatch)) {
             terminalMatch.match.$matched = matched + terminalMatch.match.$matched;
-            return matchReportFromSuccessfulMatch(matchPrefixSuccess(terminalMatch.match));
+            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(terminalMatch.match));
         }
-        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
+        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
     }
 }
 

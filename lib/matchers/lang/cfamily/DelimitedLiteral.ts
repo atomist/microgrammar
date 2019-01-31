@@ -40,7 +40,7 @@ export class DelimitedLiteral implements MatchingLogic {
         const initialOffset = is.offset;
         let currentIs = is; // is this needed? seems likely.
         if (is.peek(1) !== delimiter) {
-            return matchReportFromFailureReport(MatchFailureReport.from({
+            return matchReportFromFailureReport(this, MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: initialOffset,
                 cause: `No opening ${delimiter}; saw ${is.peek(1)} instead`,
@@ -53,7 +53,7 @@ export class DelimitedLiteral implements MatchingLogic {
             const next = currentIs.peek(1);
             if (next.length === 0) {
                 // out of input
-                return matchReportFromFailureReport(MatchFailureReport.from({
+                return matchReportFromFailureReport(this, MatchFailureReport.from({
                     $matcherId: this.$id,
                     $offset: initialOffset,
                     cause: `End of input before the closing ${delimiter}`,
@@ -64,7 +64,7 @@ export class DelimitedLiteral implements MatchingLogic {
             currentIs = currentIs.consume(next, `Looking for a closing ${delimiter}`);
         }
 
-        return matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(
+        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(
             this.$id, matched, is.offset, matched)));
     }
 }

@@ -134,11 +134,11 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
         );
 
         return (matches.length >= this.min) ?
-            matchReportFromSuccessfulMatch(matchPrefixSuccess(new TerminalPatternMatch(this.$id,
+            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id,
                 matched,
                 is.offset,
                 values))) :
-            matchReportFromFailureReport(MatchFailureReport.from({
+            matchReportFromFailureReport(this, MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: is.offset,
                 $matched: matched,
