@@ -209,8 +209,13 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return new MatchFailureReport(this.$id, initialInputState.offset, matched,
-                            `Match vetoed by ${step.$id}`);
+                        return MatchFailureReport.from({
+                            $matcherId: this.$id,
+                            $offset: initialInputState.offset,
+                            $matched: matched,
+                            cause: `Match vetoed by ${step.$id}`,
+                            children: allReportResults,
+                        });
                     }
                 } else {
                     bindingTarget[step.$id] = step.compute(bindingTarget);
