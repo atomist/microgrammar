@@ -22,7 +22,7 @@ import {
 } from "./Grammar";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
-import { exactMatch } from "./internal/ExactMatch";
+import { exactMatch, exactMatchReport } from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import {
@@ -30,6 +30,7 @@ import {
     MicrogrammarUpdates,
 } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
+import { MatchReport } from "./MatchReport";
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
@@ -209,6 +210,10 @@ export class Microgrammar<T> implements Grammar<T> {
      */
     public exactMatch(input: string | InputStream, parseContext = {}, l?: Listeners): PatternMatch & T | DismatchReport {
         return exactMatch<T>(this.matcher, input, parseContext, l);
+    }
+
+    public exactMatchReport(input: string | InputStream, parseContext = {}, l?: Listeners): MatchReport {
+        return exactMatchReport(this.matcher, input, parseContext, l);
     }
 
 }
