@@ -5,16 +5,11 @@
 
 import * as assert from "assert";
 import { stringifyTree } from "stringify-tree";
-import {
-    atLeastOne,
-    isPatternMatch,
-    microgrammar,
-    optional,
-} from "../..";
-import { firstOf } from "../../lib";
+import { firstOf, atLeastOne, optional, isPatternMatch } from "../../lib";
 import { DelimitedLiteral } from "../../lib/matchers/lang/cfamily/DelimitedLiteral";
 import { regexLiteral } from "../../lib/matchers/lang/cfamily/javascript/regexpLiteral";
 import { MatchFailureReport } from "../../lib/MatchPrefixResult";
+import { microgrammar } from "../../lib/microgrammarConstruction";
 
 describe("Task of parsing mg terms", () => {
     it("Can parse two terms with regex", async () => {

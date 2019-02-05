@@ -80,7 +80,7 @@ describe("When", () => {
     it("preserves properties", () => {
         const primitive = new Literal("foo");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        assert(requiresFoo.literal === primitive.literal);
+        assert((requiresFoo as any).literal === primitive.literal);
     });
 
 });

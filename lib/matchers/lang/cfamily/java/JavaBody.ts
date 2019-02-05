@@ -1,4 +1,4 @@
-import { MatchingLogic } from "../../../..";
+import { MatchingLogic } from "../../../../Matchers";
 import {
     block,
     blockContaining,

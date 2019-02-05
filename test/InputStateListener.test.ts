@@ -101,12 +101,19 @@ public class Foo {
 
     it("tracks nesting depth 4 statement", () => {
         const m = Microgrammar.fromDefinitions<any>({
-            toFlag: when(JavaBlock, _ => true, is => (is.listeners.depthCount as NestingDepthStateMachine).depth >= 4),
+            toFlag: when(JavaBlock, _ => true,
+                is => {
+                    console.log("depthCount is " + (is.listeners.depthCount as any).depth);
+                    return (is.listeners.depthCount as NestingDepthStateMachine).depth >= 4;
+                }),
+            // toFlag: JavaBlock,
         });
         const matches = m.findMatches(DeeplyNested, {}, { depthCount: new NestingDepthStateMachine() });
-        assert(matches.length === 1);
-        assert(matches[0].toFlag.block, JSON.stringify(matches[0]));
-        assert(new CFamilyLangHelper().canonicalize(matches[0].toFlag.block) === "println(\"too deeply nested\");");
+        assert.strictEqual(matches.length, 1);
+        assert(matches[0].toFlag.block, "Expected a block but got: " + JSON.stringify(matches[0]));
+        const canonicalized = new CFamilyLangHelper().canonicalize(matches[0].toFlag.block);
+        assert.strictEqual(canonicalized,
+            "println(\"too deeply nested\");");
     });
 
 });

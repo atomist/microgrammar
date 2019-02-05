@@ -1,5 +1,5 @@
 import { InputState } from "./InputState";
-import { MatchingLogic } from "./Matchers";
+import { Matcher, MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
     isSuccessfulMatch,
@@ -7,11 +7,11 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
 import {
     PatternMatch,
     UndefinedPatternMatch,
 } from "./PatternMatch";
-import { toMatchPrefixResult, MatchReport, matchReportFromSuccessfulMatch, matchReportFromFailureReport } from "./MatchReport";
 
 /**
  * Optional match on the given matcher
@@ -116,51 +116,58 @@ export function when(
     o: any,
     matchTest: (pm: PatternMatch) => boolean,
     inputStateTest: (is: InputState) => boolean = is => true,
-) {
+): MatchingLogic {
+    const output = new WhenMatcher(toMatchingLogic(o), matchTest, inputStateTest);
 
-    const matcher = toMatchingLogic(o);
-    const conditionalMatcher = {} as any;
-
-    conditionalMatcher.$id = `When[${matcher}]`;
-
-    // Copy other properties
     for (const prop in o) {
         if (o.hasOwnProperty(prop)) {
-            conditionalMatcher[prop] = o[prop];
+            output[prop] = o[prop];
         }
     }
+    return output;
+}
+class WhenMatcher implements MatchingLogic {
 
-    function conditionalMatch(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
-        if (!inputStateTest(is)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
+    public readonly $id: string;
+
+    constructor(public readonly inner: MatchingLogic,
+                public readonly matchTest: (pm: PatternMatch) => boolean,
+                public readonly inputStateTest: (is: InputState) => boolean) {
+
+        this.$id = `When[${inner.$id}]`;
+        this.canStartWith = inner.canStartWith;
+    }
+    public canStartWith?(char: string): boolean;
+
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
+        if (!this.inputStateTest(is)) {
+            return matchReportFromFailureReport(this, MatchFailureReport.from({
+                $matcherId: this.$id,
                 $offset: is.offset,
                 cause: "Input state test returned false",
-            });
+            }));
         }
-        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
+        const result = this.inner.matchPrefix(is, thisMatchContext, parseContext);
         if (!isSuccessfulMatch(result)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
+            return matchReportFromFailureReport(this, MatchFailureReport.from({
+                $matcherId: this.$id,
                 $offset: is.offset,
                 children: [result],
                 cause: (result as MatchFailureReport).description,
-            });
+            }));
         }
-        if (!matchTest(result.match)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
+        if (!this.matchTest(result.match)) {
+            return matchReportFromFailureReport(this, MatchFailureReport.from({
+                $matcherId: this.$id,
                 $offset: is.offset,
                 $matched: result.$matched,
                 children: [result],
                 cause: "Match test returned false",
-            });
+            }));
         }
-        return result;
+        return matchReportFromSuccessfulMatch(this, result);
     }
 
-    conditionalMatcher.matchPrefix = conditionalMatch;
-    conditionalMatcher.requiredPrefix = matcher.requiredPrefix;
-    conditionalMatcher.canStartWith = matcher.canStartWith;
-    return conditionalMatcher;
+    public matchPrefix(a, b, c) { return toMatchPrefixResult(this.matchPrefixReport(a, b, c)); }
+
 }
