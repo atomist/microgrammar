@@ -62,6 +62,28 @@ export function successfulMatchReport(matcher: MatchingLogic, params: {
     return new SuccessfulTerminalMatchReport(matcher, params);
 }
 
+export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport): FullMatchReport {
+    return new WrappingMatchReport(matcher, inner);
+}
+
+class WrappingMatchReport implements FullMatchReport {
+    public readonly kind = "real";
+    constructor(public readonly matcher: MatchingLogic,
+                public readonly inner: MatchReport) {
+    }
+
+    get successful() {
+        return this.inner.successful;
+    }
+
+    public toPatternMatch() {
+        if (isSuccessfulMatchReport(this.inner)) {
+            return this.inner.toPatternMatch();
+        }
+        throw new Error("Unsuccessful match, no pattern match for you");
+    }
+}
+
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
     if (fmr.kind === "real") {
         return (fmr as FullMatchReport).successful;
@@ -79,7 +101,7 @@ export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr
  * structures are different. So, let's output one structure that can
  * be turned into any of them.
  */
-export type MatchReport = { matcher: MatchingLogic } & ({
+export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
     kind: "wrappedPatternMatch",
     patternMatch: PatternMatch,
 } | {
@@ -153,6 +175,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
         dismatchReport: {
             description,
         },
+        successful: false,
     };
     return mr;
 }
@@ -162,6 +185,7 @@ export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternM
         matcher,
         kind: "wrappedPatternMatch",
         patternMatch: pm,
+        successful: true,
     };
     return mr;
 }
@@ -172,6 +196,7 @@ export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchF
         matcher,
         kind: "wrappedMatchFailureReport",
         matchFailureReport: mfr,
+        successful: false,
     };
     return mr;
 }
@@ -197,6 +222,7 @@ export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: S
         kind: "wrappedSuccessfulMatch",
         successfulMatch: sm,
         toPatternMatch() { return sm.match; },
+        successful: true,
     };
     return mr;
 }

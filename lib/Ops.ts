@@ -7,7 +7,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "./MatchReport";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult, wrappingMatchReport } from "./MatchReport";
 import {
     PatternMatch,
     UndefinedPatternMatch,
@@ -49,9 +49,9 @@ export class Opt implements MatchingLogic {
             return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
         }
 
-        const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
-        if (isSuccessfulMatch(maybe)) {
-            return matchReportFromSuccessfulMatch(this, maybe);
+        const maybe = this.matcher.matchPrefixReport(is, thisMatchContext, parseContext);
+        if (isSuccessfulMatchReport(maybe)) {
+            return wrappingMatchReport(this, maybe);
         }
         return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
     }
@@ -131,8 +131,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-                public readonly matchTest: (pm: PatternMatch) => boolean,
-                public readonly inputStateTest: (is: InputState) => boolean) {
+        public readonly matchTest: (pm: PatternMatch) => boolean,
+        public readonly inputStateTest: (is: InputState) => boolean) {
 
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;

@@ -75,7 +75,7 @@ describe("Microgrammar", () => {
             interface Person { forename: string; surname: string; }
             const person = microgrammar<Person>(
                 { phrase: "${forename} ${surname}", terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ } });
-            const employee = microgrammar<{person: Person, id: number}>({
+            const employee = microgrammar<{ person: Person, id: number }>({
                 person,
                 id: Integer,
             });
@@ -305,7 +305,7 @@ describe("Microgrammar", () => {
         // console.log("Result is " + JSON.stringify(result));
         assert(result.length === 1);
         const r0 = result[0] as any;
-        assert(result[0].$matched === content);
+        assert.strictEqual(result[0].$matched, content);
         assert(r0.first.name === "first");
         assert(r0.first.$matched === "<first>");
         assert(r0.second.name === "second");
