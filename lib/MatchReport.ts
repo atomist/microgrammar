@@ -26,7 +26,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly valueRepresented: any;
 
     constructor(public readonly matcher: MatchingLogic,
-                params: {
+        params: {
             matched: string,
             offset: number,
             valueRepresented: any,
