@@ -6,7 +6,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
 import { TerminalPatternMatch } from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
@@ -66,8 +66,8 @@ export class Break implements MatchingLogic {
             matched += skipped.skipped;
             currentIs = skipped.state;
         }
-        let terminalMatch: MatchPrefixResult = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
-        while (!currentIs.exhausted() && !isSuccessfulMatch(terminalMatch)) { // if it fits, it sits
+        let terminalMatch: MatchReport = this.terminateOn.matchPrefixReport(currentIs, thisMatchContext, parseContext);
+        while (!currentIs.exhausted() && !isSuccessfulMatchReport(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
                 if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
@@ -77,13 +77,15 @@ export class Break implements MatchingLogic {
             matched += currentIs.peek(1);
             currentIs = currentIs.advance();
             if (!currentIs.exhausted()) {
-                terminalMatch = this.terminateOn.matchPrefix(currentIs, thisMatchContext, parseContext);
+                terminalMatch = this.terminateOn.matchPrefixReport(currentIs, thisMatchContext, parseContext);
             }
         }
         // We have found the terminal if we get here
-        if (this.consume && isSuccessfulMatch(terminalMatch)) {
-            terminalMatch.match.$matched = matched + terminalMatch.match.$matched;
-            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(terminalMatch.match));
+        if (this.consume && isSuccessfulMatchReport(terminalMatch)) {
+            // wait. we _modify the match_ ? wat
+            const match = terminalMatch.toPatternMatch();
+            match.$matched = matched + match.$matched;
+            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(match));
         }
         return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
     }
