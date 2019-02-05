@@ -7,18 +7,17 @@ import { Regex } from "../lib/Primitives";
 
 import * as assert from "power-assert";
 import { Break } from "../lib/internal/Break";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("Regex", () => {
 
     it("match word letters", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
-        const m = regexp.matchPrefix(is);
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            const match = mmmm;
-            assert(match.$matched === "friday");
-            assert(mmmm.$offset === 0);
+        const m = regexp.matchPrefixReport(is);
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === "friday");
+            assert(m.offset === 0);
         } else {
             assert.fail("Didn't match");
         }
@@ -26,12 +25,10 @@ describe("Regex", () => {
     it("match word letters using anchor that will be recognized", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("friday 14");
-        const m = regexp.matchPrefix(is);
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            const match = mmmm;
-            assert(match.$matched === "friday");
-            assert(mmmm.$offset === 0);
+        const m = regexp.matchPrefixReport(is);
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === "friday");
+            assert(m.offset === 0);
         } else {
             assert.fail("Didn't match");
         }
