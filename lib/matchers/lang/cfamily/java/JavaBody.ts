@@ -1,10 +1,10 @@
+import { MatchingLogic } from "../../../../Matchers";
 import {
     block,
     blockContaining,
     parenthesizedExpression,
 } from "../CBlock";
 import { CFamilyStateMachine } from "../CFamilyStateMachine";
-import { MatchingLogic } from "../../../../Matchers";
 
 /**
  * Match a Java block with balanced curlies
