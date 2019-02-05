@@ -12,6 +12,7 @@ import {
 import { RealWorldPom } from "./Fixtures";
 
 import * as assert from "power-assert";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 import { Literal } from "../lib/Primitives";
 
 describe("Rep", () => {
@@ -29,10 +30,8 @@ describe("Rep", () => {
     it("rep(0) should match 0 when matcher doesn't match", () => {
         const rep = new Rep("A");
         const is = inputStateFromString("friday 14");
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
             // expect(is.peek(2)).to.equal(mmmm.$resultingInputState.peek(2));
         } else {
             assert.fail("Didn't match");
@@ -49,10 +48,9 @@ describe("Rep", () => {
     it("should match when matcher matches once", () => {
         const rep = new Rep("A");
         const is = inputStateFromString("And there was light!");
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            // good
         } else {
             assert.fail("Didn't match");
         }
@@ -61,10 +59,9 @@ describe("Rep", () => {
     it("repsep should match when matcher matches once", () => {
         const rep = new RepSep("A", "abcd");
         const is = inputStateFromString("And there was light!");
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            // good
         } else {
             assert.fail("Didn't match");
         }
@@ -75,10 +72,9 @@ describe("Rep", () => {
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === toMatch);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -89,10 +85,9 @@ describe("Rep", () => {
         const toMatch = "And there was light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "And");
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === "And");
         } else {
             assert.fail("Didn't match");
         }
@@ -112,10 +107,9 @@ describe("Rep", () => {
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === toMatch);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -126,10 +120,9 @@ describe("Rep", () => {
         const toMatch = "And,there,was,light";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === toMatch);
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -140,9 +133,9 @@ describe("Rep", () => {
         const toMatch = "And";
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
-        const m = rep.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            const mmmm = m.toPatternMatch();
             assert(!!mmmm);
         } else {
             assert.fail("Didn't match");
@@ -166,9 +159,9 @@ describe("Rep", () => {
 	</properties>
         `;
         const is = inputStateFromString(toMatch);
-        const m = rep.matchPrefix(is, {}, {}) as PatternMatch;
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
+        const m = rep.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            const mmmm = m.toPatternMatch();
             assert(mmmm.$value.length === 3);
         } else {
             assert.fail("Didn't match");
