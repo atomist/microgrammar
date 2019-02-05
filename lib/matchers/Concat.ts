@@ -28,7 +28,7 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, matchReportFromSuccessfulTreeMatch } from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -169,8 +169,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): MatchReport {
+        thisMatchContext,
+        parseContext): MatchReport {
         const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -225,7 +225,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 }
             }
         }
-        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TreePatternMatch(
+        return matchReportFromSuccessfulTreeMatch(this, matchPrefixSuccess(new TreePatternMatch(
             this.$id,
             matched,
             initialInputState.offset,

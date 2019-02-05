@@ -7,7 +7,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "./MatchReport";
 import {
     PatternMatch,
     UndefinedPatternMatch,
@@ -147,25 +147,29 @@ class WhenMatcher implements MatchingLogic {
                 cause: "Input state test returned false",
             }));
         }
-        const result = this.inner.matchPrefix(is, thisMatchContext, parseContext);
-        if (!isSuccessfulMatch(result)) {
+        const result = this.inner.matchPrefixReport(is, thisMatchContext, parseContext);
+        const resultMpr = toMatchPrefixResult(result); // shim
+        if (!isSuccessfulMatchReport(result)) {
             return matchReportFromFailureReport(this, MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: is.offset,
-                children: [result],
-                cause: (result as MatchFailureReport).description,
+                children: [resultMpr],
+                cause: (resultMpr as MatchFailureReport).description,
             }));
         }
-        if (!this.matchTest(result.match)) {
+        if (!this.matchTest(result.toPatternMatch())) {
             return matchReportFromFailureReport(this, MatchFailureReport.from({
                 $matcherId: this.$id,
                 $offset: is.offset,
-                $matched: result.$matched,
-                children: [result],
+                $matched: result.matched,
+                children: [resultMpr],
                 cause: "Match test returned false",
             }));
         }
-        return matchReportFromSuccessfulMatch(this, result);
+        return successfulMatchReport(this, {
+            matched: result.matched, offset: result.offset,
+            valueRepresented: result.toPatternMatch().$value,
+        });
     }
 
     public matchPrefix(a, b, c) { return toMatchPrefixResult(this.matchPrefixReport(a, b, c)); }

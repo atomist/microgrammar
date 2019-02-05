@@ -17,7 +17,7 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     toPatternMatch<T>(): PatternMatch & T;
 }
 
-class SuccessfulMatchReportImpl implements SuccessfulMatchReport {
+class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly successful = true;
     public readonly kind = "real";
 
@@ -42,7 +42,7 @@ class SuccessfulMatchReportImpl implements SuccessfulMatchReport {
             $matched: this.matched,
             $offset: this.offset,
             $value: this.valueRepresented,
-            matchedStructure<TT>() { return {} as TT; }, // really should be T
+            matchedStructure: <TT>() => this.valueRepresented as TT, // really should be T
         };
 
         // hack for compatibility with isSuccessfulMatch
@@ -59,7 +59,7 @@ export function successfulMatchReport(matcher: MatchingLogic, params: {
     offset: number,
     valueRepresented: any,
 }) {
-    return new SuccessfulMatchReportImpl(matcher, params);
+    return new SuccessfulTerminalMatchReport(matcher, params);
 }
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
@@ -182,6 +182,16 @@ export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: Succe
         offset: sm.$offset,
         valueRepresented: sm.$value,
     });
+}
+
+// I'm implementing terminal first
+export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: SuccessfulMatch): MatchReport {
+    const mr: MatchReport = {
+        matcher,
+        kind: "wrappedSuccessfulMatch",
+        successfulMatch: sm,
+    };
+    return mr;
 }
 
 /**
