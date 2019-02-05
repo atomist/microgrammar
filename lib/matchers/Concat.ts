@@ -28,7 +28,7 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, matchReportFromSuccessfulTreeMatch } from "../MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, matchReportFromSuccessfulTreeMatch, toMatchPrefixResult } from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -169,8 +169,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-        thisMatchContext,
-        parseContext): MatchReport {
+                             thisMatchContext,
+                             parseContext): MatchReport {
         const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -186,7 +186,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 allReportResults.push(reportResult);
                 if (isSuccessfulMatch(reportResult)) {
                     const report = reportResult;
-                    matches.push(report as any as PatternMatch);
+                    matches.push((report.match || report) as any as PatternMatch);
                     currentInputState = currentInputState.consume(report.$matched,
                         `Concat step [${reportResult.$matcherId}] matched ${reportResult.$matched}`);
                     matched += report.$matched;
