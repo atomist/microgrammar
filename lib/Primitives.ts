@@ -74,7 +74,11 @@ export abstract class AbstractRegex implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
-        return toMatchPrefixResult(this.matchPrefixReport(is));
+        const output = toMatchPrefixResult(this.matchPrefixReport(is));
+        if (!output) {
+            throw new Error("That should never return undefined");
+        }
+        return output;
     }
 
     public matchPrefixReport(is: InputState): MatchReport {

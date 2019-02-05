@@ -169,8 +169,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-        thisMatchContext,
-        parseContext): MatchReport {
+                             thisMatchContext,
+                             parseContext): MatchReport {
         const bindingTarget = {};
         const matches: PatternMatch[] = [];
         let currentInputState = initialInputState;
@@ -185,8 +185,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 const reportResult = step.matchPrefix(currentInputState, thisMatchContext, parseContext);
                 allReportResults.push(reportResult);
                 if (isSuccessfulMatch(reportResult)) {
-                    const report = reportResult.match;
-                    matches.push(report);
+                    const report = reportResult;
+                    matches.push(report as any as PatternMatch);
                     currentInputState = currentInputState.consume(report.$matched,
                         `Concat step [${reportResult.$matcherId}] matched ${reportResult.$matched}`);
                     matched += report.$matched;

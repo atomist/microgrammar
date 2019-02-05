@@ -5,6 +5,7 @@ import { when } from "../lib/Ops";
 import { Literal } from "../lib/Primitives";
 
 import * as assert from "power-assert";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("When", () => {
 
@@ -18,10 +19,9 @@ describe("When", () => {
         if (!matcher.matchPrefix) {
             throw new Error("Error: matcher.matchPrefix returned by when is undefined");
         }
-        const m = matcher.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = matcher.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            // good
         } else {
             assert.fail("Didn't match");
         }
@@ -47,10 +47,9 @@ describe("When", () => {
         const primitive = new RegExp(/[a-z]+/);
         const is = inputStateFromString("bar and this is a load of other stuff");
         const hatesFoo = when(primitive, pm => pm.$matched.indexOf("foo") === -1);
-        const m = hatesFoo.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = hatesFoo.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            // good
         } else {
             assert.fail("Didn't match");
         }
@@ -60,10 +59,9 @@ describe("When", () => {
         const primitive = new Literal("foo");
         const is = inputStateFromString("foo bar");
         const requiresFoo = when(primitive, pm => pm.$matched.indexOf("foo") !== -1);
-        const m = requiresFoo.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(!!mmmm);
+        const m = requiresFoo.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "foo");
         } else {
             assert.fail("Didn't match");
         }

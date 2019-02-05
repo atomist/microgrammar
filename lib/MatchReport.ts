@@ -3,6 +3,69 @@ import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchP
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
+export interface FullMatchReport {
+    successful: boolean;
+    kind: "real";
+    matcher: MatchingLogic; // is all of this really necessary?
+}
+
+export interface SuccessfulMatchReport extends FullMatchReport {
+    successful: true;
+    matched: string;
+    offset: number;
+    kind: "real"; // after wrappers are gone, this can go
+    toPatternMatch<T>(): PatternMatch & T;
+}
+
+class SuccessfulMatchReportImpl implements SuccessfulMatchReport {
+    public readonly successful = true;
+    public readonly kind = "real";
+
+    public readonly matched: string;
+    public readonly offset: number;
+    public readonly valueRepresented: any;
+
+    constructor(public readonly matcher: MatchingLogic,
+                params: {
+            matched: string,
+            offset: number,
+            valueRepresented: any,
+        }) {
+        this.matched = params.matched;
+        this.offset = params.offset;
+        this.valueRepresented = params.valueRepresented;
+    }
+
+    public toPatternMatch<T>(): PatternMatch & T {
+        const pm: PatternMatch = {
+            $matcherId: this.matcher.$id,
+            $matched: this.matched,
+            $offset: this.offset,
+            $value: this.valueRepresented,
+            matchedStructure<TT>() { return {} as TT; }, // really should be T
+        };
+
+        // hack for compatibility with isSuccessfulMatch
+        (pm as any).$successfulMatch = true;
+
+        // add custom fields
+
+        return pm as (PatternMatch & T);
+    }
+}
+
+export function successfulMatchReport(matcher: MatchingLogic, params: {
+    matched: string,
+    offset: number,
+    valueRepresented: any,
+}) {
+    return new SuccessfulMatchReportImpl(matcher, params);
+}
+
+export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
+    return fmr.kind === "real" && (fmr as FullMatchReport).successful;
+}
+
 /**
  * All the data about the match, enough to generate either a PatternMatch
  * or a TreeNodeCompatible or a DismatchReport.
@@ -23,7 +86,7 @@ export type MatchReport = { matcher: MatchingLogic } & ({
 } | {
     kind: "wrappedSuccessfulMatch",
     successfulMatch: SuccessfulMatch,
-});
+} | { kind: "real" });
 
 export function toPatternMatch(mr: MatchReport): PatternMatch {
     return null;
@@ -42,6 +105,12 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
             // it is not normal to call this
             // return mr.successfulMatch.match as PatternMatch & T;
             throw new Error("I didn't think this kind of match would get this called on it.");
+        case "real":
+            if (isSuccessfulMatchReport(mr)) {
+                return mr.toPatternMatch<T>();
+            } else {
+                throw new Error("not implemented");
+            }
     }
 }
 
@@ -59,6 +128,12 @@ export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
             return mr.patternMatch as PatternMatch;
         case "wrappedSuccessfulMatch":
             return mr.successfulMatch;
+        case "real":
+            if (isSuccessfulMatchReport(mr)) {
+                return mr.toPatternMatch();
+            } else {
+                throw new Error("Unhandled");
+            }
     }
 }
 
@@ -96,13 +171,17 @@ export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchF
 }
 
 // replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
-export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch) {
-    const mr: MatchReport = {
-        matcher,
-        kind: "wrappedSuccessfulMatch",
-        successfulMatch: sm,
-    };
-    return mr;
+export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch): FullMatchReport {
+    // const mr: MatchReport = {
+    //     matcher,
+    //     kind: "wrappedSuccessfulMatch",
+    //     successfulMatch: sm,
+    // };
+    return successfulMatchReport(matcher, {
+        matched: sm.$matched,
+        offset: sm.$offset,
+        valueRepresented: sm.$value,
+    });
 }
 
 /**
