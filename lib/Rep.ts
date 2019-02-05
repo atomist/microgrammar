@@ -14,7 +14,7 @@ import {
 
 import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
-import { toMatchPrefixResult, MatchReport, matchReportFromSuccessfulMatch, matchReportFromFailureReport } from "./MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, toPatternMatchOrDismatchReport, isSuccessfulMatchReport } from "./MatchReport";
 
 /**
  * Match zero or more of these
@@ -96,12 +96,13 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
             currentInputState = eat.state;
             matched += eat.skipped;
 
-            const result = this.matcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
-            allResults.push(result);
-            if (!isSuccessfulMatch(result)) {
+            const result = this.matcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+            const resultMpr = toMatchPrefixResult(result);
+            allResults.push(resultMpr);
+            if (!isSuccessfulMatchReport(result)) {
                 break;
             } else {
-                const match = result.match;
+                const match = result.toPatternMatch();
                 if (match.$matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                         `I do not think this grammar means what you think it means`);

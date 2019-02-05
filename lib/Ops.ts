@@ -97,11 +97,11 @@ export class Alt implements MatchingLogic {
 
         const failedMatches: MatchPrefixResult[] = [];
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
-            if (isSuccessfulMatch(m)) {
-                return matchReportFromSuccessfulMatch(this, m);
+            const m = matcher.matchPrefixReport(is, thisMatchContext, parseContext);
+            if (isSuccessfulMatchReport(m)) {
+                return m; // TODO: wrap this! matchReportFromSuccessfulMatch(this, m);
             }
-            failedMatches.push(m);
+            failedMatches.push(toMatchPrefixResult(m)); // shim, need Failure wrapper
         }
         return matchReportFromFailureReport(this, MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches }));
     }

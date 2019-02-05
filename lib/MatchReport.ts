@@ -26,7 +26,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly valueRepresented: any;
 
     constructor(public readonly matcher: MatchingLogic,
-        params: {
+                params: {
             matched: string,
             offset: number,
             valueRepresented: any,
@@ -63,7 +63,12 @@ export function successfulMatchReport(matcher: MatchingLogic, params: {
 }
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
-    return fmr.kind === "real" && (fmr as FullMatchReport).successful;
+    if (fmr.kind === "real") {
+        return (fmr as FullMatchReport).successful;
+    }
+    if (fmr.kind === "wrappedSuccessfulMatch") {
+        return true;
+    }
 }
 
 /**
@@ -86,6 +91,7 @@ export type MatchReport = { matcher: MatchingLogic } & ({
 } | {
     kind: "wrappedSuccessfulMatch",
     successfulMatch: SuccessfulMatch,
+    toPatternMatch(): PatternMatch,
 } | { kind: "real" });
 
 export function toPatternMatch(mr: MatchReport): PatternMatch {
@@ -190,6 +196,7 @@ export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: S
         matcher,
         kind: "wrappedSuccessfulMatch",
         successfulMatch: sm,
+        toPatternMatch() { return sm.match; },
     };
     return mr;
 }
