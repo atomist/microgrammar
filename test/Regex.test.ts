@@ -16,8 +16,8 @@ describe("Regex", () => {
         const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "friday");
-            assert(m.offset === 0);
+            assert.strictEqual(m.matched, "friday");
+            assert.strictEqual(m.offset, 0);
         } else {
             assert.fail("Didn't match");
         }

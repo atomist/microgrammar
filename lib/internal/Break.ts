@@ -6,8 +6,8 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../MatchPrefixResult";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../MatchReport";
-import { TerminalPatternMatch } from "../PatternMatch";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, toMatchPrefixResult, wrappingMatchReport } from "../MatchReport";
+import { PatternMatch, TerminalPatternMatch } from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
 /**
@@ -25,15 +25,15 @@ export class Break implements MatchingLogic {
     /**
      * Consume input until (or until and including) the terminal match
      * @param terminateOn desired terminal match
-     * @param consume default false. Whether to consume the terminal match. If this is set to true,
+     * @param consumeTerminal default false. Whether to consume the terminal match. If this is set to true,
      * the value of the match will be the match of the terminal pattern. Otherwise it will the preceding,
      * skipped content.
      * @param badMatcher pattern we don't want to see before the desired determinal match.
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-        private readonly consume: boolean = false,
-        private readonly badMatcher?: MatchingLogic) {
+                private readonly consumeTerminal: boolean = false,
+                private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {
@@ -41,13 +41,13 @@ export class Break implements MatchingLogic {
     }
 
     public canStartWith(char: string): boolean {
-        return (this.consume && !this.badMatcher && this.terminateOn.canStartWith) ?
+        return (this.consumeTerminal && !this.badMatcher && this.terminateOn.canStartWith) ?
             this.terminateOn.canStartWith(char) :
             true;
     }
 
     get requiredPrefix() {
-        return (this.consume && !this.badMatcher) ?
+        return (this.consumeTerminal && !this.badMatcher) ?
             this.terminateOn.requiredPrefix :
             undefined;
     }
@@ -59,9 +59,10 @@ export class Break implements MatchingLogic {
     public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentIs = is;
         let matched = "";
+        const originalOffset = is.offset;
 
         // Apply optimization if possible where we skip to the terminal if we're consuming it and not avoiding a bad match
-        if (this.consume && !this.badMatcher) {
+        if (this.consumeTerminal && !this.badMatcher) {
             const skipped = readyToMatch(currentIs, false, this.terminateOn);
             matched += skipped.skipped;
             currentIs = skipped.state;
@@ -81,11 +82,15 @@ export class Break implements MatchingLogic {
             }
         }
         // We have found the terminal if we get here
-        if (this.consume && isSuccessfulMatchReport(terminalMatch)) {
+        if (this.consumeTerminal && isSuccessfulMatchReport(terminalMatch)) {
             // wait. we _modify the match_ ? wat
             const match = terminalMatch.toPatternMatch();
             match.$matched = matched + match.$matched;
-            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(match));
+            return matchReportFromPatternMatch(this, {
+                ...match,
+                $matched: matched + terminalMatch.matched,
+            } as PatternMatch,
+                { offset: originalOffset });
         }
         return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
     }

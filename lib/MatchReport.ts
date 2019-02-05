@@ -26,7 +26,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly valueRepresented: any;
 
     constructor(public readonly matcher: MatchingLogic,
-        params: {
+                params: {
             matched: string,
             offset: number,
             valueRepresented: any,
@@ -69,7 +69,7 @@ export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport):
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-        public readonly inner: MatchReport) {
+                public readonly inner: MatchReport) {
     }
 
     get successful() {
@@ -85,12 +85,7 @@ class WrappingMatchReport implements FullMatchReport {
 }
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
-    if (fmr.kind === "real") {
-        return (fmr as FullMatchReport).successful;
-    }
-    if (fmr.kind === "wrappedSuccessfulMatch") {
-        return true;
-    }
+    return fmr.successful;
 }
 
 /**
@@ -104,6 +99,8 @@ export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr
 export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
     kind: "wrappedPatternMatch",
     patternMatch: PatternMatch,
+    matched: string,
+    toPatternMatch(): PatternMatch,
 } | {
     kind: "wrappedDismatchReport",
     dismatchReport: DismatchReport,
@@ -111,8 +108,9 @@ export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
     kind: "wrappedMatchFailureReport",
     matchFailureReport: MatchFailureReport,
 } | {
-    kind: "wrappedSuccessfulMatch",
+    kind: "wrappedSuccessfulMatch", x
     successfulMatch: SuccessfulMatch,
+    matched: string,
     toPatternMatch(): PatternMatch,
 } | { kind: "real" });
 
@@ -180,12 +178,17 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
     return mr;
 }
 
-export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch): MatchReport {
+export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
+                                            opts: { offset?: number },
+    // because in a break, the outer match stores this differently than the PatternMatch
+): MatchReport {
     const mr: MatchReport = {
         matcher,
         kind: "wrappedPatternMatch",
         patternMatch: pm,
+        matched: pm.$matched,
         successful: true,
+        toPatternMatch() { return pm; },
     };
     return mr;
 }
@@ -225,6 +228,7 @@ export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: S
             (sm.match as any).$successfulMatch = true;  // shim
             return sm.match;
         },
+        matched: sm.$matched,
         successful: true,
     };
     return mr;

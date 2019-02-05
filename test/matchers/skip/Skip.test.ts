@@ -11,6 +11,7 @@ import {
     yadaYadaThenThisButNotThat,
 } from "../../../lib/matchers/skip/Skip";
 import { isSuccessfulMatch } from "../../../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../../../lib/MatchReport";
 
 describe("Skip", () => {
 
@@ -53,11 +54,12 @@ describe("Skip", () => {
             _end: "}",
         });
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "HEY YOU ${thing}");
-            assert(mmmm.name === "thing", "Couldn't find name property: Structure was " + JSON.stringify(mmmm));
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ${thing}");
+            const pm = m.toPatternMatch() as any;
+            assert.strictEqual(pm.name, "thing",
+                "Couldn't find name property: Structure was " + JSON.stringify(pm, null, 2));
         } else {
             assert.fail("Didn't match:" + JSON.stringify(m));
         }
