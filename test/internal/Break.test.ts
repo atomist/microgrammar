@@ -15,17 +15,16 @@ import { Alt } from "../../lib/Ops";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../../lib/Config";
 import { isSuccessfulMatch } from "../../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../../lib/MatchReport";
 
 describe("Break", () => {
 
     it("break matches exhausted", () => {
         const b = new Break(new Literal("14"));
         const is = inputStateFromString("");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "");
         } else {
             assert.fail("Didn't match");
         }
@@ -34,10 +33,9 @@ describe("Break", () => {
     it("break matches another matcher", () => {
         const b = new Break(new Regex(/[a-z]/));
         const is = inputStateFromString("HEY YOU banana");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "HEY YOU ");
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ");
 
         } else {
             assert.fail("Didn't match");
@@ -53,10 +51,9 @@ describe("Break", () => {
                 _end: "}",
             }));
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "HEY YOU ");
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ");
         } else {
             assert.fail("Didn't match");
         }
@@ -65,11 +62,9 @@ describe("Break", () => {
     it("break matches", () => {
         const b = new Break(new Literal("14"));
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "friday ");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday ");
         } else {
             assert.fail("Didn't match");
         }
@@ -91,12 +86,10 @@ describe("Break", () => {
     it("break matches and consumes", () => {
         const b = new Break(new Literal("14"), true);
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {}) as any;
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "friday 14");
-            assert(mmmm.$value === "14");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday 14");
+            assert(m.toPatternMatch().$value === "14");
         } else {
             assert.fail("Didn't match");
         }
@@ -114,11 +107,9 @@ describe("Break", () => {
     it("break matches nothing as it comes immediately", () => {
         const b = new Break(new Literal("friday"));
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "");
         } else {
             assert.fail("Didn't match");
         }
