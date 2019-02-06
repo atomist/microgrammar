@@ -14,7 +14,7 @@ import {
 
 import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, toPatternMatchOrDismatchReport, isSuccessfulMatchReport } from "./MatchReport";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, toPatternMatchOrDismatchReport } from "./MatchReport";
 
 /**
  * Match zero or more of these
@@ -116,10 +116,10 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                 const eaten = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatchResult = this.sepMatcher.matchPrefix(currentInputState, thisMatchContext, parseContext);
-                allResults.push(sepMatchResult);
-                if (isSuccessfulMatch(sepMatchResult)) {
-                    const sepMatch = sepMatchResult.match;
+                const sepMatchResult = this.sepMatcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+                allResults.push(toMatchPrefixResult(sepMatchResult));
+                if (isSuccessfulMatchReport(sepMatchResult)) {
+                    const sepMatch = sepMatchResult.toPatternMatch();
                     currentInputState = currentInputState.consume(sepMatch.$matched, `Rep separator [${sepMatch.$matched}]`);
                     matched += (sepMatch).$matched;
                 } else {
