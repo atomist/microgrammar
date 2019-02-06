@@ -131,8 +131,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-        public readonly matchTest: (pm: PatternMatch) => boolean,
-        public readonly inputStateTest: (is: InputState) => boolean) {
+                public readonly matchTest: (pm: PatternMatch) => boolean,
+                public readonly inputStateTest: (is: InputState) => boolean) {
 
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;
@@ -169,6 +169,7 @@ class WhenMatcher implements MatchingLogic {
         return successfulMatchReport(this, {
             matched: result.matched, offset: result.offset,
             valueRepresented: result.toPatternMatch().$value,
+            parseNodeName: "When",
         });
     }
 
