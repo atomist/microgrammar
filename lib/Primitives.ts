@@ -5,7 +5,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "./MatchReport";
 import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
@@ -14,23 +14,24 @@ import { TerminalPatternMatch } from "./PatternMatch";
 export class Literal implements MatchingLogic {
 
     public $id = `Literal[${this.literal}]`;
+    public readonly parseNodeName = "Literal";
 
     constructor(public literal: string) {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
-        const peek = is.peek(this.literal.length);
-        return (peek === this.literal) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal)) :
-            new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
-                `Did not match literal [${this.literal}]: saw [${peek}]`);
+        return toMatchPrefixResult(this.matchPrefixReport(is));
     }
 
     public matchPrefixReport(is: InputState): MatchReport {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(
-                new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal))) :
+            successfulMatchReport(this, {
+                matched: this.literal,
+                valueRepresented: this.literal,
+                parseNodeName: this.parseNodeName,
+                offset: is.offset,
+            }) :
             matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
                 `Did not match literal [${this.literal}]: saw [${peek}]`));
     }
@@ -75,7 +76,7 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     public matchPrefix(is: InputState): MatchPrefixResult {
         const output = toMatchPrefixResult(this.matchPrefixReport(is));
-        if (!output) {
+        if (!output) { // debugging
             throw new Error("That should never return undefined");
         }
         return output;

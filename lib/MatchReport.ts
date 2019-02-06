@@ -1,4 +1,4 @@
-import { Matcher, MatchingLogic } from "./Matchers";
+import { MatchingLogic } from "./Matchers";
 import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
@@ -15,6 +15,7 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     offset: number;
     kind: "real"; // after wrappers are gone, this can go
     toPatternMatch<T>(): PatternMatch & T;
+    toParseTree(): TreeNodeCompatible;
 }
 
 class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
@@ -24,16 +25,20 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly matched: string;
     public readonly offset: number;
     public readonly valueRepresented: any;
+    public readonly parseNodeName: string;
 
-    constructor(public readonly matcher: MatchingLogic,
-                params: {
+    constructor(
+        public readonly matcher: MatchingLogic,
+        params: {
             matched: string,
             offset: number,
             valueRepresented: any,
+            parseNodeName: string,
         }) {
         this.matched = params.matched;
         this.offset = params.offset;
         this.valueRepresented = params.valueRepresented;
+        this.parseNodeName = params.parseNodeName;
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
@@ -52,12 +57,22 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
 
         return pm as (PatternMatch & T);
     }
+
+    public toParseTree() {
+        return {
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: [],
+        };
+    }
 }
 
 export function successfulMatchReport(matcher: MatchingLogic, params: {
     matched: string,
     offset: number,
     valueRepresented: any,
+    parseNodeName: string,
 }) {
     return new SuccessfulTerminalMatchReport(matcher, params);
 }
@@ -69,7 +84,7 @@ export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport):
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-                public readonly inner: MatchReport) {
+        public readonly inner: MatchReport) {
     }
 
     get successful() {
@@ -112,15 +127,11 @@ export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
     kind: "wrappedMatchFailureReport",
     matchFailureReport: MatchFailureReport,
 } | {
-    kind: "wrappedSuccessfulMatch", x
+    kind: "wrappedSuccessfulMatch",
     successfulMatch: SuccessfulMatch,
     matched: string,
     toPatternMatch(): PatternMatch,
 } | { kind: "real" });
-
-export function toPatternMatch(mr: MatchReport): PatternMatch {
-    return null;
-}
 
 export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     PatternMatch & T | DismatchReport {
@@ -144,8 +155,11 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     }
 }
 
-export function toTreeNodeCompatible(mr: MatchReport): TreeNodeCompatible {
-    return null;
+export function toParseTree(mr: MatchReport): TreeNodeCompatible {
+    if (!isSuccessfulMatchReport(mr)) {
+        throw new Error("Unimplemented");
+    }
+    return mr.toParseTree();
 }
 
 export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
@@ -183,7 +197,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-                                            opts: { offset?: number } = {},
+    opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     const mr: MatchReport = {
@@ -219,6 +233,7 @@ export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: Succe
         matched: sm.$matched,
         offset: sm.$offset,
         valueRepresented: sm.$value,
+        parseNodeName: matcher.$id,
     });
 }
 
