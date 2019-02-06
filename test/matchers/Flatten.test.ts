@@ -63,11 +63,11 @@ describe("flatten", () => {
             letter: "T",
         });
         assert.throws(() => g.firstMatch("dog T and other stuff"),
-        e => {
-            assert(e.message.indexOf("Cannot flatten a structure") !== -1);
-            assert(e.message.indexOf("name,c") !== -1);
-            return true;
-        });
+            e => {
+                assert(e.message.indexOf("Cannot flatten a structure") !== -1);
+                assert(e.message.indexOf("name,c") !== -1);
+                return true;
+            });
     });
 
     it("consume correctly from object optional", () => {
@@ -80,10 +80,10 @@ describe("flatten", () => {
             a: flatten(optional(struct)),
         });
         const m = g.findMatches("!possum* !dinosaur*") as any;
-        assert(m[0].a === "possum");
-        assert(m.length === 2);
-        assert(m[0].a === "possum");
-        assert(m[1].a === "dinosaur");
+        assert.strictEqual(m[0].a, "possum");
+        assert.strictEqual(m.length, 2);
+        assert.strictEqual(m[0].a, "possum");
+        assert.strictEqual(m[1].a, "dinosaur");
     });
 
 });

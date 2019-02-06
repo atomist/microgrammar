@@ -28,7 +28,7 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, matchReportFromSuccessfulTreeMatch, toMatchPrefixResult } from "../MatchReport";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, matchReportFromSuccessfulTreeMatch, toMatchPrefixResult } from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -182,17 +182,17 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                const reportResult = step.matchPrefix(currentInputState, thisMatchContext, parseContext);
-                allReportResults.push(reportResult);
-                if (isSuccessfulMatch(reportResult)) {
-                    const report = reportResult;
-                    matches.push((report.match || report) as any as PatternMatch);
+                const reportResult = step.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+                allReportResults.push(toMatchPrefixResult(reportResult));
+                if (isSuccessfulMatchReport(reportResult)) {
+                    const report = reportResult.toPatternMatch();
+                    matches.push(report);
                     currentInputState = currentInputState.consume(report.$matched,
-                        `Concat step [${reportResult.$matcherId}] matched ${reportResult.$matched}`);
+                        `Concat step [${reportResult.matcher.$id}] matched ${reportResult.matched}`);
                     matched += report.$matched;
-                    if (reportResult.capturedStructure) {
+                    if ((report as any).capturedStructure) {
                         // Bind the nested structure if necessary
-                        bindingTarget[step.$id] = reportResult.capturedStructure;
+                        bindingTarget[step.$id] = (report as any).capturedStructure;
                     } else {
                         // otherwise, save the matcher's value.
                         bindingTarget[step.$id] = report.$value;

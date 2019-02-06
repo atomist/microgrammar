@@ -82,6 +82,10 @@ class WrappingMatchReport implements FullMatchReport {
         }
         throw new Error("Unsuccessful match, no pattern match for you");
     }
+
+    get matched() {
+        return (this.inner as any).matched; // todo: all should have matched
+    }
 }
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
@@ -179,7 +183,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-                                            opts: { offset?: number },
+                                            opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     const mr: MatchReport = {

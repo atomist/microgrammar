@@ -2,16 +2,16 @@ import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import {
     isSuccessfulMatch,
+    MatchFailureReport,
     MatchPrefixResult,
     matchPrefixSuccess,
-    MatchFailureReport,
 } from "../MatchPrefixResult";
+import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "../MatchReport";
 import {
     isTreePatternMatch,
     TerminalPatternMatch,
 } from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
-import { MatchReport, matchReportFromSuccessfulMatch, matchReportFromFailureReport } from "../MatchReport";
 
 /**
  * Flatten this match, pulling up its only property with the name given to
@@ -29,45 +29,29 @@ class FlatteningMatcher implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
-        const r = this.delegate.matchPrefix(is, thisMatchContext, parseContext);
-        if (isSuccessfulMatch(r)) {
-            if (isTreePatternMatch(r.match)) {
-                const propNames =
-                    Object.getOwnPropertyNames(r.match.submatches());
-                if (propNames.length !== 1) {
-                    throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
-                }
-                const onlyPropertyName = propNames[0];
-                const relevantSubMatch = r.match.$valueMatches[onlyPropertyName];
-                // TODO how do we update this?
-                const match = new TerminalPatternMatch(r.$matcherId, r.$matched, r.$offset, relevantSubMatch.$value);
-                return matchPrefixSuccess(match);
-            } else {
-                return r;
-            }
-        }
-        return r;
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
     }
 
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
-        const r = this.delegate.matchPrefix(is, thisMatchContext, parseContext);
-        if (isSuccessfulMatch(r)) {
-            if (isTreePatternMatch(r.match)) {
+        const r = this.delegate.matchPrefixReport(is, thisMatchContext, parseContext);
+        if (isSuccessfulMatchReport(r)) {
+            const pm = r.toPatternMatch();
+            if (isTreePatternMatch(pm)) {
                 const propNames =
-                    Object.getOwnPropertyNames(r.match.submatches());
+                    Object.getOwnPropertyNames(pm.submatches());
                 if (propNames.length !== 1) {
                     throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
                 }
                 const onlyPropertyName = propNames[0];
-                const relevantSubMatch = r.match.$valueMatches[onlyPropertyName];
+                const relevantSubMatch = pm.$valueMatches[onlyPropertyName];
                 // TODO how do we update this?
-                const match = new TerminalPatternMatch(r.$matcherId, r.$matched, r.$offset, relevantSubMatch.$value);
-                return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(match));
+                const match = new TerminalPatternMatch(r.matcher.$id, r.matched, r.offset, relevantSubMatch.$value);
+                return matchReportFromPatternMatch(this, match);
             } else {
-                return matchReportFromSuccessfulMatch(this, r);
+                return matchReportFromSuccessfulMatch(this, r.toPatternMatch());
             }
         }
-        return matchReportFromFailureReport(this, r as MatchFailureReport);
+        return matchReportFromFailureReport(this, toMatchPrefixResult(r) as MatchFailureReport); // todo: wrap failure
     }
 
 }
