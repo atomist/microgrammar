@@ -1,3 +1,4 @@
+import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
 import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
@@ -9,6 +10,14 @@ export interface FullMatchReport {
     matcher: MatchingLogic; // is all of this really necessary?
 }
 
+export interface FailedMatchReport extends FullMatchReport {
+    successful: false;
+    offset: number;
+    matched?: string;
+    description?: string;
+    toDismatchTree(): DismatchTreeNode;
+}
+
 export interface SuccessfulMatchReport extends FullMatchReport {
     successful: true;
     matched: string;
@@ -18,65 +27,6 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     toParseTree(): TreeNodeCompatible;
 }
 
-class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
-    public readonly successful = true;
-    public readonly kind = "real";
-
-    public readonly matched: string;
-    public readonly offset: number;
-    public readonly valueRepresented: any;
-    public readonly parseNodeName: string;
-
-    constructor(
-        public readonly matcher: MatchingLogic,
-        params: {
-            matched: string,
-            offset: number,
-            valueRepresented: any,
-            parseNodeName: string,
-        }) {
-        this.matched = params.matched;
-        this.offset = params.offset;
-        this.valueRepresented = params.valueRepresented;
-        this.parseNodeName = params.parseNodeName;
-    }
-
-    public toPatternMatch<T>(): PatternMatch & T {
-        const pm: PatternMatch = {
-            $matcherId: this.matcher.$id,
-            $matched: this.matched,
-            $offset: this.offset,
-            $value: this.valueRepresented,
-            matchedStructure: <TT>() => this.valueRepresented as TT, // really should be T
-        };
-
-        // hack for compatibility with isSuccessfulMatch
-        (pm as any).$successfulMatch = true;
-
-        // add custom fields
-
-        return pm as (PatternMatch & T);
-    }
-
-    public toParseTree() {
-        return {
-            $name: this.parseNodeName,
-            $value: this.matched,
-            $offset: this.offset,
-            $children: [],
-        };
-    }
-}
-
-export function successfulMatchReport(matcher: MatchingLogic, params: {
-    matched: string,
-    offset: number,
-    valueRepresented: any,
-    parseNodeName: string,
-}) {
-    return new SuccessfulTerminalMatchReport(matcher, params);
-}
-
 export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport): FullMatchReport {
     return new WrappingMatchReport(matcher, inner);
 }
@@ -84,7 +34,7 @@ export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport):
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-        public readonly inner: MatchReport) {
+                public readonly inner: MatchReport) {
     }
 
     get successful() {
@@ -105,6 +55,10 @@ class WrappingMatchReport implements FullMatchReport {
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
     return fmr.successful;
+}
+
+export function isFailedMatchReport(fmr: FullMatchReport | MatchReport): fmr is FailedMatchReport {
+    return fmr.kind === "real" && !fmr.successful;
 }
 
 /**
@@ -162,6 +116,31 @@ export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     return mr.toParseTree();
 }
 
+export type DismatchTreeNode = TreeNodeCompatible & ({
+    /**
+     * Whether this part of the tree matched successfully
+     */
+    successful: true;
+    /**
+     * You may describe why this input string was so compelling
+     */
+    description?: string;
+} | {
+    successful: false;
+    /**
+     * If it didn't match, why not?
+     */
+    description: string;
+});
+
+export function toDismatchTree(mr: MatchReport): DismatchTreeNode {
+    if (isFailedMatchReport(mr)) {
+        return mr.toDismatchTree();
+    } else {
+        throw new Error("But nothing failed!");
+    }
+}
+
 export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
     switch (mr.kind) {
         case "wrappedDismatchReport":
@@ -175,6 +154,11 @@ export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
         case "real":
             if (isSuccessfulMatchReport(mr)) {
                 return mr.toPatternMatch();
+            } else if (isFailedMatchReport(mr)) {
+                return new MatchFailureReport(mr.matcher.$id,
+                    mr.offset,
+                    mr.matched,
+                    mr.description);
             } else {
                 throw new Error("Unhandled");
             }
@@ -197,7 +181,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-    opts: { offset?: number } = {},
+                                            opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     const mr: MatchReport = {

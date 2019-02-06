@@ -1,12 +1,13 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import {
-    isSuccessfulMatch,
     MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../MatchPrefixResult";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "../MatchReport";
+import {
+    isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch,
+    matchReportFromSuccessfulMatch, toMatchPrefixResult,
+} from "../MatchReport";
 import {
     isTreePatternMatch,
     TerminalPatternMatch,

@@ -1,11 +1,13 @@
 import { InputState } from "./InputState";
+import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
 import {
     MatchFailureReport,
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, successfulMatchReport, toMatchPrefixResult } from "./MatchReport";
+import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
 import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
@@ -32,8 +34,12 @@ export class Literal implements MatchingLogic {
                 parseNodeName: this.parseNodeName,
                 offset: is.offset,
             }) :
-            matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
-                `Did not match literal [${this.literal}]: saw [${peek}]`));
+            failedMatchReport(this, {
+                offset: is.offset,
+                matched: commonPortion(this.literal, peek),
+                description: `Did not match literal [${this.literal}]: saw [${peek}]`,
+                parseNodeName: this.parseNodeName,
+            });
     }
 
     public canStartWith(char: string): boolean {
@@ -43,6 +49,14 @@ export class Literal implements MatchingLogic {
     get requiredPrefix(): string {
         return this.literal;
     }
+}
+
+function commonPortion(str1: string, str2: string) {
+    let i = 0;
+    while (i < str1.length && i < str2.length && str1[i] === str2[i]) {
+        i++;
+    }
+    return str1.slice(0, i);
 }
 
 export function isLiteral(ml: MatchingLogic): ml is Literal {
