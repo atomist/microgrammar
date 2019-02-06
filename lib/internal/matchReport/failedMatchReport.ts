@@ -1,5 +1,8 @@
 import { MatchingLogic } from "../../Matchers";
-import { DismatchTreeNode, FailedMatchReport } from "../../MatchReport";
+import {
+    DismatchTreeNode,
+    FailedMatchReport,
+} from "../../MatchReport";
 
 export function failedMatchReport(matcher: MatchingLogic, params: {
     matched?: string;

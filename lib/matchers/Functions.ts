@@ -5,8 +5,12 @@ import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch,
-    matchReportFromSuccessfulMatch, toMatchPrefixResult,
+    isSuccessfulMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromPatternMatch,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
 } from "../MatchReport";
 import {
     isTreePatternMatch,

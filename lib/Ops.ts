@@ -1,5 +1,8 @@
 import { InputState } from "./InputState";
-import { Matcher, MatchingLogic } from "./Matchers";
+import {
+    Matcher,
+    MatchingLogic,
+} from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
     isSuccessfulMatch,
@@ -9,7 +12,11 @@ import {
 } from "./MatchPrefixResult";
 import {
     isSuccessfulMatchReport,
-    MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, wrappingMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+    wrappingMatchReport,
 } from "./MatchReport";
 import {
     PatternMatch,

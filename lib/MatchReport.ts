@@ -1,7 +1,14 @@
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
-import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
-import { DismatchReport, PatternMatch } from "./PatternMatch";
+import {
+    MatchFailureReport,
+    MatchPrefixResult,
+    SuccessfulMatch,
+} from "./MatchPrefixResult";
+import {
+    DismatchReport,
+    PatternMatch,
+} from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 export interface FullMatchReport {

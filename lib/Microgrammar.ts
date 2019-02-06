@@ -22,7 +22,10 @@ import {
 } from "./Grammar";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
-import { exactMatch, exactMatchReport } from "./internal/ExactMatch";
+import {
+    exactMatch,
+    exactMatchReport,
+} from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import {
@@ -30,7 +33,10 @@ import {
     MicrogrammarUpdates,
 } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
-import { MatchReport, isSuccessfulMatchReport } from "./MatchReport";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+} from "./MatchReport";
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 

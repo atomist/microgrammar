@@ -6,8 +6,10 @@ import {
     matchPrefixSuccess,
 } from "../../MatchPrefixResult";
 import {
-    MatchReport, matchReportFromFailureReport,
-    matchReportFromSuccessfulMatch, toMatchPrefixResult,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
 } from "../../MatchReport";
 import { TerminalPatternMatch } from "../../PatternMatch";
 
