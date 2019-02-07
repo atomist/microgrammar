@@ -15,4 +15,8 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(treeNode.$name, "Literal");
     });
 
+    // what is the toParseTree of a successful non-match from Optional?
+
+
+
 });

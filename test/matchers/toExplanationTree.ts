@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { Literal, optional } from "../../lib";
+import { firstOf, Literal, optional } from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { MatchExplanationTreeNode, toExplanationTree } from "../../lib/MatchReport";
 
@@ -50,4 +50,25 @@ describe("Failing matches report useful stuff", () => {
             assert.strictEqual(innerTreeNode.successful, false);
             assert.strictEqual(innerTreeNode.$name, "Literal");
         });
+
+    it("Describes an Alt as various unsuccessful matches and one successful one", () => {
+        const mg = firstOf("foo", "bar", "lizards", "four");
+        const inputString = "lizards are fast";
+        const report = mg.matchPrefixReport(inputStateFromString(inputString), {}, {});
+        const treeNode = toExplanationTree(report);
+
+        assert.strictEqual(treeNode.$name, "Alt");
+        assert.strictEqual(treeNode.$value, "lizards");
+        assert.strictEqual(treeNode.$offset, 0);
+        assert.strictEqual(treeNode.successful, true);
+        assert.strictEqual(treeNode.$children.length, 3);
+
+        const unsuccessfulChild = treeNode.$children[0];
+        assert.strictEqual(unsuccessfulChild.successful, false);
+        assert.strictEqual(unsuccessfulChild.$value, undefined);
+
+        const successfulChild = treeNode.$children[2];
+        assert.strictEqual(successfulChild.successful, true);
+        assert.strictEqual(successfulChild.$value, "lizards");
+    });
 });

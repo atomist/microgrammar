@@ -1,4 +1,5 @@
 import { InputState } from "./InputState";
+import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { Matcher, MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
@@ -89,6 +90,7 @@ export function firstOf(a: any, b: any, ...matchers: any[]): MatchingLogic {
 export class Alt implements MatchingLogic {
 
     public readonly matchers: MatchingLogic[];
+    public readonly parseNodeName = "Alt";
 
     constructor(a: any, b: any, ...matchers: any[]) {
         const matchObjects = [a, b].concat(matchers);
@@ -107,14 +109,18 @@ export class Alt implements MatchingLogic {
 
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
-            return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, ""));
+            return failedMatchReport(this, {
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                reason: "Input exhausted",
+            });
         }
 
         const failedMatches: MatchPrefixResult[] = [];
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefixReport(is, thisMatchContext, parseContext);
             if (isSuccessfulMatchReport(m)) {
-                return m; // TODO: wrap this! matchReportFromSuccessfulMatch(this, m);
+                return wrappingMatchReport(this, [...failedMatches, m]); // TODO: wrap this! matchReportFromSuccessfulMatch(this, m);
             }
             failedMatches.push(toMatchPrefixResult(m)); // shim, need Failure wrapper
         }
