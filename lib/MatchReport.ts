@@ -8,6 +8,7 @@ export interface FullMatchReport {
     successful: boolean;
     kind: "real";
     matcher: MatchingLogic; // is all of this really necessary?
+    toExplanationTree(): MatchExplanationTreeNode;
 }
 
 export interface FailedMatchReport extends FullMatchReport {
@@ -15,7 +16,6 @@ export interface FailedMatchReport extends FullMatchReport {
     offset: number;
     matched?: string;
     description?: string;
-    toDismatchTree(): DismatchTreeNode;
 }
 
 export interface SuccessfulMatchReport extends FullMatchReport {
@@ -34,7 +34,7 @@ export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport):
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-        public readonly inner: MatchReport) {
+                public readonly inner: MatchReport) {
     }
 
     get successful() {
@@ -50,6 +50,10 @@ class WrappingMatchReport implements FullMatchReport {
 
     get matched() {
         return (this.inner as any).matched; // todo: all should have matched
+    }
+
+    public toExplanationTree(): MatchExplanationTreeNode {
+        throw new Error("Not implemented");
     }
 }
 
@@ -116,28 +120,26 @@ export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     return mr.toParseTree();
 }
 
-export type DismatchTreeNode = TreeNodeCompatible & ({
+export interface MatchExplanationTreeNode extends TreeNodeCompatible {
+    $children: MatchExplanationTreeNode[]; // narrowed
     /**
      * Whether this part of the tree matched successfully
      */
-    successful: true;
+    successful: boolean;
     /**
-     * You may describe why this input string was so compelling
+     * If failed, please always populate the description of why.
+     * If successful, you may describe why this input string was so compelling
      */
     description?: string;
-} | {
-    successful: false;
-    /**
-     * If it didn't match, why not?
-     */
-    description: string;
-});
+}
 
-export function toDismatchTree(mr: MatchReport): DismatchTreeNode {
+export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
     if (isFailedMatchReport(mr)) {
-        return mr.toDismatchTree();
+        return mr.toExplanationTree();
+    } else if (isSuccessfulMatchReport(mr)) {
+        return mr.toExplanationTree();
     } else {
-        throw new Error("But nothing failed!");
+        throw new Error("I can't build a dismatch tree from " + mr.kind);
     }
 }
 
@@ -181,7 +183,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-    opts: { offset?: number } = {},
+                                            opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     const mr: MatchReport = {

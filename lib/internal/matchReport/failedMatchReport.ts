@@ -1,5 +1,5 @@
 import { MatchingLogic } from "../../Matchers";
-import { DismatchTreeNode, FailedMatchReport } from "../../MatchReport";
+import { FailedMatchReport, MatchExplanationTreeNode } from "../../MatchReport";
 
 export function failedMatchReport(matcher: MatchingLogic, params: {
     matched?: string;
@@ -34,7 +34,7 @@ class FailedTerminalMatchReport implements FailedMatchReport {
 
     }
 
-    public toDismatchTree(): DismatchTreeNode {
+    public toExplanationTree(): MatchExplanationTreeNode {
         return {
             successful: false,
             description: this.description,

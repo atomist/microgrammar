@@ -1,8 +1,7 @@
 import { MatchingLogic } from "../../Matchers";
-import { SuccessfulMatchReport, FullMatchReport } from "../../MatchReport";
-import { PatternMatch } from "../../PatternMatch";
 import { SuccessfulMatch } from "../../MatchPrefixResult";
-
+import { FullMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport, toParseTree } from "../../MatchReport";
+import { PatternMatch } from "../../PatternMatch";
 
 // replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
 export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch): FullMatchReport {
@@ -78,6 +77,13 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
             $value: this.matched,
             $offset: this.offset,
             $children: [],
+        };
+    }
+
+    public toExplanationTree(): MatchExplanationTreeNode {
+        throw {
+            successful: true,
+            ...this.toParseTree(),
         };
     }
 }
