@@ -31,7 +31,7 @@ export class Opt implements MatchingLogic {
     get $id() {
         return `Opt[${this.matcher.$id}]`;
     }
-    public readonly parseNodeName: "Optional";
+    public readonly parseNodeName = "Optional";
 
     private readonly matcher: MatchingLogic;
 
@@ -52,7 +52,9 @@ export class Opt implements MatchingLogic {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
             return successfulMatchReport(this, {
-                matched: "", offset: is.offset, parseNodeName: this.parseNodeName,
+                matched: "",
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
                 reason: "Input stream is exhausted. Good thing this was optional.",
             });
         }
@@ -61,7 +63,12 @@ export class Opt implements MatchingLogic {
         if (isSuccessfulMatchReport(maybe)) {
             return wrappingMatchReport(this, maybe);
         }
-        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset)));
+        return successfulMatchReport(this, {
+            matched: "",
+            offset: is.offset,
+            parseNodeName: this.parseNodeName,
+            reason: "Did not match, but that's OK; it's optional.",
+        });
     }
 }
 
@@ -139,8 +146,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-                public readonly matchTest: (pm: PatternMatch) => boolean,
-                public readonly inputStateTest: (is: InputState) => boolean) {
+        public readonly matchTest: (pm: PatternMatch) => boolean,
+        public readonly inputStateTest: (is: InputState) => boolean) {
 
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;

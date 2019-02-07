@@ -26,7 +26,7 @@ export function successfulMatchReport(matcher: MatchingLogic, params: {
     reason?: string,
 }) {
     return new SuccessfulTerminalMatchReport(matcher, {
-        valueRepresented: params.matched,
+        valueRepresented: params.matched ? params.matched : undefined,
         parseNodeName: matcher.$id,
         ...params,
     });
@@ -55,6 +55,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
         this.offset = params.offset;
         this.valueRepresented = params.valueRepresented;
         this.parseNodeName = params.parseNodeName;
+        this.reason = params.reason;
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
@@ -84,7 +85,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     }
 
     public toExplanationTree(): MatchExplanationTreeNode {
-        throw {
+        return {
             successful: true,
             reason: this.reason,
             ...this.toParseTree(),
