@@ -2,6 +2,7 @@ import * as assert from "assert";
 import { firstOf, optional } from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { toValueStructure } from "../../lib/MatchReport";
+import { microgrammar } from "../../lib/microgrammarConstruction";
 import { Literal } from "../../lib/Primitives";
 
 describe("Converting a match report to a value structure", () => {
@@ -42,4 +43,39 @@ describe("Converting a match report to a value structure", () => {
 
             assert.strictEqual(vs, "foo");
         });
+
+    it("gets the inner structure of a Concat", () => {
+        const mg = microgrammar({
+            first: "foo",
+            second: "bar",
+        });
+
+        const inputString = "foo bar";
+        const report = mg.exactMatchReport(inputString);
+        const vs = toValueStructure(report);
+
+        assert.deepEqual(vs, {
+            first: "foo", second: "bar",
+        });
+    });
+
+    it("includes various properties that are added to the ctx", () => {
+        const mg = microgrammar({
+            first: "foo",
+            second: "bar",
+            synth: ctx => ctx.second + ctx.first,
+            sneaky: ctx => { ctx.mutationsAreEvil = "but I am sneaky"; },
+        });
+
+        const inputString = "foo bar";
+        const report = mg.exactMatchReport(inputString);
+        const vs = toValueStructure(report);
+
+        assert.deepEqual(vs, {
+            first: "foo",
+            second: "bar",
+            synth: "barfoo",
+            mutationsAreEvil: "but I am sneaky",
+        });
+    });
 });
