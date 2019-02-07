@@ -27,33 +27,55 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     toParseTree(): TreeNodeCompatible;
 }
 
-export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport): FullMatchReport {
-    return new WrappingMatchReport(matcher, inner);
+export function wrappingMatchReport(matcher: MatchingLogic, params: {
+    inner: SuccessfulMatchReport,
+    additional?: FailedMatchReport[],
+    parseNodeName?: string,
+}): FullMatchReport {
+    return new WrappingMatchReport(matcher,
+        params.parseNodeName || matcher.$id,
+        params.inner,
+        params.additional);
 }
 
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-                public readonly inner: MatchReport) {
+                public readonly parseNodeName: string,
+                public readonly inner: SuccessfulMatchReport,
+                public readonly additional: FailedMatchReport[] = []) {
     }
 
     get successful() {
-        return this.inner.successful;
+        return true;
     }
 
     public toPatternMatch() {
-        if (isSuccessfulMatchReport(this.inner)) {
-            return this.inner.toPatternMatch();
-        }
-        throw new Error("Unsuccessful match, no pattern match for you");
+        // the wrapping disappears
+        return this.inner.toPatternMatch();
     }
 
     get matched() {
-        return (this.inner as any).matched; // todo: all should have matched
+        return this.inner.matched;
+    }
+
+    public toParseTree(): TreeNodeCompatible {
+        // only successful matches go into the parse tree
+        return {
+            $name: this.parseNodeName,
+            $offset: this.inner.offset,
+            $value: this.inner.matched,
+            $children: [this.inner.toParseTree()],
+        };
     }
 
     public toExplanationTree(): MatchExplanationTreeNode {
-        throw new Error("Not implemented");
+        // all non-matches and matches go into the explanation tree
+        return {
+            ...this.toParseTree(),
+            successful: true,
+            $children: [...this.additional, this.inner].map(m => m.toExplanationTree()),
+        };
     }
 }
 
