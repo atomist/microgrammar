@@ -57,7 +57,7 @@ describe("Failing matches report useful stuff", () => {
         const report = mg.matchPrefixReport(inputStateFromString(inputString), {}, {});
         const treeNode = toExplanationTree(report);
 
-        assert.strictEqual(treeNode.$name, "Alt");
+        assert.strictEqual(treeNode.$name, "Alternative");
         assert.strictEqual(treeNode.$value, "lizards");
         assert.strictEqual(treeNode.$offset, 0);
         assert.strictEqual(treeNode.successful, true);

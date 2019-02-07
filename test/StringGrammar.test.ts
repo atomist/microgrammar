@@ -6,6 +6,7 @@ import { Rep } from "../lib/Rep";
 
 import * as assert from "power-assert";
 import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("StringGrammarTest", () => {
 
@@ -20,15 +21,11 @@ describe("StringGrammarTest", () => {
     });
 
     it("not broken without concat", () => {
-        const result = new Alt(stringGrammar, "la").matchPrefix(
+        const result = new Alt(stringGrammar, "la").matchPrefixReport(
             inputStateFromString("\"    winter is coming \" la la la"), {}, {});
-        if (isSuccessfulMatch(result)) {
-            const match = result.match;
-            if (isPatternMatch(match)) {
-                assert(isPatternMatch(match));
-                assert(match.$matched === "\"    winter is coming \"");
-            }
-            assert((match as any).text, "    winter is coming");
+        if (isSuccessfulMatchReport(result)) {
+            assert(result.matched === "\"    winter is coming \"");
+            assert((result.toPatternMatch() as any).text, "    winter is coming");
         } else {
             assert.fail("did not match");
         }
