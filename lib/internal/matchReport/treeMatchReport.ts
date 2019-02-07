@@ -59,6 +59,11 @@ class TreeMatchReport implements SuccessfulMatchReport {
 
     }
     public toPatternMatch<T>(): PatternMatch & T {
+        // ok. the pattern match needs a field for every explicit child,
+        // and it's value is: if a tree, child.reportMatch.toPatternMatch()
+        // otherwise, child.reportMatch.toValueStructure(), and then put its toPatternMatch() into $valueMatches
+        // meanwhile all the explicit childrens' toPatternMatch() go into submatches.
+        // plus, all the extra properties go on.
         throw new Error("Method not implemented.");
     }
     public toParseTree(): TreeNodeCompatible {
