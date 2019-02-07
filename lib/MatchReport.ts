@@ -3,6 +3,7 @@ import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchP
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
+export { matchReportFromSuccessfulMatch } from "./internal/matchReport/terminalMatchReport";
 export interface FullMatchReport {
     successful: boolean;
     kind: "real";
@@ -115,7 +116,7 @@ export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     return mr.toParseTree();
 }
 
-export type DismatchTreeNode = TreeNodeCompatible<DismatchTreeNode> & ({
+export type DismatchTreeNode = TreeNodeCompatible & ({
     /**
      * Whether this part of the tree matched successfully
      */
@@ -203,21 +204,6 @@ export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchF
         successful: false,
     };
     return mr;
-}
-
-// replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
-export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch): FullMatchReport {
-    // const mr: MatchReport = {
-    //     matcher,
-    //     kind: "wrappedSuccessfulMatch",
-    //     successfulMatch: sm,
-    // };
-    return successfulMatchReport(matcher, {
-        matched: sm.$matched,
-        offset: sm.$offset,
-        valueRepresented: sm.$value,
-        parseNodeName: matcher.$id,
-    });
 }
 
 // I'm implementing terminal first

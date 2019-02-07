@@ -4,7 +4,7 @@
  * We do not implement its optional parent property.
  * We require its optional value and offset properties.
  */
-export interface TreeNodeCompatible<T extends TreeNodeCompatible = TreeNodeCompatible> {
+export interface TreeNodeCompatible {
 
     /**
      * Name of the node, available in path expressions
@@ -14,7 +14,7 @@ export interface TreeNodeCompatible<T extends TreeNodeCompatible = TreeNodeCompa
     /**
      * Children of the node if it's a non-terminal
      */
-    $children?: T[];
+    $children?: TreeNodeCompatible[];
 
     /**
      * String represented by this tree node

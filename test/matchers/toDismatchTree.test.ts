@@ -46,7 +46,7 @@ describe("Failing matches report useful stuff", () => {
             assert.strictEqual(treeNode.description, "Did not match, but that's OK; it's optional");
             assert.strictEqual(treeNode.$children.length, 1);
 
-            const innerTreeNode = treeNode.$children[0];
+            const innerTreeNode = treeNode.$children[0] as DismatchTreeNode;
             assert.strictEqual(innerTreeNode.successful, false);
             assert.strictEqual(innerTreeNode.$name, "Literal");
         });
