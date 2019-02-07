@@ -32,28 +32,33 @@ export function wrappingMatchReport(matcher: MatchingLogic, params: {
     inner: SuccessfulMatchReport,
     additional?: FailedMatchReport[],
     parseNodeName?: string,
-}): FullMatchReport {
+}): SuccessfulMatchReport {
     return new WrappingMatchReport(matcher,
         params.parseNodeName || matcher.$id,
         params.inner,
         params.additional);
 }
 
-class WrappingMatchReport implements FullMatchReport {
+class WrappingMatchReport implements SuccessfulMatchReport {
     public readonly kind = "real";
+    public readonly successful = true;
     constructor(public readonly matcher: MatchingLogic,
                 public readonly parseNodeName: string,
                 public readonly inner: SuccessfulMatchReport,
                 public readonly additional: FailedMatchReport[] = []) {
     }
 
-    get successful() {
-        return true;
+    get offset() {
+        return this.inner.offset;
     }
 
-    public toPatternMatch() {
+    public toValueStructure<T>() {
+        return this.inner.toValueStructure<T>();
+    }
+
+    public toPatternMatch<T>() {
         // the wrapping disappears
-        return this.inner.toPatternMatch();
+        return this.inner.toPatternMatch<T>();
     }
 
     get matched() {
