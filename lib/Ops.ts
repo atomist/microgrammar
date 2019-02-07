@@ -1,21 +1,19 @@
 import { InputState } from "./InputState";
 import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
-import { Matcher, MatchingLogic } from "./Matchers";
+import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
-    isSuccessfulMatch,
     MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "./MatchPrefixResult";
 import {
-    isSuccessfulMatchReport,
-    MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, wrappingMatchReport,
+    FailedMatchReport,
+    isFailedMatchReport, isSuccessfulMatchReport, MatchReport,
+    matchReportFromFailureReport, toMatchPrefixResult, wrappingMatchReport,
 } from "./MatchReport";
 import {
     PatternMatch,
-    UndefinedPatternMatch,
 } from "./PatternMatch";
 
 /**
@@ -62,7 +60,7 @@ export class Opt implements MatchingLogic {
 
         const maybe = this.matcher.matchPrefixReport(is, thisMatchContext, parseContext);
         if (isSuccessfulMatchReport(maybe)) {
-            return wrappingMatchReport(this, maybe);
+            return wrappingMatchReport(this, { parseNodeName: this.parseNodeName, inner: maybe });
         }
         return successfulMatchReport(this, {
             matched: "",
@@ -90,7 +88,7 @@ export function firstOf(a: any, b: any, ...matchers: any[]): MatchingLogic {
 export class Alt implements MatchingLogic {
 
     public readonly matchers: MatchingLogic[];
-    public readonly parseNodeName = "Alt";
+    public readonly parseNodeName = "Alternative";
 
     constructor(a: any, b: any, ...matchers: any[]) {
         const matchObjects = [a, b].concat(matchers);
@@ -116,15 +114,27 @@ export class Alt implements MatchingLogic {
             });
         }
 
-        const failedMatches: MatchPrefixResult[] = [];
+        const failedMatches: FailedMatchReport[] = [];
         for (const matcher of this.matchers) {
             const m = matcher.matchPrefixReport(is, thisMatchContext, parseContext);
             if (isSuccessfulMatchReport(m)) {
-                return wrappingMatchReport(this, [...failedMatches, m]); // TODO: wrap this! matchReportFromSuccessfulMatch(this, m);
+                return wrappingMatchReport(this, {
+                    inner: m,
+                    additional: failedMatches,
+                    parseNodeName: this.parseNodeName,
+                });
+            } else if (isFailedMatchReport(m)) {
+                failedMatches.push(m);
+            } else {
+                console.log("Warning: not retaining failed match report from " + m.matcher.$id);
             }
-            failedMatches.push(toMatchPrefixResult(m)); // shim, need Failure wrapper
         }
-        return matchReportFromFailureReport(this, MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches }));
+        return failedMatchReport(this, {
+            parseNodeName: this.parseNodeName,
+            offset: is.offset,
+            children: failedMatches,
+            reason: "All alternatives failed",
+        });
     }
 }
 
@@ -136,7 +146,7 @@ export class Alt implements MatchingLogic {
 export function when(
     o: any,
     matchTest: (pm: PatternMatch) => boolean,
-    inputStateTest: (is: InputState) => boolean = is => true,
+    inputStateTest: (is: InputState) => boolean = () => true,
 ): MatchingLogic {
     const output = new WhenMatcher(toMatchingLogic(o), matchTest, inputStateTest);
 
@@ -152,8 +162,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-        public readonly matchTest: (pm: PatternMatch) => boolean,
-        public readonly inputStateTest: (is: InputState) => boolean) {
+                public readonly matchTest: (pm: PatternMatch) => boolean,
+                public readonly inputStateTest: (is: InputState) => boolean) {
 
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;
