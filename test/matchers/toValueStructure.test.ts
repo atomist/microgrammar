@@ -5,7 +5,7 @@ import { toValueStructure } from "../../lib/MatchReport";
 import { microgrammar } from "../../lib/microgrammarConstruction";
 import { Literal } from "../../lib/Primitives";
 
-describe("Converting a match report to a value structure", () => {
+describe("toValueStructure", () => {
     it("Converts a literal to a string", async () => {
         const mg = new Literal("foo");
         const inputString = "foobar";

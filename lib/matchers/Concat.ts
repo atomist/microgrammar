@@ -37,7 +37,9 @@ import {
     matchReportFromFailureReport,
     matchReportFromSuccessfulTreeMatch,
     toMatchPrefixResult,
+    SuccessfulMatchReport,
 } from "../MatchReport";
+import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -109,6 +111,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     public $lazy = false;
 
     public readonly matchSteps: MatchStep[] = [];
+
+    public readonly parseNodeName = "Concat";
 
     // Used to check first matcher. We want to do that to check
     // for required prefix etc.
@@ -187,7 +191,9 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
-                // add a whitespace match
+                if (!!eat.skipped) {
+                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset))
+                }
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
@@ -206,6 +212,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 } else if (isFailedMatchReport(report)) {
                     return failedTreeMatchReport(this, {
                         originalOffset: initialInputState.offset,
+                        parseNodeName: this.parseNodeName,
                         matched,
                         reason: `Failed at step '${step.name}'`,
                         successes: matches,
@@ -217,6 +224,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     console.log("JESS: not-real failure report from " + step.$id);
                     return failedTreeMatchReport(this, {
                         originalOffset: initialInputState.offset,
+                        parseNodeName: this.parseNodeName,
                         matched,
                         reason: `Failed at step '${step.name}'`,
                         successes: matches,
@@ -231,6 +239,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
                         return failedTreeMatchReport(this, {
                             originalOffset: initialInputState.offset,
+                            parseNodeName: this.parseNodeName,
                             failingOffset: currentInputState.offset,
                             matched,
                             failureName: step.$id,
@@ -239,12 +248,16 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         });
                     }
                 } else {
-                    bindingTarget[step.$id] = step.compute(bindingTarget);
+                    const computeResult = step.compute(bindingTarget);
+                    if (computeResult !== undefined) {
+                        bindingTarget[step.$id] = computeResult;
+                    }
                 }
             }
         }
         return successfulTreeMatchReport(this, {
             matched,
+            parseNodeName: this.parseNodeName,
             offset: initialInputState.offset,
             children: matches,
             extraProperties: bindingTarget,
@@ -259,6 +272,15 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 
 function isMatcher(s: MatchStep): s is Matcher {
     return (s as Matcher).matchPrefixReport !== undefined;
+}
+
+function whitespaceChildMatch(skipped: string, matcher: Concat, offset: number): TreeChild {
+    const matchReport = successfulMatchReport(matcher, {
+        parseNodeName: "Whitespace",
+        matched: skipped,
+        offset,
+    });
+    return { explicit: false, matchReport }
 }
 
 /**

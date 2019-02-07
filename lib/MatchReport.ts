@@ -80,6 +80,12 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
             if (isSuccessfulMatchReport(mr)) {
                 return mr.toPatternMatch<T>();
             } else {
+                if (isFailedMatchReport(mr)) {
+                    return {
+                        description: "Looks like it didn't match",
+                        explanationTree: mr.toExplanationTree(),
+                    } as DismatchReport;
+                }
                 throw new Error("not implemented");
             }
     }
@@ -187,7 +193,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-    opts: { offset?: number } = {},
+                                            opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     if (!pm.$value) {
@@ -200,7 +206,7 @@ export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternM
         matched: pm.$matched,
         successful: true,
         toPatternMatch() { return pm; },
-        toValueStructure() { return pm.$value; },
+        toValueStructure() { return pm.matchedStructure(); },
     };
     return mr;
 }

@@ -5,7 +5,7 @@ import { microgrammar } from "../../lib/microgrammarConstruction";
 import { firstOf } from "../../lib/Ops";
 import { Literal } from "../../lib/Primitives";
 
-describe("Viewing the match as a tree over the parsed file", () => {
+describe("toParseTree", () => {
     it("sees a single node", async () => {
         const mg = new Literal("foo");
         const inputString = "foobar";
@@ -61,7 +61,7 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(firstGrandchild.$value, "foo");
         assert.strictEqual(firstGrandchild.$name, "Literal");
 
-        const whitespaceChild = firstChild.$children[1];
+        const whitespaceChild = treeNode.$children[1];
         assert.strictEqual(whitespaceChild.$value, " ");
         assert.strictEqual(whitespaceChild.$offset, 3);
         assert.strictEqual(whitespaceChild.$name, "Whitespace");

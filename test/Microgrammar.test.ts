@@ -441,7 +441,7 @@ describe("Microgrammar", () => {
         if (matches.length !== 1) {
             throw new Error(`Expected 1 matches, not ${matches.length}`);
         }
-        assert(matches[0]._separator === undefined);
+        assert.strictEqual(matches[0]._separator, undefined);
         expect(matches[0].dogs).to.have.members(["Fido"]);
         expect(matches[0].cats).to.have.members(["Felix", "Oscar"]);
     });

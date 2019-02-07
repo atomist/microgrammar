@@ -111,13 +111,22 @@ class TreeMatchReport implements SuccessfulMatchReport, WithNamedChildren {
                 // skip existing child. Not sure this is always what we should do
                 return;
             }
+            if (isSpecialMember(k)) {
+                return;
+            }
             output[k] = v;
         });
 
         return output as unknown as PatternMatch & T;
     }
     public toParseTree(): TreeNodeCompatible {
-        throw new Error("Method not implemented.");
+        const happiness = this.children.map(c => wrapChild(this.matcher, c).toParseTree());
+        return {
+            $name: this.parseNodeName,
+            $offset: this.offset,
+            $value: this.matched || "",
+            $children: happiness,
+        };
     }
     public toValueStructure<T>(): T {
         const output = {};
@@ -142,7 +151,13 @@ class TreeMatchReport implements SuccessfulMatchReport, WithNamedChildren {
         return output as T;
     }
     public toExplanationTree(): MatchExplanationTreeNode {
-        throw new Error("Method not implemented.");
+        const happiness = this.children.map(c => wrapChild(this.matcher, c).toExplanationTree());
+        return {
+            ...this.toParseTree(),
+            successful: true,
+            reason: this.reason,
+            $children: happiness,
+        };
     }
 }
 

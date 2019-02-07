@@ -1,23 +1,25 @@
 import assert = require("power-assert");
 import { DefaultFromStringOptions } from "../../lib/internal/CompleteFromStringOptions";
-import { exactMatch } from "../../lib/internal/ExactMatch";
+import { exactMatch, exactMatchReport } from "../../lib/internal/ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,
 } from "../../lib/internal/SpecGrammar";
+import { isSuccessfulMatchReport } from "../../lib/MatchReport";
 import { isPatternMatch } from "../../lib/PatternMatch";
 
 describe("SpecGrammar", () => {
 
     it("can parse a series of literals and references", () => {
         const microgrammarSpecString = "->${fruit}<-";
-        const specMatch = exactMatch<MicrogrammarSpec>(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
-        if (isPatternMatch(specMatch)) {
-            assert(specMatch.these.length === 1);
-            assert.deepEqual(specMatch.matchedStructure(),
-               {
+        const specMatch = exactMatchReport(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
+        if (isSuccessfulMatchReport(specMatch)) {
+            const vs = specMatch.toValueStructure<MicrogrammarSpec>();
+            assert(vs.these.length === 1);
+            assert.deepEqual(vs,
+                {
                     these: [{
-                        literal: "->", element: {elementName: "fruit"},
+                        literal: "->", element: { elementName: "fruit" },
                     }]
                     , trailing: "<-",
                 });
