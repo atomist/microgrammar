@@ -14,4 +14,5 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(treeNode.$offset, 0);
         assert.strictEqual(treeNode.$name, "Literal");
     });
+
 });

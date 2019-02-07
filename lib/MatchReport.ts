@@ -1,4 +1,3 @@
-import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
 import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
@@ -34,7 +33,7 @@ export function wrappingMatchReport(matcher: MatchingLogic, inner: MatchReport):
 class WrappingMatchReport implements FullMatchReport {
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-                public readonly inner: MatchReport) {
+        public readonly inner: MatchReport) {
     }
 
     get successful() {
@@ -116,7 +115,7 @@ export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     return mr.toParseTree();
 }
 
-export type DismatchTreeNode = TreeNodeCompatible & ({
+export type DismatchTreeNode = TreeNodeCompatible<DismatchTreeNode> & ({
     /**
      * Whether this part of the tree matched successfully
      */
@@ -181,7 +180,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-                                            opts: { offset?: number } = {},
+    opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     const mr: MatchReport = {
