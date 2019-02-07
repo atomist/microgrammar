@@ -65,7 +65,14 @@ class TreeMatchReport implements SuccessfulMatchReport {
         throw new Error("Method not implemented.");
     }
     public toValueStructure<T>(): T {
-        throw new Error("Method not implemented.");
+        const output = {};
+        for (const ch of this.children) {
+            if (ch.explicit) {
+                output[ch.name] = ch.matchReport.toValueStructure();
+            }
+        }
+        // you'll need the extra properties here too. Wait for a test failure
+        return output as T;
     }
     public toExplanationTree(): MatchExplanationTreeNode {
         throw new Error("Method not implemented.");
@@ -116,7 +123,7 @@ class FailedTreeMatchReport implements FailedMatchReport {
 
     public toExplanationTree(): MatchExplanationTreeNode {
         // todo: wrap with name somehow
-        const happiness = this.successfulChildren.map(c => c.matchReport.toExplanationTree());
+        const happiness = this.successfulChildren.map(c => wrapChild(this.matcher, c).toExplanationTree());
         const failure = this.failedChild.matchReport.toExplanationTree();
         return {
             successful: false,
@@ -124,7 +131,7 @@ class FailedTreeMatchReport implements FailedMatchReport {
             $name: this.parseNodeName,
             $offset: this.offset,
             $value: this.matched || "",
-            $children: happiness.concat(failure),
+            $children: [...happiness, failure],
         };
     }
 }
