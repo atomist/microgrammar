@@ -93,6 +93,6 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     }
 
     public toValueStructure<T>(): T {
-        throw new Error("Unimplemented");
+        return this.valueRepresented;
     }
 }
