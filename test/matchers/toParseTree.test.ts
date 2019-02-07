@@ -49,7 +49,7 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(treeNode.$name, "Concat");
         assert.strictEqual(treeNode.$value, "foo bar");
         assert.strictEqual(treeNode.$offset, 0);
-        assert.strictEqual(treeNode.$children.length, 2);
+        assert.strictEqual(treeNode.$children.length, 3);
 
         const firstChild = treeNode.$children[0];
         assert.strictEqual(firstChild.$value, "foo");
@@ -61,7 +61,12 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(firstGrandchild.$value, "foo");
         assert.strictEqual(firstGrandchild.$name, "Literal");
 
-        const secondChild = treeNode.$children[0];
+        const whitespaceChild = firstChild.$children[1];
+        assert.strictEqual(whitespaceChild.$value, " ");
+        assert.strictEqual(whitespaceChild.$offset, 3);
+        assert.strictEqual(whitespaceChild.$name, "Whitespace");
+
+        const secondChild = treeNode.$children[2];
         assert.strictEqual(secondChild.$value, "bar");
         assert.strictEqual(secondChild.$offset, 4);
         assert.strictEqual(secondChild.$name, "second");
