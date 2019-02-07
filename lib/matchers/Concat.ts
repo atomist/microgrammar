@@ -28,7 +28,14 @@ import {
 } from "../Config";
 import { Break } from "../internal/Break";
 import { readyToMatch } from "../internal/Whitespace";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, matchReportFromSuccessfulTreeMatch, toMatchPrefixResult } from "../MatchReport";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch,
+    matchReportFromSuccessfulTreeMatch,
+    toMatchPrefixResult,
+} from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar

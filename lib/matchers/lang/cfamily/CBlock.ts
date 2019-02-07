@@ -5,7 +5,11 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
-import { MatchReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../../../MatchReport";
+import {
+    MatchReport,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+} from "../../../MatchReport";
 import { TerminalPatternMatch } from "../../../PatternMatch";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";

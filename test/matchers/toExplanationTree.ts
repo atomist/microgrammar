@@ -1,7 +1,14 @@
 import * as assert from "assert";
-import { firstOf, Literal, optional } from "../../lib";
+import {
+    firstOf,
+    Literal,
+    optional,
+} from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
-import { MatchExplanationTreeNode, toExplanationTree } from "../../lib/MatchReport";
+import {
+    MatchExplanationTreeNode,
+    toExplanationTree,
+} from "../../lib/MatchReport";
 
 describe("Failing matches report useful stuff", () => {
     it("Describes a literal dismatch", async () => {

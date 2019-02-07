@@ -15,7 +15,12 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../lib/MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../lib/MatchReport";
+import {
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+} from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
 import { TerminalPatternMatch } from "../lib/PatternMatch";

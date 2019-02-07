@@ -9,8 +9,12 @@ import {
 } from "./MatchPrefixResult";
 import {
     FailedMatchReport,
-    isFailedMatchReport, isSuccessfulMatchReport, MatchReport,
-    matchReportFromFailureReport, toMatchPrefixResult, wrappingMatchReport,
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    toMatchPrefixResult,
+    wrappingMatchReport,
 } from "./MatchReport";
 import {
     PatternMatch,

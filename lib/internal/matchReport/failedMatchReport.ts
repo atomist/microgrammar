@@ -1,5 +1,10 @@
 import { MatchingLogic } from "../../Matchers";
-import { FailedMatchReport, FullMatchReport, MatchExplanationTreeNode, MatchReport } from "../../MatchReport";
+import {
+    FailedMatchReport,
+    FullMatchReport,
+    MatchExplanationTreeNode,
+    MatchReport,
+} from "../../MatchReport";
 
 export function failedMatchReport(matcher: MatchingLogic, params: {
     matched?: string;

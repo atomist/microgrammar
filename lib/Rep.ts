@@ -14,7 +14,14 @@ import {
 
 import { WhiteSpaceHandler } from "./Config";
 import { readyToMatch } from "./internal/Whitespace";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, toPatternMatchOrDismatchReport } from "./MatchReport";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+    toPatternMatchOrDismatchReport,
+} from "./MatchReport";
 
 /**
  * Match zero or more of these

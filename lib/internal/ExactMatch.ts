@@ -7,8 +7,11 @@ import {
     MatchFailureReport,
 } from "../MatchPrefixResult";
 import {
-    MatchReport, matchReportFromError,
-    matchReportFromFailureReport, matchReportFromPatternMatch, toPatternMatchOrDismatchReport,
+    MatchReport,
+    matchReportFromError,
+    matchReportFromFailureReport,
+    matchReportFromPatternMatch,
+    toPatternMatchOrDismatchReport,
 } from "../MatchReport";
 import {
     DismatchReport,

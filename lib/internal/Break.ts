@@ -6,8 +6,19 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../MatchPrefixResult";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, toMatchPrefixResult, wrappingMatchReport } from "../MatchReport";
-import { PatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromPatternMatch,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+    wrappingMatchReport,
+} from "../MatchReport";
+import {
+    PatternMatch,
+    TerminalPatternMatch,
+} from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
 /**
