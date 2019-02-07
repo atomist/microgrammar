@@ -25,6 +25,7 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     kind: "real"; // after wrappers are gone, this can go
     toPatternMatch<T>(): PatternMatch & T;
     toParseTree(): TreeNodeCompatible;
+    toValueStructure<T>(): T;
 }
 
 export function wrappingMatchReport(matcher: MatchingLogic, params: {
@@ -135,6 +136,14 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     }
 }
 
+/**
+ * Extract a tree describing how the match was parsed.
+ * Each matcher adds a node, plus Concat adds nodes for all its properties
+ * and Rep adds nodes for all its elements.
+ * Synthetic elements are empty elements are not included; each node
+ * maps to content in the file.
+ * @param mr match report from Grammar.exactMatchReport
+ */
 export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     if (!isSuccessfulMatchReport(mr)) {
         throw new Error("Unimplemented");
@@ -155,6 +164,12 @@ export interface MatchExplanationTreeNode extends TreeNodeCompatible {
     reason?: string;
 }
 
+/**
+ * Return a tree which explains the activity of the matching, both
+ * what matched and what didn't. Empty matches are included, and failed
+ * matches are included. Use this to figure out why something matched (or didn't).
+ * @param mr a MatchReport from Grammar.exactMatchReport
+ */
 export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
     if (isFailedMatchReport(mr)) {
         return mr.toExplanationTree();
@@ -165,6 +180,21 @@ export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
     }
 }
 
+/**
+ * Return the values extracted from a match. For any match constructed with
+ * `microgrammar(...)` this will return an object with a property for each term.
+ * Synthetic properties are included.
+ * @param mr a MatchReport from Grammar.exactMatchReport
+ */
+export function toValueStructure<T = any>(mr: MatchReport): T {
+    if (isSuccessfulMatchReport(mr)) {
+        return mr.toValueStructure();
+    } else {
+        throw new Error("You can only get the value structure of successful matches");
+    }
+}
+
+// shim
 export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
     switch (mr.kind) {
         case "wrappedDismatchReport":

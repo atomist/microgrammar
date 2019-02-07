@@ -91,4 +91,8 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
             ...this.toParseTree(),
         };
     }
+
+    public toValueStructure<T>(): T {
+        throw new Error("Unimplemented");
+    }
 }

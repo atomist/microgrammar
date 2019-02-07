@@ -1,7 +1,8 @@
 import * as assert from "assert";
-import { firstOf } from "../..";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { toParseTree } from "../../lib/MatchReport";
+import { microgrammar } from "../../lib/microgrammarConstruction";
+import { firstOf } from "../../lib/Ops";
 import { Literal } from "../../lib/Primitives";
 
 describe("Viewing the match as a tree over the parsed file", () => {
@@ -33,6 +34,38 @@ describe("Viewing the match as a tree over the parsed file", () => {
         assert.strictEqual(successfulChild.$value, "lizards");
         assert.strictEqual(successfulChild.$offset, 0);
         assert.strictEqual(successfulChild.$name, "Literal");
+    });
+
+    it("labels the children of a concat with their names", () => {
+        const mg = microgrammar({
+            first: "foo",
+            second: "bar",
+        });
+
+        const inputString = "foo bar";
+        const report = mg.exactMatchReport(inputString);
+        const treeNode = toParseTree(report);
+
+        assert.strictEqual(treeNode.$name, "Concat");
+        assert.strictEqual(treeNode.$value, "foo bar");
+        assert.strictEqual(treeNode.$offset, 0);
+        assert.strictEqual(treeNode.$children.length, 2);
+
+        const firstChild = treeNode.$children[0];
+        assert.strictEqual(firstChild.$value, "foo");
+        assert.strictEqual(firstChild.$offset, 0);
+        assert.strictEqual(firstChild.$name, "first");
+        assert.strictEqual(firstChild.$children.length, 1);
+
+        const firstGrandchild = firstChild.$children[0];
+        assert.strictEqual(firstGrandchild.$value, "foo");
+        assert.strictEqual(firstGrandchild.$name, "Literal");
+
+        const secondChild = treeNode.$children[0];
+        assert.strictEqual(secondChild.$value, "bar");
+        assert.strictEqual(secondChild.$offset, 4);
+        assert.strictEqual(secondChild.$name, "second");
+        assert.strictEqual(secondChild.$children.length, 1);
     });
 
 });
