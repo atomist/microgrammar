@@ -7,7 +7,7 @@ export function failedMatchReport(matcher: MatchingLogic, params: {
     parseNodeName?: string;
     reason: string;
     children?: FullMatchReport[];
-}) {
+}): FailedMatchReport {
     return new FailedTerminalMatchReport(matcher, {
         parseNodeName: matcher.$id,
         children: [],

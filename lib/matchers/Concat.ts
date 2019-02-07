@@ -27,10 +27,14 @@ import {
     WhiteSpaceHandler,
 } from "../Config";
 import { Break } from "../internal/Break";
+import { failedMatchReport } from "../internal/matchReport/failedMatchReport";
+import { successfulTreeMatchReport } from "../internal/matchReport/treeMatchReport";
 import { readyToMatch } from "../internal/Whitespace";
 import {
+    FullMatchReport, isFailedMatchReport,
     isSuccessfulMatchReport, MatchReport,
-    matchReportFromFailureReport, matchReportFromSuccessfulTreeMatch,
+    matchReportFromFailureReport,
+    matchReportFromSuccessfulTreeMatch,
     toMatchPrefixResult,
 } from "../MatchReport";
 
@@ -174,41 +178,40 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 
     public matchPrefixReport(initialInputState: InputState,
                              thisMatchContext,
-                             parseContext): MatchReport {
+                             parseContext): FullMatchReport {
         const bindingTarget = {};
-        const matches: PatternMatch[] = [];
+        const matches: FullMatchReport[] = [];
         let currentInputState = initialInputState;
         let matched = "";
-        const allReportResults: MatchPrefixResult[] = [];
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
+                // add a whitespace match
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                const reportResult = step.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
-                allReportResults.push(toMatchPrefixResult(reportResult));
-                if (isSuccessfulMatchReport(reportResult)) {
-                    const report = reportResult.toPatternMatch();
+                const report = step.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+                if (isSuccessfulMatchReport(report)) {
                     matches.push(report);
-                    currentInputState = currentInputState.consume(report.$matched,
-                        `Concat step [${reportResult.matcher.$id}] matched ${reportResult.matched}`);
-                    matched += report.$matched;
-                    if ((report as any).capturedStructure) {
-                        // Bind the nested structure if necessary
-                        bindingTarget[step.$id] = (report as any).capturedStructure;
-                    } else {
-                        // otherwise, save the matcher's value.
-                        bindingTarget[step.$id] = report.$value;
-                    }
+                    currentInputState = currentInputState.consume(report.matched,
+                        `Concat step [${report.matcher.$id}] matched ${report.matched}`);
+                    matched += report.matched;
+                    bindingTarget[step.$id] = report.toValueStructure ?  // shim
+                        report.toValueStructure() :
+                        function() {
+                            console.log("WARNING: guessing at structure");
+                            return (toMatchPrefixResult(report) as PatternMatch).$value;
+                        }();
+                } else if (isFailedMatchReport(report)) {
+                    matches.push(report);
+                    return failedMatchReport(this, {
+                        offset: initialInputState.offset,
+                        matched,
+                        reason: `Failed at step '${step.name}'`,
+                        children: matches,
+                    });
                 } else {
-                    return matchReportFromFailureReport(this, MatchFailureReport.from({
-                        $matcherId: this.$id,
-                        $offset: initialInputState.offset,
-                        $matched: matched,
-                        cause: `Failed at step '${step.name}' due to ${(reportResult as any).description}`,
-                        children: allReportResults,
-                    }));
+                    console.log("ERROR: not recording match for " + step.name);
                 }
             } else {
                 // It's a function taking the contexts.
@@ -216,26 +219,24 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return matchReportFromFailureReport(this, MatchFailureReport.from({
-                            $matcherId: this.$id,
-                            $offset: initialInputState.offset,
-                            $matched: matched,
-                            cause: `Match vetoed by ${step.$id}`,
-                            children: allReportResults,
-                        }));
+                        return failedMatchReport(this, {
+                            offset: initialInputState.offset,
+                            matched,
+                            reason: `Match vetoed by ${step.$id}`,
+                            children: matches,
+                        });
                     }
                 } else {
                     bindingTarget[step.$id] = step.compute(bindingTarget);
                 }
             }
         }
-        return matchReportFromSuccessfulTreeMatch(this, matchPrefixSuccess(new TreePatternMatch(
-            this.$id,
+        return successfulTreeMatchReport(this, {
             matched,
-            initialInputState.offset,
-            this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
-            matches,
-            bindingTarget), bindingTarget));
+            offset: initialInputState.offset,
+            children: matches,
+            extraProperties: bindingTarget,
+        });
     }
 
     public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
