@@ -1,12 +1,9 @@
 import * as assert from "power-assert";
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 import { Concat } from "../lib/matchers/Concat";
-import {
-    isSuccessfulMatch,
-    SuccessfulMatch,
-} from "../lib/MatchPrefixResult";
 import { Microgrammar } from "../lib/Microgrammar";
 
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 import {
     Integer,
     LowercaseBoolean,
@@ -20,10 +17,15 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
-        assert(matched.a === 24);
-        assert(matched.b === 7);
-        assert(matched.sum === 24 + 7);
+        const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.a === 24);
+            assert(matched.b === 7);
+            assert(matched.sum === 24 + 7);
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("doesn't veto match based on false calculation", () => {
@@ -33,10 +35,15 @@ describe("ContextTest", () => {
             willBeFalse: ctx => typeof ctx.a === "string",
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
-        assert(matched.a === 24);
-        assert(matched.b === 7);
-        assert(matched.sum === 24 + 7);
+        const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.a === 24);
+            assert(matched.b === 7);
+            assert(matched.sum === 24 + 7);
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("binds calculation to returned value", () => {
@@ -45,10 +52,15 @@ describe("ContextTest", () => {
             b: Integer,
             sum: ctx => ctx.a + ctx.b,
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
-        assert(matched.a === 24);
-        assert(matched.b === 7);
-        assert(matched.sum === 24 + 7);
+        const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.a === 24);
+            assert(matched.b === 7);
+            assert(matched.sum === 24 + 7);
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("rewrites property using separate function", () => {
@@ -59,9 +71,14 @@ describe("ContextTest", () => {
                 ctx.b = parseInt(ctx.b, 10);
             },
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
-        assert(matched.a === 24);
-        assert(matched.b === 7);
+        const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.a === 24);
+            assert(matched.b === 7);
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("rewrites property using transformation", () => {
@@ -70,9 +87,14 @@ describe("ContextTest", () => {
             stringB: /[0-9]+/,
             b: ctx => parseInt(ctx.stringB, 10),
         });
-        const matched: any = (cc.matchPrefix(inputStateFromString("24 7"), {}, {}) as SuccessfulMatch).match;
-        assert(matched.a === 24);
-        assert(matched.b === 7);
+        const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.a === 24);
+            assert(matched.b === 7);
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("use function to dictate match", () => {
@@ -84,10 +106,10 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = cc.matchPrefix(inputStateFromString("true 7 35"), {}, {});
-        assert(isSuccessfulMatch(matched));
-        const matched2 = cc.matchPrefix(inputStateFromString("false 7 35"), {}, {});
-        assert(!isSuccessfulMatch(matched2));
+        const matched = cc.matchPrefixReport(inputStateFromString("true 7 35"), {}, {});
+        assert(isSuccessfulMatchReport(matched));
+        const matched2 = cc.matchPrefixReport(inputStateFromString("false 7 35"), {}, {});
+        assert(!isSuccessfulMatchReport(matched2));
     });
 
     it("handles nested matches", () => {
@@ -101,8 +123,13 @@ describe("ContextTest", () => {
             b: Integer,
             c: Integer,
         });
-        const matched = (cc.matchPrefix(inputStateFromString("gary 7 35"), {}, {}) as SuccessfulMatch).match;
-        assert((matched as any).promoted === "gary");
+        const mr = cc.matchPrefixReport(inputStateFromString("gary 7 35"), {}, {});
+        if (isSuccessfulMatchReport(mr)) {
+            const matched = mr.toValueStructure() as any;
+            assert(matched.promoted === "gary");
+        } else {
+            assert.fail("Did not match");
+        }
     });
 
     it("handles multiple bound matches in microgrammar", () => {
