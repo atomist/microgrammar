@@ -1,3 +1,4 @@
+import { TreeChild, namedChild, failedTreeMatchReport } from './../internal/matchReport/treeMatchReport';
 import { InputState } from "../InputState";
 import {
     LazyMatchingLogic,
@@ -177,10 +178,10 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): FullMatchReport {
+        thisMatchContext,
+        parseContext): FullMatchReport {
         const bindingTarget = {};
-        const matches: FullMatchReport[] = [];
+        const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
         let matched = "";
         for (const step of this.matchSteps) {
@@ -192,23 +193,23 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 
                 const report = step.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
                 if (isSuccessfulMatchReport(report)) {
-                    matches.push(report);
+                    matches.push(namedChild(step.$id, report));
                     currentInputState = currentInputState.consume(report.matched,
                         `Concat step [${report.matcher.$id}] matched ${report.matched}`);
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure ?  // shim
                         report.toValueStructure() :
-                        function() {
+                        function () {
                             console.log("WARNING: guessing at structure");
                             return (toMatchPrefixResult(report) as PatternMatch).$value;
                         }();
                 } else if (isFailedMatchReport(report)) {
-                    matches.push(report);
-                    return failedMatchReport(this, {
+                    matches.push(namedChild(step.$id, report));
+                    return failedTreeMatchReport(this, {
                         offset: initialInputState.offset,
                         matched,
                         reason: `Failed at step '${step.name}'`,
-                        children: matches,
+                        children: matches.map,
                     });
                 } else {
                     console.log("ERROR: not recording match for " + step.name);
@@ -219,11 +220,12 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 if (isMatchVeto(step)) {
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return failedMatchReport(this, {
+                        return failedTreeMatchReport(this, {
                             offset: initialInputState.offset,
                             matched,
+                            failureName: step.$id,
                             reason: `Match vetoed by ${step.$id}`,
-                            children: matches,
+                            successes: matches,
                         });
                     }
                 } else {
