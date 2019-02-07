@@ -267,12 +267,12 @@ export class MatchingMachine {
                 this.observer).state;
 
             const previousIs = currentInputState;
-            const tryMatch = currentMatcher.matchPrefix(currentInputState, {}, parseContext);
+            const tryMatch = currentMatcher.matchPrefixReport(currentInputState, {}, parseContext);
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
-            if (isSuccessfulMatch(tryMatch) && tryMatch.$matched !== "") {
-                const match = (tryMatch.match ? tryMatch.match : tryMatch as any as PatternMatch); // why did it not do this before?
+            if (isSuccessfulMatchReport(tryMatch) && tryMatch.matched !== "") {
+                const match = tryMatch.toPatternMatch();
                 // Enrich with the name
                 (match as any).$name = match.$matcherId;
                 currentMatcher = toMatchingLogic(this.onMatch(match)); // this sneakily puts it in class instance state
@@ -286,8 +286,8 @@ export class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (isSuccessfulMatch(tryMatch) && this.omg) {
-                    const matches = this.omg.findMatches(tryMatch.$matched);
+                if (isSuccessfulMatchReport(tryMatch) && this.omg) {
+                    const matches = this.omg.findMatches(tryMatch.matched);
                     for (const m of matches) {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }

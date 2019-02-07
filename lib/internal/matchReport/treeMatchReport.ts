@@ -1,6 +1,6 @@
 import { MatchingLogic } from "../../Matchers";
 import { FailedMatchReport, FullMatchReport, MatchExplanationTreeNode, MatchReport, SuccessfulMatchReport } from "../../MatchReport";
-import { PatternMatch } from "../../PatternMatch";
+import { isSpecialMember, isTreePatternMatch, PatternMatch } from "../../PatternMatch";
 import { TreeNodeCompatible } from "./../../TreeNodeCompatible";
 import { failedMatchReport } from "./failedMatchReport";
 import { wrappingMatchReport } from "./wrappingMatchReport";
@@ -49,32 +49,65 @@ class TreeMatchReport implements SuccessfulMatchReport {
     public readonly successful = true;
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly children: TreeChild[],
-                private readonly reason: string,
-                private readonly parseNodeName: string,
-                private readonly extraProperties: Record<string, any>,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly children: TreeChild[],
+        private readonly reason: string,
+        private readonly parseNodeName: string,
+        private readonly extraProperties: Record<string, any>,
     ) {
 
     }
     public toPatternMatch<T>(): PatternMatch & T {
-        // ok. the pattern match needs a field for every explicit child,
-        // and it's value is: if a tree, child.reportMatch.toPatternMatch()
-        // otherwise, child.reportMatch.toValueStructure(), and then put its toPatternMatch() into $valueMatches
-        // meanwhile all the explicit childrens' toPatternMatch() go into submatches.
         // plus, all the extra properties go on.
-        throw new Error("Method not implemented.");
+
+        const vs = this.toValueStructure<T>();
+        const output = {
+            $matcherId: this.matcher.$id,
+            $matched: this.matched,
+            $offset: this.offset,
+            matchedStructure: <TT>(): TT => {
+                return vs as any as TT;
+            },
+            $value: vs,
+            $valueMatches: {},
+        };
+        const submatches = {};
+        for (const child of this.children) {
+            if (!child.explicit) {
+                continue;
+            }
+            if (isSpecialMember(child.name)) {
+                continue;
+            }
+            const childPatternMatch = child.matchReport.toPatternMatch();
+            submatches[child.name] = childPatternMatch;
+            if (isTreePatternMatch(childPatternMatch)) {
+                output[child.name] = childPatternMatch;
+            } else {
+                output[child.name] = child.matchReport.toValueStructure();
+                output.$valueMatches[child.name] = childPatternMatch;
+            }
+        }
+        (output as any).submatches = () => submatches;
+
+        // plus the extra properties
+
+        return output as unknown as PatternMatch & T;
     }
     public toParseTree(): TreeNodeCompatible {
         throw new Error("Method not implemented.");
     }
     public toValueStructure<T>(): T {
         const output = {};
-        for (const ch of this.children) {
-            if (ch.explicit) {
-                output[ch.name] = ch.matchReport.toValueStructure();
+        for (const child of this.children) {
+            if (!child.explicit) {
+                continue;
             }
+            if (isSpecialMember(child.name)) {
+                continue;
+            }
+            output[child.name] = child.matchReport.toValueStructure();
         }
         // you'll need the extra properties here too. Wait for a test failure
         return output as T;
@@ -117,12 +150,12 @@ class FailedTreeMatchReport implements FailedMatchReport {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly successfulChildren: TreeChild[],
-                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-                private readonly reason: string,
-                private readonly parseNodeName: string,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly successfulChildren: TreeChild[],
+        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+        private readonly reason: string,
+        private readonly parseNodeName: string,
     ) {
     }
 

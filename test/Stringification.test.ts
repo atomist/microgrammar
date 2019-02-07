@@ -51,14 +51,15 @@ describe("stringification and matchedStructure", () => {
             _rx: ">",
         });
         const result = mg.findMatches(content);
+        assert.strictEqual(result.length, 1);
         const cleanNested: Nested = result[0].matchedStructure<Nested>();
         assert(cleanNested.person.name === "foo");
-        assert.deepEqual(cleanNested, { person: { name: "foo" }});
+        assert.deepEqual(cleanNested, { person: { name: "foo" } });
     });
 
 });
 
 interface Nested {
 
-    person: {name: string};
+    person: { name: string };
 }
