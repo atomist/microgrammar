@@ -13,7 +13,7 @@ export function successfulTreeMatchReport(matcher: MatchingLogic, params:
         parseNodeName?: string,
         reason?: string,
         extraProperties?: Record<string, any>,
-    }): SuccessfulMatchReport {
+    }): SuccessfulMatchReport & WithNamedChildren {
     const { offset, matched, parseNodeName, reason, extraProperties, children } = params;
     return new TreeMatchReport(
         matcher,
@@ -45,19 +45,33 @@ export function unnamedChild(matchReport: SuccessfulMatchReport): TreeChild {
     return { explicit: false, matchReport };
 }
 
-class TreeMatchReport implements SuccessfulMatchReport {
+export interface WithNamedChildren {
+    getChildMatchReport(name: string): FullMatchReport;
+}
+
+class TreeMatchReport implements SuccessfulMatchReport, WithNamedChildren {
     public readonly successful = true;
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly children: TreeChild[],
-                private readonly reason: string,
-                private readonly parseNodeName: string,
-                private readonly extraProperties: Record<string, any>,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly children: TreeChild[],
+        private readonly reason: string,
+        private readonly parseNodeName: string,
+        private readonly extraProperties: Record<string, any>,
     ) {
-
     }
+
+    public getChildMatchReport(name: string): FullMatchReport {
+        const childOfInterest = this.children.find(child =>
+            child.explicit &&
+            child.name === name);
+        if (!childOfInterest) {
+            return undefined;
+        }
+        return childOfInterest.matchReport;
+    }
+
     public toPatternMatch<T>(): PatternMatch & T {
         // plus, all the extra properties go on.
 
@@ -142,7 +156,7 @@ export function failedTreeMatchReport(matcher: MatchingLogic, params:
         failingOffset?: number,
         successes?: TreeChild[],
         parseNodeName?: string,
-    }): FailedMatchReport {
+    }): FailedMatchReport & WithNamedChildren {
     const { matched, parseNodeName, reason, successes,
         failureName, failureReport } = params;
 
@@ -160,18 +174,29 @@ export function failedTreeMatchReport(matcher: MatchingLogic, params:
     );
 }
 
-class FailedTreeMatchReport implements FailedMatchReport {
+class FailedTreeMatchReport implements FailedMatchReport, WithNamedChildren {
     public readonly kind = "real";
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly successfulChildren: TreeChild[],
-                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-                private readonly reason: string,
-                private readonly parseNodeName: string,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly successfulChildren: TreeChild[],
+        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+        private readonly reason: string,
+        private readonly parseNodeName: string,
     ) {
+    }
+
+    public getChildMatchReport(name: string): FullMatchReport {
+        if (name === this.failedChild.name) {
+            return this.failedChild.matchReport;
+        }
+        const childOfInterest = this.successfulChildren.find(child => child.explicit && child.name === name);
+        if (!childOfInterest) {
+            return undefined;
+        }
+        return childOfInterest.matchReport;
     }
 
     public toExplanationTree(): MatchExplanationTreeNode {

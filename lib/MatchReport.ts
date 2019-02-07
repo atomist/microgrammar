@@ -97,6 +97,9 @@ export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     if (!isSuccessfulMatchReport(mr)) {
         throw new Error("Unimplemented");
     }
+    if (!mr.toParseTree) {
+        throw new Error("toParseTree not found on " + mr.kind);
+    }
     return mr.toParseTree();
 }
 
@@ -188,7 +191,7 @@ export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternM
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     if (!pm.$value) {
-        throw new Error("You can't have a pattern match without a $value")
+        throw new Error("You can't have a pattern match without a $value");
     }
     const mr: MatchReport = {
         matcher,

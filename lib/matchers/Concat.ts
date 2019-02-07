@@ -20,7 +20,7 @@ import {
     Literal,
     Regex,
 } from "../Primitives";
-import { failedTreeMatchReport, namedChild, TreeChild } from "./../internal/matchReport/treeMatchReport";
+import { failedTreeMatchReport, namedChild, TreeChild, WithNamedChildren } from "./../internal/matchReport/treeMatchReport";
 import { MatchFailureReport } from "./../MatchPrefixResult";
 
 import {
@@ -178,8 +178,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): FullMatchReport {
+        thisMatchContext,
+        parseContext): FullMatchReport & WithNamedChildren {
         const bindingTarget = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
@@ -199,7 +199,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure ?  // shim
                         report.toValueStructure() :
-                        function() {
+                        function () {
                             console.log("WARNING: guessing at structure");
                             return (toMatchPrefixResult(report) as PatternMatch).$value;
                         }();

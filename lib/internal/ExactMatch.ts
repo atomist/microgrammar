@@ -16,7 +16,9 @@ import {
 } from "../PatternMatch";
 import { InputStream } from "../spi/InputStream";
 import { StringInputStream } from "../spi/StringInputStream";
+import { SuccessfulMatchReport } from "./../MatchReport.d";
 import { inputStateFromStream } from "./InputStateFactory";
+import { failedMatchReport } from "./matchReport/failedMatchReport";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
                               parseContext = {},
@@ -35,15 +37,18 @@ export function exactMatchReport(matcher: MatchingLogic, input: string | InputSt
     const result = wrapped.matchPrefixReport(inputStateFromStream(toInputStream(input), l), {}, parseContext);
 
     if (isSuccessfulMatchReport(result)) {
-        const detyped = result.toPatternMatch() as any;
-        if (detyped.trailingJunk !== "") {
-            return matchReportFromError(matcher,
-                `Not all input was consumed: Left over [${detyped.trailingJunk}]`);
-        } else {
-            return matchReportFromPatternMatch(matcher, detyped.desired);
+        // require empty trailingJunk match
+        const trailingJunkReport = result.getChildMatchReport("trailingJunk") as SuccessfulMatchReport;
+        if (trailingJunkReport.matched !== "") {
+            return failedMatchReport(wrapped, {
+                offset: trailingJunkReport.offset,
+                children: [result],
+                reason:
+                    `Not all input was consumed: Left over [${trailingJunkReport.matched}]`,
+            });
         }
     }
-    return matchReportFromFailureReport(matcher, result as any as MatchFailureReport);
+    return result.getChildMatchReport("desired");
 }
 
 function toInputStream(input: string | InputStream): InputStream {
