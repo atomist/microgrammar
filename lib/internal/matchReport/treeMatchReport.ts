@@ -49,12 +49,12 @@ class TreeMatchReport implements SuccessfulMatchReport {
     public readonly successful = true;
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly children: TreeChild[],
-        private readonly reason: string,
-        private readonly parseNodeName: string,
-        private readonly extraProperties: Record<string, any>,
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly children: TreeChild[],
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
     ) {
 
     }
@@ -91,7 +91,14 @@ class TreeMatchReport implements SuccessfulMatchReport {
         }
         (output as any).submatches = () => submatches;
 
-        // plus the extra properties
+        Object.entries(this.extraProperties).forEach(([k, v]) => {
+            // I think this might overwrite some children we don't want to overwrite
+            if (Object.keys(output).includes(k)) {
+                // skip existing child. Not sure this is always what we should do
+                return;
+            }
+            output[k] = v;
+        });
 
         return output as unknown as PatternMatch & T;
     }
@@ -107,9 +114,17 @@ class TreeMatchReport implements SuccessfulMatchReport {
             if (isSpecialMember(child.name)) {
                 continue;
             }
+            if (!child.matchReport.toValueStructure) {
+                throw new Error("Jess, implement toValueStructure on " + child.matchReport.kind);
+            }
             output[child.name] = child.matchReport.toValueStructure();
         }
-        // you'll need the extra properties here too. Wait for a test failure
+        Object.entries(this.extraProperties).forEach(([k, v]) => {
+            if (isSpecialMember(k)) {
+                return;
+            }
+            output[k] = v;
+        });
         return output as T;
     }
     public toExplanationTree(): MatchExplanationTreeNode {
@@ -150,12 +165,12 @@ class FailedTreeMatchReport implements FailedMatchReport {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly successfulChildren: TreeChild[],
-        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-        private readonly reason: string,
-        private readonly parseNodeName: string,
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly successfulChildren: TreeChild[],
+                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+                private readonly reason: string,
+                private readonly parseNodeName: string,
     ) {
     }
 

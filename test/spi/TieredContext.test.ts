@@ -33,7 +33,8 @@ describe("Per file context", () => {
         const mg = Microgrammar.fromDefinitions<{ name: string, zip: string }>({
             name: /[A-Z][a-z]+/,
             zip: skipTo(/[0-9]{5}/),
-            _keep: (ctx, _, parseContext) => ++parseContext.count % 2 === 0,
+            _keep: (ctx, _, parseContext) =>
+                ++parseContext.count % 2 === 0,
         });
 
         const input = "Sandy:12345, Candice,94131   Terri:12345 Ahmed:64321";
@@ -41,7 +42,7 @@ describe("Per file context", () => {
             count: 0,
         };
         const matches = mg.findMatches(input, glob);
-        assert(matches.length === 2);
+        assert.strictEqual(matches.length, 2);
     });
 
 });

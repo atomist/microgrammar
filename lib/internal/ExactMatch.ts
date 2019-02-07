@@ -7,8 +7,8 @@ import {
     MatchFailureReport,
 } from "../MatchPrefixResult";
 import {
-    MatchReport, matchReportFromError,
-    matchReportFromFailureReport, matchReportFromPatternMatch, toPatternMatchOrDismatchReport,
+    isSuccessfulMatchReport, MatchReport,
+    matchReportFromError, matchReportFromFailureReport, matchReportFromPatternMatch, toPatternMatchOrDismatchReport,
 } from "../MatchReport";
 import {
     DismatchReport,
@@ -19,23 +19,23 @@ import { StringInputStream } from "../spi/StringInputStream";
 import { inputStateFromStream } from "./InputStateFactory";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): PatternMatch & T | DismatchReport {
+                              parseContext = {},
+                              l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(exactMatchReport(matcher, input, parseContext, l));
 }
 
 export function exactMatchReport(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): MatchReport {
+                                 parseContext = {},
+                                 l?: Listeners): MatchReport {
 
     const wrapped = Concat.of({
         desired: matcher,
         trailingJunk: RestOfInput,
     });
-    const result = wrapped.matchPrefix(inputStateFromStream(toInputStream(input), l), {}, parseContext);
+    const result = wrapped.matchPrefixReport(inputStateFromStream(toInputStream(input), l), {}, parseContext);
 
-    if (isSuccessfulMatch(result)) {
-        const detyped = result.match as any;
+    if (isSuccessfulMatchReport(result)) {
+        const detyped = result.toPatternMatch() as any;
         if (detyped.trailingJunk !== "") {
             return matchReportFromError(matcher,
                 `Not all input was consumed: Left over [${detyped.trailingJunk}]`);
@@ -43,7 +43,7 @@ export function exactMatchReport(matcher: MatchingLogic, input: string | InputSt
             return matchReportFromPatternMatch(matcher, detyped.desired);
         }
     }
-    return matchReportFromFailureReport(matcher, result as MatchFailureReport);
+    return matchReportFromFailureReport(matcher, result as any as MatchFailureReport);
 }
 
 function toInputStream(input: string | InputStream): InputStream {

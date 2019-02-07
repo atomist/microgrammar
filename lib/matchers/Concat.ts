@@ -1,4 +1,3 @@
-import { TreeChild, namedChild, failedTreeMatchReport } from './../internal/matchReport/treeMatchReport';
 import { InputState } from "../InputState";
 import {
     LazyMatchingLogic,
@@ -21,6 +20,7 @@ import {
     Literal,
     Regex,
 } from "../Primitives";
+import { failedTreeMatchReport, namedChild, TreeChild } from "./../internal/matchReport/treeMatchReport";
 import { MatchFailureReport } from "./../MatchPrefixResult";
 
 import {
@@ -178,8 +178,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-        thisMatchContext,
-        parseContext): FullMatchReport {
+                             thisMatchContext,
+                             parseContext): FullMatchReport {
         const bindingTarget = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
@@ -199,20 +199,29 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure ?  // shim
                         report.toValueStructure() :
-                        function () {
+                        function() {
                             console.log("WARNING: guessing at structure");
                             return (toMatchPrefixResult(report) as PatternMatch).$value;
                         }();
                 } else if (isFailedMatchReport(report)) {
-                    matches.push(namedChild(step.$id, report));
                     return failedTreeMatchReport(this, {
-                        offset: initialInputState.offset,
+                        originalOffset: initialInputState.offset,
                         matched,
                         reason: `Failed at step '${step.name}'`,
-                        children: matches.map,
+                        successes: matches,
+                        failureName: step.name,
+                        failureReport: report,
                     });
                 } else {
-                    console.log("ERROR: not recording match for " + step.name);
+                    // It has failed, but is not a "real" failure yet
+                    console.log("JESS: not-real failure report from " + step.$id);
+                    return failedTreeMatchReport(this, {
+                        originalOffset: initialInputState.offset,
+                        matched,
+                        reason: `Failed at step '${step.name}'`,
+                        successes: matches,
+                        failureName: step.name,
+                    });
                 }
             } else {
                 // It's a function taking the contexts.
@@ -221,7 +230,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     // tslint:disable-next-line:no-boolean-literal-compare
                     if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
                         return failedTreeMatchReport(this, {
-                            offset: initialInputState.offset,
+                            originalOffset: initialInputState.offset,
+                            failingOffset: currentInputState.offset,
                             matched,
                             failureName: step.$id,
                             reason: `Match vetoed by ${step.$id}`,

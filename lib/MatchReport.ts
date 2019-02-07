@@ -49,6 +49,7 @@ export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
     patternMatch: PatternMatch,
     matched: string,
     toPatternMatch(): PatternMatch,
+    toValueStructure(): any,
 } | {
     kind: "wrappedDismatchReport",
     dismatchReport: DismatchReport,
@@ -183,9 +184,12 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-                                            opts: { offset?: number } = {},
+    opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
+    if (!pm.$value) {
+        throw new Error("You can't have a pattern match without a $value")
+    }
     const mr: MatchReport = {
         matcher,
         kind: "wrappedPatternMatch",
@@ -193,6 +197,7 @@ export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternM
         matched: pm.$matched,
         successful: true,
         toPatternMatch() { return pm; },
+        toValueStructure() { return pm.$value; },
     };
     return mr;
 }

@@ -25,7 +25,8 @@ describe("StringGrammarTest", () => {
             inputStateFromString("\"    winter is coming \" la la la"), {}, {});
         if (isSuccessfulMatchReport(result)) {
             assert(result.matched === "\"    winter is coming \"");
-            assert((result.toPatternMatch() as any).text, "    winter is coming");
+            const pm = result.toPatternMatch();
+            assert((pm as any).text, "    winter is coming");
         } else {
             assert.fail("did not match");
         }
