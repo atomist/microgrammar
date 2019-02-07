@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
+import { toExplanationTree } from "../lib/MatchReport";
 import {
     matchesIn,
     Microgrammar,
@@ -157,12 +158,20 @@ describe("Microgrammar async", () => {
             notxml: "notxml",
         });
         const result = await mg.findMatchesAsync(content);
-        assert(result.length === 1);
+        if (result.length === 0) {
+            const dismatchReport = mg.exactMatchReport(content);
+            if (dismatchReport.successful) {
+                throw new Error("WTF, exactMatch works");
+            }
+            const explanation = toExplanationTree(dismatchReport);
+            console.log(explanation);
+        }
+        assert.strictEqual(result.length, 1);
     });
 
     it("2 elements: whitespace sensitive", async () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions<{namex: string, notxml: string}>({
+        const mg = Microgrammar.fromDefinitions<{ namex: string, notxml: string }>({
             ...WhiteSpaceSensitive,
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
