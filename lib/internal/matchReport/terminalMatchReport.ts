@@ -23,6 +23,7 @@ export function successfulMatchReport(matcher: MatchingLogic, params: {
     offset: number,
     valueRepresented?: any,
     parseNodeName?: string,
+    reason?: string,
 }) {
     return new SuccessfulTerminalMatchReport(matcher, {
         valueRepresented: params.matched,
@@ -39,6 +40,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly offset: number;
     public readonly valueRepresented: any;
     public readonly parseNodeName: string;
+    public readonly reason?: string;
 
     constructor(
         public readonly matcher: MatchingLogic,
@@ -47,6 +49,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
             offset: number,
             valueRepresented: any,
             parseNodeName: string,
+            reason?: string,
         }) {
         this.matched = params.matched;
         this.offset = params.offset;
@@ -83,6 +86,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public toExplanationTree(): MatchExplanationTreeNode {
         throw {
             successful: true,
+            reason: this.reason,
             ...this.toParseTree(),
         };
     }

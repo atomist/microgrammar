@@ -130,7 +130,7 @@ export interface MatchExplanationTreeNode extends TreeNodeCompatible {
      * If failed, please always populate the description of why.
      * If successful, you may describe why this input string was so compelling
      */
-    description?: string;
+    reason?: string;
 }
 
 export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {

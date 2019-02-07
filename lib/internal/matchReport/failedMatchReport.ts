@@ -5,7 +5,7 @@ export function failedMatchReport(matcher: MatchingLogic, params: {
     matched?: string;
     offset: number;
     parseNodeName?: string;
-    description: string;
+    reason: string;
 }) {
     return new FailedTerminalMatchReport(matcher, {
         parseNodeName: matcher.$id,
@@ -19,17 +19,17 @@ class FailedTerminalMatchReport implements FailedMatchReport {
     public readonly matched?: string;
     public readonly offset: number;
     public readonly parseNodeName: string;
-    public readonly description: string;
+    public readonly reason: string;
 
     constructor(public readonly matcher: MatchingLogic, params: {
         matched?: string;
         offset: number;
         parseNodeName: string;
-        description: string;
+        reason: string;
     }) {
         this.matched = params.matched;
         this.offset = params.offset;
-        this.description = params.description;
+        this.reason = params.reason;
         this.parseNodeName = params.parseNodeName;
 
     }
@@ -37,7 +37,7 @@ class FailedTerminalMatchReport implements FailedMatchReport {
     public toExplanationTree(): MatchExplanationTreeNode {
         return {
             successful: false,
-            description: this.description,
+            reason: this.reason,
             $name: this.parseNodeName,
             $offset: this.offset,
             $value: this.matched || "",

@@ -37,7 +37,7 @@ export class Literal implements MatchingLogic {
             failedMatchReport(this, {
                 offset: is.offset,
                 matched: commonPortion(this.literal, peek),
-                description: `Did not match literal [${this.literal}]: saw [${peek}]`,
+                reason: `Did not match literal [${this.literal}]: saw [${peek}]`,
                 parseNodeName: this.parseNodeName,
             });
     }

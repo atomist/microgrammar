@@ -15,7 +15,7 @@ describe("Failing matches report useful stuff", () => {
         assert.strictEqual(treeNode.$offset, 0);
         assert.deepEqual(treeNode.$children, []);
         assert.strictEqual(treeNode.successful, false);
-        assert.strictEqual(treeNode.description, "Did not match literal [foo]: saw [bar]");
+        assert.strictEqual(treeNode.reason, "Did not match literal [foo]: saw [bar]");
     });
 
     it("Describes a literal dismatch with a prefix that works", async () => {
@@ -29,7 +29,7 @@ describe("Failing matches report useful stuff", () => {
         assert.strictEqual(treeNode.$offset, 0);
         assert.deepEqual(treeNode.$children, []);
         assert.strictEqual(treeNode.successful, false);
-        assert.strictEqual(treeNode.description, "Did not match literal [foo]: saw [fou]");
+        assert.strictEqual(treeNode.reason, "Did not match literal [foo]: saw [fou]");
     });
 
     it("Describes an Optional as a successful match with an unsuccessful one inside",
@@ -43,7 +43,7 @@ describe("Failing matches report useful stuff", () => {
             assert.strictEqual(treeNode.$value, "");
             assert.strictEqual(treeNode.$offset, 0);
             assert.strictEqual(treeNode.successful, true);
-            assert.strictEqual(treeNode.description, "Did not match, but that's OK; it's optional");
+            assert.strictEqual(treeNode.reason, "Did not match, but that's OK; it's optional");
             assert.strictEqual(treeNode.$children.length, 1);
 
             const innerTreeNode = treeNode.$children[0] as MatchExplanationTreeNode;
