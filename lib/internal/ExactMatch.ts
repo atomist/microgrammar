@@ -1,14 +1,8 @@
-import { Listeners } from "../InputState";
+import { InputState, Listeners } from "../InputState";
 import { MatchingLogic } from "../Matchers";
-import { Concat } from "../matchers/Concat";
-import { RestOfInput } from "../matchers/skip/Skip";
 import {
-    isSuccessfulMatch,
-    MatchFailureReport,
-} from "../MatchPrefixResult";
-import {
-    isSuccessfulMatchReport, MatchReport,
-    matchReportFromError, matchReportFromFailureReport, matchReportFromPatternMatch, toPatternMatchOrDismatchReport,
+    FailedMatchReport, isSuccessfulMatchReport,
+    MatchReport, toPatternMatchOrDismatchReport,
 } from "../MatchReport";
 import {
     DismatchReport,
@@ -16,39 +10,59 @@ import {
 } from "../PatternMatch";
 import { InputStream } from "../spi/InputStream";
 import { StringInputStream } from "../spi/StringInputStream";
-import { SuccessfulMatchReport } from "./../MatchReport";
 import { inputStateFromStream } from "./InputStateFactory";
 import { failedMatchReport } from "./matchReport/failedMatchReport";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): PatternMatch & T | DismatchReport {
+                              parseContext = {},
+                              l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(exactMatchReport(matcher, input, parseContext, l));
 }
 
 export function exactMatchReport(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): MatchReport {
+                                 parseContext = {},
+                                 l?: Listeners): MatchReport {
+    const inputState = inputStateFromStream(toInputStream(input), l);
 
-    const wrapped = Concat.of({
-        desired: matcher,
-        trailingJunk: RestOfInput,
-    });
-    const result = wrapped.matchPrefixReport(inputStateFromStream(toInputStream(input), l), {}, parseContext);
+    const result = matcher.matchPrefixReport(inputState, {}, parseContext);
 
-    if (isSuccessfulMatchReport(result)) {
-        // require empty trailingJunk match
-        const trailingJunkReport = result.getChildMatchReport("trailingJunk") as SuccessfulMatchReport;
-        if (trailingJunkReport.matched !== "") {
-            return failedMatchReport(wrapped, {
-                offset: trailingJunkReport.offset,
-                children: [result],
-                reason:
-                    `Not all input was consumed: Left over [${trailingJunkReport.matched}]`,
-            });
-        }
+    if (!isSuccessfulMatchReport(result)) {
+        return result;
     }
-    return result.getChildMatchReport("desired");
+    const trailingInputState = advanceTo(result.endingOffset, inputState);
+    if (trailingInputState.exhausted()) {
+        return result;
+    }
+    const extraInputDescription = describeExtraInput(trailingInputState);
+    return failedMatchReport(matcher, {
+        offset: 0,
+        children: [result, trailingJunkMatchReport(result.endingOffset, extraInputDescription)],
+        parseNodeName: "ExactMatch",
+        reason: `Not all input was consumed: Left over [${extraInputDescription}]`,
+    });
+}
+
+function advanceTo(endingOffset: number, inputState: InputState): InputState {
+    // is there a better way to move the input stream forward?
+    let currentInputState = inputState;
+    while (!currentInputState.exhausted() && currentInputState.offset <= endingOffset) {
+        currentInputState = currentInputState.advance();
+    }
+    return currentInputState;
+}
+
+function describeExtraInput(inputState: InputState): string {
+    const extraInput = inputState.peek(20);
+    const nextInputState = inputState.consume(extraInput, "observing extra input in ExactMatch");
+    return nextInputState.exhausted() ? extraInput : extraInput + "...";
+}
+
+function trailingJunkMatchReport(endingOffset: number, extraInputDescription: string): FailedMatchReport {
+    return failedMatchReport({ $id: "EndOfInput" } as MatchingLogic, {
+        offset: endingOffset,
+        parseNodeName: "EndOfInput",
+        reason: `Expected end of input. Saw: ${extraInputDescription}`,
+    });
 }
 
 function toInputStream(input: string | InputStream): InputStream {

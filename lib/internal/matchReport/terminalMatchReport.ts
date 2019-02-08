@@ -38,6 +38,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
 
     public readonly matched: string;
     public readonly offset: number;
+    public readonly endingOffset: number;
     public readonly valueRepresented: any;
     public readonly parseNodeName: string;
     public readonly reason?: string;
@@ -56,6 +57,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
         this.valueRepresented = params.valueRepresented;
         this.parseNodeName = params.parseNodeName;
         this.reason = params.reason;
+        this.endingOffset = this.offset + this.matched.length;
     }
 
     public toPatternMatch<T>(): PatternMatch & T {

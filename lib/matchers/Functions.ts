@@ -42,18 +42,21 @@ class FlatteningMatcher implements MatchingLogic {
     }
 }
 
+// consider abstracting a superclass from this and wrappingMatchReport
 class FlatteningMatchReport implements SuccessfulMatchReport {
 
     public readonly matched: string;
     public readonly offset: number;
+    public readonly endingOffset: number;
     public readonly kind = "real";
     public readonly successful = true;
     public readonly parseNodeName = "Flatten";
 
     constructor(public readonly matcher: MatchingLogic,
-        private readonly inner: SuccessfulMatchReport) {
+                private readonly inner: SuccessfulMatchReport) {
         this.matched = inner.matched;
         this.offset = inner.offset;
+        this.endingOffset = inner.endingOffset;
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
@@ -112,6 +115,7 @@ class FlatteningMatchReport implements SuccessfulMatchReport {
 
 }
 
+// consider moving this to terminalMatchReport and also calling it there
 function successfulPatternMatch(params: {
     matcherId: string,
     matched: string,

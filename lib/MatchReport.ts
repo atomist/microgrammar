@@ -22,6 +22,7 @@ export interface SuccessfulMatchReport extends FullMatchReport {
     successful: true;
     matched: string;
     offset: number;
+    endingOffset: number;
     kind: "real"; // after wrappers are gone, this can go
     toPatternMatch<T>(): PatternMatch & T;
     toParseTree(): TreeNodeCompatible;
@@ -193,7 +194,7 @@ export function matchReportFromError(matcher: MatchingLogic, description: string
 }
 
 export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-                                            opts: { offset?: number } = {},
+    opts: { offset?: number } = {},
     // because in a break, the outer match stores this differently than the PatternMatch
 ): MatchReport {
     if (!pm.$value) {

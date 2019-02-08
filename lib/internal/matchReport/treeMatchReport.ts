@@ -57,14 +57,16 @@ export interface WithNamedChildren extends FullMatchReport {
 class TreeMatchReport implements SuccessfulMatchReport, WithNamedChildren {
     public readonly successful = true;
     public readonly kind = "real";
+    public readonly endingOffset: number;
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly children: TreeChild[],
-                private readonly reason: string,
-                private readonly parseNodeName: string,
-                private readonly extraProperties: Record<string, any>,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly children: TreeChild[],
+        private readonly reason: string,
+        private readonly parseNodeName: string,
+        private readonly extraProperties: Record<string, any>,
     ) {
+        this.endingOffset = offset + matched.length;
     }
 
     public getChildMatchReport(name: string): FullMatchReport {
@@ -199,12 +201,12 @@ class FailedTreeMatchReport implements FailedMatchReport, WithNamedChildren {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-                public readonly matched: string,
-                public readonly offset: number,
-                private readonly successfulChildren: TreeChild[],
-                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-                private readonly reason: string,
-                private readonly parseNodeName: string,
+        public readonly matched: string,
+        public readonly offset: number,
+        private readonly successfulChildren: TreeChild[],
+        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+        private readonly reason: string,
+        private readonly parseNodeName: string,
     ) {
     }
 

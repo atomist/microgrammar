@@ -27,6 +27,10 @@ class WrappingMatchReport implements SuccessfulMatchReport {
         return this.inner.offset;
     }
 
+    get endingOffset() {
+        return this.inner.endingOffset;
+    }
+
     public toValueStructure<T>() {
         return this.inner.toValueStructure<T>();
     }
