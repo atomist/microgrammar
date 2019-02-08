@@ -1,6 +1,5 @@
 import { InputState } from "../InputState";
-import { WithNamedChildren, isTreeMatchReport } from "../internal/matchReport/treeMatchReport";
-import { wrappingFailedMatchReport, wrappingMatchReport } from "../internal/matchReport/wrappingMatchReport";
+import { wrappingFailedMatchReport } from "../internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "../Matchers";
 import {
     MatchPrefixResult,
@@ -11,7 +10,7 @@ import {
     SuccessfulMatchReport,
     toMatchPrefixResult,
 } from "../MatchReport";
-import { PatternMatch } from "../PatternMatch";
+import { isTreePatternMatch, PatternMatch } from "../PatternMatch";
 import { TreeNodeCompatible } from "../TreeNodeCompatible";
 import { toMatchingLogic } from "./Concat";
 
@@ -37,16 +36,7 @@ class FlatteningMatcher implements MatchingLogic {
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         const r = this.delegate.matchPrefixReport(is, thisMatchContext, parseContext);
         if (isSuccessfulMatchReport(r)) {
-            if (isTreeMatchReport(r)) {
-                const vs = r.toValueStructure();
-                const properties = Object.keys(vs);
-                if (properties.length !== 1) {
-                    throw new Error(`Cannot flatten a structure with more than one property: Found [${properties.join(",")}]`);
-                }
-                return new FlatteningMatchReport(this, r, properties[0]);
-            } else {
-                return wrappingMatchReport(this, { inner: r, parseNodeName: "Flatten" });
-            }
+            return new FlatteningMatchReport(this, r);
         }
         return wrappingFailedMatchReport(this, { inner: (r as FailedMatchReport), parseNodeName: "Flatten" });
     }
@@ -60,18 +50,30 @@ class FlatteningMatchReport implements SuccessfulMatchReport {
     public readonly successful = true;
     public readonly parseNodeName = "Flatten";
 
-    private readonly flattenTo: SuccessfulMatchReport;
-
     constructor(public readonly matcher: MatchingLogic,
-        private readonly inner: SuccessfulMatchReport & WithNamedChildren,
-        namedChild: string) {
+        private readonly inner: SuccessfulMatchReport) {
         this.matched = inner.matched;
-        this.flattenTo = (inner.getChildMatchReport(namedChild) as SuccessfulMatchReport);
-        this.offset = this.flattenTo.offset;
+        this.offset = inner.offset;
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
-        return this.flattenTo.toPatternMatch<T>();
+        const match = this.inner.toPatternMatch<T>();
+        if (isTreePatternMatch(match)) {
+            const propNames =
+                Object.getOwnPropertyNames(match.submatches());
+            if (propNames.length !== 1) {
+                throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
+            }
+            const onlyPropertyName = propNames[0];
+            const relevantSubMatch = match.$valueMatches[onlyPropertyName];
+            // TODO how do we update this?
+            return successfulPatternMatch({
+                matcherId: this.matcher.$id, matched: match.$matched, offset: match.$offset,
+                valueRepresented: { value: relevantSubMatch.$value },
+            }) as PatternMatch & T;
+        } else {
+            return match;
+        }
     }
 
     public toParseTree(): TreeNodeCompatible {
@@ -96,7 +98,39 @@ class FlatteningMatchReport implements SuccessfulMatchReport {
     }
 
     public toValueStructure<T>(): T {
-        throw new Error("Method not implemented.");
+        const innerVs = this.inner.toValueStructure();
+        if (typeof innerVs === "object") {
+            const propNames = Object.keys(innerVs);
+            if (propNames.length !== 1) {
+                throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
+            }
+            return innerVs[propNames[0]] as T;
+        } else {
+            return innerVs as T;
+        }
     }
 
+}
+
+function successfulPatternMatch(params: {
+    matcherId: string,
+    matched: string,
+    offset: number,
+    valueRepresented?: { value: any }, // you can explicitly provide "undefined"
+}): PatternMatch {
+    const { matched, offset } = params;
+    const $value = params.valueRepresented ? params.valueRepresented.value : matched;
+
+    const pm: PatternMatch = {
+        $matcherId: params.matcherId,
+        $matched: matched,
+        $offset: offset,
+        $value,
+        matchedStructure: <TT>() => $value as TT,
+    };
+
+    // shim. hack for compatibility with isSuccessfulMatch
+    (pm as any).$successfulMatch = true;
+
+    return pm;
 }
