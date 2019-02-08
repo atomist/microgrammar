@@ -30,7 +30,7 @@ export function exactMatchReport(matcher: MatchingLogic, input: string | InputSt
         return result;
     }
     const trailingInputState = advanceTo(result.endingOffset, inputState);
-    if (trailingInputState.exhausted()) {
+    if (hasNothingLeft(trailingInputState)) {
         return result;
     }
     const extraInputDescription = describeExtraInput(trailingInputState);
@@ -49,6 +49,11 @@ function advanceTo(endingOffset: number, inputState: InputState): InputState {
         currentInputState = currentInputState.advance();
     }
     return currentInputState;
+}
+
+function hasNothingLeft(inputState: InputState) {
+    // sometimes exhausted() returns false even when there is nothing left.
+    return inputState.exhausted() || inputState.peek(1).length === 0;
 }
 
 function describeExtraInput(inputState: InputState): string {
