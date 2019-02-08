@@ -5,7 +5,12 @@
 
 import * as assert from "assert";
 import { stringifyTree } from "stringify-tree";
-import { atLeastOne, firstOf, isPatternMatch, optional } from "../../lib";
+import {
+    atLeastOne,
+    firstOf,
+    isPatternMatch,
+    optional,
+} from "../../lib";
 import { DelimitedLiteral } from "../../lib/matchers/lang/cfamily/DelimitedLiteral";
 import { regexLiteral } from "../../lib/matchers/lang/cfamily/javascript/regexpLiteral";
 import { MatchFailureReport } from "../../lib/MatchPrefixResult";
