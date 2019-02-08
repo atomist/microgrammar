@@ -6,40 +6,32 @@ import {
     Term,
 } from "../Matchers";
 import {
-    isSuccessfulMatch,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../MatchPrefixResult";
 import { Microgrammar } from "../Microgrammar";
 import {
     isSpecialMember,
     PatternMatch,
-    TreePatternMatch,
 } from "../PatternMatch";
 import {
     Literal,
     Regex,
 } from "../Primitives";
-import { failedTreeMatchReport, namedChild, TreeChild, WithNamedChildren } from "./../internal/matchReport/treeMatchReport";
-import { MatchFailureReport } from "./../MatchPrefixResult";
+import { failedTreeMatchReport, namedChild, TreeChild } from "./../internal/matchReport/treeMatchReport";
 
 import {
     SkipCapable,
     WhiteSpaceHandler,
 } from "../Config";
 import { Break } from "../internal/Break";
-import { failedMatchReport } from "../internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
 import { successfulTreeMatchReport } from "../internal/matchReport/treeMatchReport";
 import { readyToMatch } from "../internal/Whitespace";
 import {
     FullMatchReport, isFailedMatchReport,
     isSuccessfulMatchReport, MatchReport,
-    matchReportFromFailureReport,
-    matchReportFromSuccessfulTreeMatch,
     toMatchPrefixResult,
-    SuccessfulMatchReport,
 } from "../MatchReport";
-import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -182,8 +174,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-        thisMatchContext,
-        parseContext): FullMatchReport & WithNamedChildren {
+                             thisMatchContext,
+                             parseContext): FullMatchReport {
         const bindingTarget = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
@@ -192,7 +184,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
                 if (!!eat.skipped) {
-                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset))
+                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
                 }
                 currentInputState = eat.state;
                 matched += eat.skipped;
@@ -205,7 +197,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure ?  // shim
                         report.toValueStructure() :
-                        function () {
+                        function() {
                             console.log("WARNING: guessing at structure");
                             return (toMatchPrefixResult(report) as PatternMatch).$value;
                         }();
@@ -280,7 +272,7 @@ function whitespaceChildMatch(skipped: string, matcher: Concat, offset: number):
         matched: skipped,
         offset,
     });
-    return { explicit: false, matchReport }
+    return { explicit: false, matchReport };
 }
 
 /**
