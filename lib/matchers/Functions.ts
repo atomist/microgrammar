@@ -1,17 +1,13 @@
 import { InputState } from "../InputState";
+import { wrappingFailedMatchReport, wrappingMatchReport } from "../internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "../Matchers";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch,
-    matchReportFromSuccessfulMatch, toMatchPrefixResult,
+    FailedMatchReport, isSuccessfulMatchReport, MatchReport,
+    toMatchPrefixResult,
 } from "../MatchReport";
-import {
-    isTreePatternMatch,
-    TerminalPatternMatch,
-} from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
 /**
@@ -36,23 +32,18 @@ class FlatteningMatcher implements MatchingLogic {
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         const r = this.delegate.matchPrefixReport(is, thisMatchContext, parseContext);
         if (isSuccessfulMatchReport(r)) {
-            const pm = r.toPatternMatch();
-            if (isTreePatternMatch(pm)) {
-                const propNames =
-                    Object.getOwnPropertyNames(pm.submatches());
-                if (propNames.length !== 1) {
-                    throw new Error(`Cannot flatten a structure with more than one property: Found [${propNames.join(",")}]`);
+            const vs = r.toValueStructure();
+            if (typeof vs === "object") {
+                const properties = Object.keys(vs);
+                if (properties.length !== 1) {
+                    throw new Error(`Cannot flatten a structure with more than one property: Found [${properties.join(",")}]`);
                 }
-                const onlyPropertyName = propNames[0];
-                const relevantSubMatch = pm.$valueMatches[onlyPropertyName];
-                // TODO how do we update this?
-                const match = new TerminalPatternMatch(r.matcher.$id, r.matched, r.offset, relevantSubMatch.$value);
-                return matchReportFromPatternMatch(this, match);
+                const valueRepresented = vs[properties[0]];
+                return wrappingMatchReport(this, { inner: r, parseNodeName: "Flatten", valueRepresented });
             } else {
-                return matchReportFromSuccessfulMatch(this, r.toPatternMatch());
+                return wrappingMatchReport(this, { inner: r, parseNodeName: "Flatten" });
             }
         }
-        return matchReportFromFailureReport(this, toMatchPrefixResult(r) as MatchFailureReport); // todo: wrap failure
+        return wrappingFailedMatchReport(this, { inner: (r as FailedMatchReport), parseNodeName: "Flatten" });
     }
-
 }

@@ -36,7 +36,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("possum*") as any;
         assert(m);
-        assert(m.a === "possum");
+        assert.strictEqual(m.a, "possum");
     });
 
     it("pull up missing object optional", () => {
@@ -80,7 +80,6 @@ describe("flatten", () => {
             a: flatten(optional(struct)),
         });
         const m = g.findMatches("!possum* !dinosaur*") as any;
-        assert.strictEqual(m[0].a, "possum");
         assert.strictEqual(m.length, 2);
         assert.strictEqual(m[0].a, "possum");
         assert.strictEqual(m[1].a, "dinosaur");

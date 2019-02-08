@@ -1,18 +1,20 @@
-import { MatchingLogic } from "../..";
 
+import { MatchingLogic } from "../../Matchers";
 import { FailedMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport } from "../../MatchReport";
-
 import { TreeNodeCompatible } from "../../TreeNodeCompatible";
 
 export function wrappingMatchReport(matcher: MatchingLogic, params: {
     inner: SuccessfulMatchReport,
     additional?: FailedMatchReport[],
     parseNodeName?: string,
+    valueRepresented?: any,
 }): SuccessfulMatchReport {
+    const { valueRepresented } = params;
     return new WrappingMatchReport(matcher,
         params.parseNodeName || matcher.$id,
         params.inner,
-        params.additional);
+        params.additional,
+        valueRepresented ? ({ valueRepresented }) : undefined);
 }
 
 class WrappingMatchReport implements SuccessfulMatchReport {
@@ -21,7 +23,8 @@ class WrappingMatchReport implements SuccessfulMatchReport {
     constructor(public readonly matcher: MatchingLogic,
                 public readonly parseNodeName: string,
                 public readonly inner: SuccessfulMatchReport,
-                public readonly additional: FailedMatchReport[] = []) {
+                public readonly additional: FailedMatchReport[] = [],
+                private readonly valueOverride?: { valueRepresented?: any }) {
     }
 
     get offset() {
@@ -29,7 +32,7 @@ class WrappingMatchReport implements SuccessfulMatchReport {
     }
 
     public toValueStructure<T>() {
-        return this.inner.toValueStructure<T>();
+        return this.valueOverride ? this.valueOverride.valueRepresented : this.inner.toValueStructure<T>();
     }
 
     public toPatternMatch<T>() {
@@ -57,6 +60,43 @@ class WrappingMatchReport implements SuccessfulMatchReport {
             ...this.toParseTree(),
             successful: true,
             $children: [...this.additional, this.inner].map(m => m.toExplanationTree()),
+        };
+    }
+}
+
+export function wrappingFailedMatchReport(matcher: MatchingLogic, params: {
+    inner: FailedMatchReport,
+    parseNodeName?: string,
+}): FailedMatchReport {
+    return new WrappingFailedMatchReport(matcher,
+        params.parseNodeName || matcher.$id,
+        params.inner,
+    );
+}
+
+class WrappingFailedMatchReport implements FailedMatchReport {
+    public readonly kind = "real";
+    public readonly successful = false;
+    constructor(public readonly matcher: MatchingLogic,
+                public readonly parseNodeName: string,
+                public readonly inner: FailedMatchReport) {
+    }
+
+    get offset() {
+        return this.inner.offset;
+    }
+
+    get matched() {
+        return this.inner.matched;
+    }
+
+    public toExplanationTree(): MatchExplanationTreeNode {
+        return {
+            $name: this.parseNodeName,
+            $offset: this.inner.offset,
+            $value: this.inner.matched,
+            successful: false,
+            $children: [this.inner.toExplanationTree()],
         };
     }
 }
