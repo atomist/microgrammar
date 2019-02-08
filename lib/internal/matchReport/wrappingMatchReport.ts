@@ -7,24 +7,20 @@ export function wrappingMatchReport(matcher: MatchingLogic, params: {
     inner: SuccessfulMatchReport,
     additional?: FailedMatchReport[],
     parseNodeName?: string,
-    valueRepresented?: any,
 }): SuccessfulMatchReport {
-    const { valueRepresented } = params;
     return new WrappingMatchReport(matcher,
         params.parseNodeName || matcher.$id,
         params.inner,
-        params.additional,
-        valueRepresented ? ({ valueRepresented }) : undefined);
+        params.additional);
 }
 
 class WrappingMatchReport implements SuccessfulMatchReport {
     public readonly kind = "real";
     public readonly successful = true;
     constructor(public readonly matcher: MatchingLogic,
-                public readonly parseNodeName: string,
-                public readonly inner: SuccessfulMatchReport,
-                public readonly additional: FailedMatchReport[] = [],
-                private readonly valueOverride?: { valueRepresented?: any }) {
+        public readonly parseNodeName: string,
+        public readonly inner: SuccessfulMatchReport,
+        public readonly additional: FailedMatchReport[] = []) {
     }
 
     get offset() {
@@ -32,7 +28,7 @@ class WrappingMatchReport implements SuccessfulMatchReport {
     }
 
     public toValueStructure<T>() {
-        return this.valueOverride ? this.valueOverride.valueRepresented : this.inner.toValueStructure<T>();
+        return this.inner.toValueStructure<T>();
     }
 
     public toPatternMatch<T>() {
@@ -78,8 +74,8 @@ class WrappingFailedMatchReport implements FailedMatchReport {
     public readonly kind = "real";
     public readonly successful = false;
     constructor(public readonly matcher: MatchingLogic,
-                public readonly parseNodeName: string,
-                public readonly inner: FailedMatchReport) {
+        public readonly parseNodeName: string,
+        public readonly inner: FailedMatchReport) {
     }
 
     get offset() {

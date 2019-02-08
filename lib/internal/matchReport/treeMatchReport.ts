@@ -5,6 +5,11 @@ import { TreeNodeCompatible } from "./../../TreeNodeCompatible";
 import { failedMatchReport } from "./failedMatchReport";
 import { wrappingMatchReport } from "./wrappingMatchReport";
 
+export function isTreeMatchReport(m: FullMatchReport): m is WithNamedChildren {
+    const maybe = m as WithNamedChildren;
+    return m && !!maybe.getChildMatchReport;
+}
+
 export function successfulTreeMatchReport(matcher: MatchingLogic, params:
     {
         matched: string,
@@ -45,7 +50,7 @@ export function unnamedChild(matchReport: SuccessfulMatchReport): TreeChild {
     return { explicit: false, matchReport };
 }
 
-export interface WithNamedChildren {
+export interface WithNamedChildren extends FullMatchReport {
     getChildMatchReport(name: string): FullMatchReport;
 }
 
@@ -53,12 +58,12 @@ class TreeMatchReport implements SuccessfulMatchReport, WithNamedChildren {
     public readonly successful = true;
     public readonly kind = "real";
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly children: TreeChild[],
-        private readonly reason: string,
-        private readonly parseNodeName: string,
-        private readonly extraProperties: Record<string, any>,
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly children: TreeChild[],
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
     ) {
     }
 
@@ -194,12 +199,12 @@ class FailedTreeMatchReport implements FailedMatchReport, WithNamedChildren {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly successfulChildren: TreeChild[],
-        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-        private readonly reason: string,
-        private readonly parseNodeName: string,
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly successfulChildren: TreeChild[],
+                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+                private readonly reason: string,
+                private readonly parseNodeName: string,
     ) {
     }
 

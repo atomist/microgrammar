@@ -16,19 +16,19 @@ import {
 } from "../PatternMatch";
 import { InputStream } from "../spi/InputStream";
 import { StringInputStream } from "../spi/StringInputStream";
-import { SuccessfulMatchReport } from "./../MatchReport.d";
+import { SuccessfulMatchReport } from "./../MatchReport";
 import { inputStateFromStream } from "./InputStateFactory";
 import { failedMatchReport } from "./matchReport/failedMatchReport";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-                              parseContext = {},
-                              l?: Listeners): PatternMatch & T | DismatchReport {
+    parseContext = {},
+    l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(exactMatchReport(matcher, input, parseContext, l));
 }
 
 export function exactMatchReport(matcher: MatchingLogic, input: string | InputStream,
-                                 parseContext = {},
-                                 l?: Listeners): MatchReport {
+    parseContext = {},
+    l?: Listeners): MatchReport {
 
     const wrapped = Concat.of({
         desired: matcher,
