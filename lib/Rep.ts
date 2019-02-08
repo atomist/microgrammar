@@ -128,11 +128,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
             }
         }
 
-        const values = matches.map(m =>
-            (typeof m.$value === "object") ?
-                m :
-                m.$value,
-        );
+        const values = matches.map(m => m.$value);
 
         return (matches.length >= this.min) ?
             matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id,
