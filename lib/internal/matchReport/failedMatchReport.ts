@@ -44,7 +44,7 @@ class FailedTerminalMatchReport implements FailedMatchReport {
             reason: this.reason,
             $name: this.parseNodeName,
             $offset: this.offset,
-            $value: this.matched || "",
+            $value: this.matched,
             $children: this.children.map(c => c.toExplanationTree()),
         };
     }

@@ -1,7 +1,7 @@
 import { InputState } from "./InputState";
 import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
-import { wrappingMatchReport } from "./internal/matchReport/wrappingMatchReport";
+import { wrappingFailedMatchReport, wrappingMatchReport } from "./internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
@@ -10,12 +10,13 @@ import {
 } from "./MatchPrefixResult";
 import {
     FailedMatchReport,
-    isFailedMatchReport, isSuccessfulMatchReport, MatchReport,
-    matchReportFromFailureReport, toMatchPrefixResult,
+    isFailedMatchReport, isSuccessfulMatchReport, MatchExplanationTreeNode,
+    MatchReport, matchReportFromFailureReport, SuccessfulMatchReport, toMatchPrefixResult,
 } from "./MatchReport";
 import {
     PatternMatch,
 } from "./PatternMatch";
+import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 /**
  * Optional match on the given matcher
@@ -63,13 +64,61 @@ export class Opt implements MatchingLogic {
         if (isSuccessfulMatchReport(maybe)) {
             return wrappingMatchReport(this, { parseNodeName: this.parseNodeName, inner: maybe });
         }
-        return successfulMatchReport(this, {
-            matched: "",
-            offset: is.offset,
-            parseNodeName: this.parseNodeName,
-            reason: "Did not match, but that's OK; it's optional.",
-        });
+        return new WrappingEmptyMatchReport(this,
+            this.parseNodeName,
+            (maybe as FailedMatchReport), // shim: someday there will be only the two
+        );
     }
+}
+
+class WrappingEmptyMatchReport implements SuccessfulMatchReport {
+    public readonly successful: true;
+    public readonly kind = "real";
+    public readonly matched = "";
+    public readonly offset: number;
+    public readonly endingOffset: number;
+
+    constructor(public readonly matcher: MatchingLogic,
+                private readonly parseNodeName: string,
+                private readonly inner: FailedMatchReport) {
+        this.offset = inner.offset;
+        this.endingOffset = inner.offset;
+    }
+
+    public toPatternMatch<T>(): PatternMatch & T {
+        const pm: PatternMatch = {
+            $matcherId: this.matcher.$id,
+            $matched: this.matched,
+            $offset: this.offset,
+            $value: undefined,
+            matchedStructure: <TT>() => undefined as TT, // really should be T
+        };
+        // hack for compatibility with isSuccessfulMatch
+        (pm as any).$successfulMatch = true;
+        return pm as (PatternMatch & T);
+    }
+    public toParseTree(): TreeNodeCompatible {
+        return {
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: [],
+        };
+    }
+    public toValueStructure<T>(): T {
+        return undefined;
+    }
+    public toExplanationTree(): MatchExplanationTreeNode {
+        return {
+            reason: "Did not match, but that's OK; it's optional.",
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: [this.inner.toExplanationTree()],
+            successful: true,
+        };
+    }
+
 }
 
 /**

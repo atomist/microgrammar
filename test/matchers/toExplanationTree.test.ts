@@ -2,6 +2,7 @@ import * as assert from "assert";
 import { firstOf, Literal, optional } from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { MatchExplanationTreeNode, toExplanationTree } from "../../lib/MatchReport";
+import { microgrammar } from "../../lib/microgrammarConstruction";
 
 describe("Failing matches report useful stuff", () => {
     it("Describes a literal dismatch", async () => {
@@ -43,7 +44,7 @@ describe("Failing matches report useful stuff", () => {
             assert.strictEqual(treeNode.$value, "");
             assert.strictEqual(treeNode.$offset, 0);
             assert.strictEqual(treeNode.successful, true);
-            assert.strictEqual(treeNode.reason, "Did not match, but that's OK; it's optional");
+            assert.strictEqual(treeNode.reason, "Did not match, but that's OK; it's optional.");
             assert.strictEqual(treeNode.$children.length, 1);
 
             const innerTreeNode = treeNode.$children[0] as MatchExplanationTreeNode;
@@ -65,10 +66,35 @@ describe("Failing matches report useful stuff", () => {
 
         const unsuccessfulChild = treeNode.$children[0];
         assert.strictEqual(unsuccessfulChild.successful, false);
-        assert.strictEqual(unsuccessfulChild.$value, undefined);
+        assert.strictEqual(unsuccessfulChild.$value, "");
 
         const successfulChild = treeNode.$children[2];
         assert.strictEqual(successfulChild.successful, true);
         assert.strictEqual(successfulChild.$value, "lizards");
     });
+
+    it("Notices a value updated by a compute function", () => {
+        const mg = microgrammar({
+            banana: "banana",
+            apple: "apple",
+            _unbanana: ctx => ctx.banana = "lizard",
+        });
+        const inputString = "banana apple";
+        const report = mg.exactMatchReport(inputString);
+        const treeNode = toExplanationTree(report);
+
+        const overwrittenNode = childNamed("banana", treeNode);
+        assert.strictEqual(overwrittenNode.$children.length, 2);
+        // assert.strictEqual(overwrittenNode.$value, "lizard");
+
+        const computeChild = overwrittenNode.$children[1];
+        assert.strictEqual(computeChild.$name, "Compute");
+        assert.strictEqual(computeChild.$value, "lizard");
+        assert.strictEqual(computeChild.reason, "Overwritten by function in _unbanana");
+
+    });
 });
+
+function childNamed(name: string, treeNode: MatchExplanationTreeNode): MatchExplanationTreeNode {
+    return treeNode.$children.find(c => c.$name === name);
+}

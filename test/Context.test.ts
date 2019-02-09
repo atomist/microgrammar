@@ -1,4 +1,4 @@
-import * as assert from "power-assert";
+import * as assert from "assert";
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 import { Concat } from "../lib/matchers/Concat";
 import { Microgrammar } from "../lib/Microgrammar";
@@ -9,7 +9,7 @@ import {
     LowercaseBoolean,
 } from "../lib/Primitives";
 
-describe("ContextTest", () => {
+describe("Context", () => {
 
     it("binds calculation", () => {
         const cc = Concat.of({
@@ -185,8 +185,8 @@ describe("ContextTest", () => {
             _undo: ctx => ctx.name = "marmaduke",
         });
         const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-        assert(matches.length === 2);
-        assert(matches[0].name === "marmaduke");
+        assert.strictEqual(matches.length, 2);
+        assert.strictEqual(matches[0].name, "marmaduke");
     });
 
     // TODO this seems to be really strange behavior, but we can work around it for now in users

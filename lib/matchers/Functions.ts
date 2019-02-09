@@ -1,5 +1,5 @@
 import { InputState } from "../InputState";
-import { wrappingFailedMatchReport } from "../internal/matchReport/wrappingMatchReport";
+import { SuccessfulMatchReportWrapper, wrappingFailedMatchReport } from "../internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "../Matchers";
 import {
     MatchPrefixResult,
@@ -42,21 +42,11 @@ class FlatteningMatcher implements MatchingLogic {
     }
 }
 
-// consider abstracting a superclass from this and wrappingMatchReport
-class FlatteningMatchReport implements SuccessfulMatchReport {
+class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
 
-    public readonly matched: string;
-    public readonly offset: number;
-    public readonly endingOffset: number;
-    public readonly kind = "real";
-    public readonly successful = true;
-    public readonly parseNodeName = "Flatten";
-
-    constructor(public readonly matcher: MatchingLogic,
-                private readonly inner: SuccessfulMatchReport) {
-        this.matched = inner.matched;
-        this.offset = inner.offset;
-        this.endingOffset = inner.endingOffset;
+    constructor(matcher: MatchingLogic,
+        inner: SuccessfulMatchReport) {
+        super(matcher, "Flatten", inner);
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
@@ -79,27 +69,6 @@ class FlatteningMatchReport implements SuccessfulMatchReport {
         }
     }
 
-    public toParseTree(): TreeNodeCompatible {
-        // only successful matches go into the parse tree
-        return {
-            $name: this.parseNodeName,
-            $offset: this.inner.offset,
-            $value: this.inner.matched,
-            $children: [this.inner.toParseTree()],
-        };
-    }
-
-    public toExplanationTree(): MatchExplanationTreeNode {
-        // all non-matches and matches go into the explanation tree
-        return {
-            $name: this.parseNodeName,
-            $offset: this.inner.offset,
-            $value: this.inner.matched,
-            successful: true,
-            $children: [this.inner.toExplanationTree()],
-        };
-    }
-
     public toValueStructure<T>(): T {
         const innerVs = this.inner.toValueStructure();
         if (typeof innerVs === "object") {
@@ -112,7 +81,6 @@ class FlatteningMatchReport implements SuccessfulMatchReport {
             return innerVs as T;
         }
     }
-
 }
 
 // consider moving this to terminalMatchReport and also calling it there
