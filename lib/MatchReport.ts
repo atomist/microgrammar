@@ -219,7 +219,14 @@ export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchF
         kind: "wrappedMatchFailureReport",
         matchFailureReport: mfr,
         successful: false,
-    };
+        toExplanationTree() {
+            return {
+                $name: matcher.$id,
+                reason: mfr.description,
+                $children: [],
+            };
+        },
+    } as MatchReport;
     return mr;
 }
 

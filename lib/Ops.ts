@@ -72,7 +72,7 @@ export class Opt implements MatchingLogic {
 }
 
 class WrappingEmptyMatchReport implements SuccessfulMatchReport {
-    public readonly successful: true;
+    public readonly successful = true;
     public readonly kind = "real";
     public readonly matched = "";
     public readonly offset: number;

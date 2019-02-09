@@ -1,9 +1,11 @@
 import { expect } from "chai";
-import * as assert from "power-assert";
 import { fail } from "power-assert";
+import * as assert from "power-assert";
+import { stringifyTree } from "stringify-tree";
 import { Integer } from "../lib";
 import { WhiteSpaceSensitive } from "../lib/Config";
 import { MatchingLogic } from "../lib/Matchers";
+import { toExplanationTree } from "../lib/MatchReport";
 import {
     MatchingMachine,
     Microgrammar,
@@ -526,6 +528,10 @@ describe("Microgrammar", () => {
         expect(m.pigs).to.have.members(["Porker"]);
 
         const matches2 = mg.findMatches("**** Felix, Oscar****Porker");
+        if (matches2.length < 1) {
+            const explanation = toExplanationTree(mg.exactMatchReport("**** Felix, Oscar****Porker"));
+            console.log(stringifyTree(explanation, n => `${n.$name} ${n.reason}`, c => c.$children));
+        }
         const m2 = matches2[0];
         expect(m2.dogs).to.equal(undefined);
         expect(m2.cats).to.have.members(["Felix", "Oscar"]);
