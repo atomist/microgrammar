@@ -84,14 +84,13 @@ describe("Failing matches report useful stuff", () => {
         const treeNode = toExplanationTree(report);
 
         const overwrittenNode = childNamed("banana", treeNode);
+        assert.strictEqual(overwrittenNode.$value, "lizard");
         assert.strictEqual(overwrittenNode.$children.length, 2);
-        // assert.strictEqual(overwrittenNode.$value, "lizard");
 
         const computeChild = overwrittenNode.$children[1];
         assert.strictEqual(computeChild.$name, "Compute");
         assert.strictEqual(computeChild.$value, "lizard");
         assert.strictEqual(computeChild.reason, "Overwritten by function in _unbanana");
-
     });
 });
 

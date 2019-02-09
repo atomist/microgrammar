@@ -1,4 +1,13 @@
+import * as stringify from "json-stringify-safe";
+import {
+    SkipCapable,
+    WhiteSpaceHandler,
+} from "../Config";
 import { InputState } from "../InputState";
+import { Break } from "../internal/Break";
+import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
+import { ComputeEffectsReport, successfulTreeMatchReport } from "../internal/matchReport/treeMatchReport";
+import { readyToMatch } from "../internal/Whitespace";
 import {
     LazyMatchingLogic,
     Matcher,
@@ -8,6 +17,11 @@ import {
 import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
+import {
+    FullMatchReport, isFailedMatchReport,
+    isSuccessfulMatchReport, MatchReport,
+    toMatchPrefixResult,
+} from "../MatchReport";
 import { Microgrammar } from "../Microgrammar";
 import {
     isSpecialMember,
@@ -18,20 +32,6 @@ import {
     Regex,
 } from "../Primitives";
 import { failedTreeMatchReport, namedChild, TreeChild } from "./../internal/matchReport/treeMatchReport";
-
-import {
-    SkipCapable,
-    WhiteSpaceHandler,
-} from "../Config";
-import { Break } from "../internal/Break";
-import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
-import { successfulTreeMatchReport } from "../internal/matchReport/treeMatchReport";
-import { readyToMatch } from "../internal/Whitespace";
-import {
-    FullMatchReport, isFailedMatchReport,
-    isSuccessfulMatchReport, MatchReport,
-    toMatchPrefixResult,
-} from "../MatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -176,10 +176,11 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     public matchPrefixReport(initialInputState: InputState,
                              thisMatchContext,
                              parseContext): FullMatchReport {
-        const bindingTarget = {};
+        const bindingTarget: Record<string, any> = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
         let matched = "";
+        const computeEffects: ComputeEffectsReport[] = [];
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
@@ -240,10 +241,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         });
                     }
                 } else {
-                    const computeResult = step.compute(bindingTarget);
-                    if (computeResult !== undefined) {
-                        bindingTarget[step.$id] = computeResult;
-                    }
+                    const effects = applyComputation(step.$id, step.compute, bindingTarget);
+                    computeEffects.push(effects);
                 }
             }
         }
@@ -253,6 +252,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
             offset: initialInputState.offset,
             children: matches,
             extraProperties: bindingTarget,
+            computeEffects,
         });
     }
 
@@ -260,6 +260,34 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
         return toMatchPrefixResult(this.matchPrefixReport(initialInputState, thisMatchContext, parseContext));
     }
 
+}
+
+function applyComputation(stepName: string,
+                          compute: (arg: Record<string, any>) => any,
+                          argument: Record<string, any>,
+): ComputeEffectsReport {
+    const beforeProperties = Object.entries(argument).map(([k, v]) => {
+        return {
+            name: k,
+            before: stringify(v),
+        };
+    });
+    const computeResult = compute(argument);
+    if (computeResult !== undefined) {
+        argument[stepName] = computeResult;
+    }
+    const newProperties = Object.keys(argument).filter(n => !Object.keys(beforeProperties).includes(n));
+    const alteredProperties = beforeProperties.filter(bp => {
+        const beforeString = argument[bp.name];
+        const afterString = stringify(argument[bp.name]);
+        return beforeString === afterString;
+    }).map(bp => bp.name);
+    return {
+        stepName,
+        computeResult,
+        newProperties,
+        alteredProperties,
+    };
 }
 
 function isMatcher(s: MatchStep): s is Matcher {

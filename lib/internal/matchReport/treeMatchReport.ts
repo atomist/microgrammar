@@ -13,8 +13,9 @@ export function successfulTreeMatchReport(matcher: MatchingLogic, params:
         parseNodeName?: string,
         reason?: string,
         extraProperties?: Record<string, any>,
+        computeEffects?: ComputeEffectsReport[],
     }): SuccessfulMatchReport {
-    const { offset, matched, parseNodeName, reason, extraProperties, children } = params;
+    const { offset, matched, parseNodeName, reason, computeEffects, extraProperties, children } = params;
     return new TreeMatchReport(
         matcher,
         matched,
@@ -23,7 +24,15 @@ export function successfulTreeMatchReport(matcher: MatchingLogic, params:
         reason,
         parseNodeName || matcher.$id,
         extraProperties || {},
+        computeEffects || [],
     );
+}
+
+export interface ComputeEffectsReport {
+    stepName: string;
+    computeResult: any;
+    alteredProperties: string[];
+    newProperties: string[];
 }
 
 export type TreeChild = {
@@ -56,6 +65,7 @@ class TreeMatchReport implements SuccessfulMatchReport {
         private readonly reason: string,
         private readonly parseNodeName: string,
         private readonly extraProperties: Record<string, any>,
+        private readonly computeEffects: ComputeEffectsReport[],
     ) {
         this.endingOffset = offset + matched.length;
     }
@@ -93,16 +103,12 @@ class TreeMatchReport implements SuccessfulMatchReport {
         }
         (output as any).submatches = () => submatches;
 
-        Object.entries(this.extraProperties).forEach(([k, v]) => {
-            // I think this might overwrite some children we don't want to overwrite
-            if (Object.keys(output).includes(k)) {
-                // skip existing child. Not sure this is always what we should do
-                return;
-            }
-            if (isSpecialMember(k)) {
-                return;
-            }
-            output[k] = v;
+        this.computeEffects.forEach(ce => {
+            [...ce.alteredProperties, ...ce.newProperties]
+                .filter(p => !isSpecialMember(p))
+                .forEach(p => {
+                    output[p] = this.extraProperties[p];
+                });
         });
 
         return output as unknown as PatternMatch & T;
