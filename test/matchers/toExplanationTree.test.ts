@@ -77,7 +77,9 @@ describe("Failing matches report useful stuff", () => {
         const mg = microgrammar({
             banana: "banana",
             apple: "apple",
-            _unbanana: ctx => ctx.banana = "lizard",
+            unbanana: ctx => {
+                ctx.banana = "lizard";
+            },
         });
         const inputString = "banana apple";
         const report = mg.exactMatchReport(inputString);
@@ -90,7 +92,7 @@ describe("Failing matches report useful stuff", () => {
         const computeChild = overwrittenNode.$children[1];
         assert.strictEqual(computeChild.$name, "Compute");
         assert.strictEqual(computeChild.$value, "lizard");
-        assert.strictEqual(computeChild.reason, "Overwritten by function in _unbanana");
+        assert.strictEqual(computeChild.reason, "Overwritten by function in unbanana");
     });
 });
 

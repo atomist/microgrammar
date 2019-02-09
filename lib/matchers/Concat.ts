@@ -211,6 +211,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         successes: matches,
                         failureName: step.name,
                         failureReport: report,
+                        extraProperties: bindingTarget,
+                        computeEffects,
                     });
                 } else {
                     // It has failed, but is not a "real" failure yet
@@ -222,6 +224,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         reason: `Failed at step '${step.name}'`,
                         successes: matches,
                         failureName: step.name,
+                        extraProperties: bindingTarget,
+                        computeEffects,
                     });
                 }
             } else {
@@ -238,6 +242,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                             failureName: step.$id,
                             reason: `Match vetoed by ${step.$id}`,
                             successes: matches,
+                            extraProperties: bindingTarget,
+                            computeEffects,
                         });
                     }
                 } else {
@@ -276,11 +282,9 @@ function applyComputation(stepName: string,
     if (computeResult !== undefined) {
         argument[stepName] = computeResult;
     }
-    const newProperties = Object.keys(argument).filter(n => !Object.keys(beforeProperties).includes(n));
+    const newProperties = Object.keys(argument).filter(n => !beforeProperties.find(bp => bp.name === n));
     const alteredProperties = beforeProperties.filter(bp => {
-        const beforeString = argument[bp.name];
-        const afterString = stringify(argument[bp.name]);
-        return beforeString === afterString;
+        return bp.before !== stringify(argument[bp.name]);
     }).map(bp => bp.name);
     return {
         stepName,

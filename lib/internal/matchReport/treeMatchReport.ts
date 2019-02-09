@@ -1,9 +1,10 @@
+import _ = require("lodash");
 import { MatchingLogic } from "../../Matchers";
 import { FailedMatchReport, FullMatchReport, MatchExplanationTreeNode, MatchReport, SuccessfulMatchReport } from "../../MatchReport";
 import { isSpecialMember, isTreePatternMatch, PatternMatch } from "../../PatternMatch";
 import { TreeNodeCompatible } from "./../../TreeNodeCompatible";
 import { failedMatchReport } from "./failedMatchReport";
-import { wrappingMatchReport } from "./wrappingMatchReport";
+import { SuccessfulMatchReportWrapper, wrappingMatchReport } from "./wrappingMatchReport";
 
 export function successfulTreeMatchReport(matcher: MatchingLogic, params:
     {
@@ -59,13 +60,13 @@ class TreeMatchReport implements SuccessfulMatchReport {
     public readonly kind = "real";
     public readonly endingOffset: number;
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly children: TreeChild[],
-        private readonly reason: string,
-        private readonly parseNodeName: string,
-        private readonly extraProperties: Record<string, any>,
-        private readonly computeEffects: ComputeEffectsReport[],
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly children: TreeChild[],
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
+                private readonly computeEffects: ComputeEffectsReport[],
     ) {
         this.endingOffset = offset + matched.length;
     }
@@ -103,18 +104,13 @@ class TreeMatchReport implements SuccessfulMatchReport {
         }
         (output as any).submatches = () => submatches;
 
-        this.computeEffects.forEach(ce => {
-            [...ce.alteredProperties, ...ce.newProperties]
-                .filter(p => !isSpecialMember(p))
-                .forEach(p => {
-                    output[p] = this.extraProperties[p];
-                });
-        });
+        this.applyComputeEffects(output);
 
         return output as unknown as PatternMatch & T;
     }
     public toParseTree(): TreeNodeCompatible {
-        const happiness = this.children.map(c => wrapChild(this.matcher, c).toParseTree());
+        // Parse tree ignores computations. It shows only what was pulled from the file
+        const happiness = this.children.map(c => wrapChild(this.matcher, c, { altered: false }).toParseTree());
         return {
             $name: this.parseNodeName,
             $offset: this.offset,
@@ -136,16 +132,14 @@ class TreeMatchReport implements SuccessfulMatchReport {
             }
             output[child.name] = child.matchReport.toValueStructure();
         }
-        Object.entries(this.extraProperties).forEach(([k, v]) => {
-            if (isSpecialMember(k)) {
-                return;
-            }
-            output[k] = v;
-        });
+        this.applyComputeEffects(output);
         return output as T;
     }
     public toExplanationTree(): MatchExplanationTreeNode {
-        const happiness = this.children.map(c => wrapChild(this.matcher, c).toExplanationTree());
+
+        const happiness = this.children.map(c =>
+            wrapChild(this.matcher, c, computationsThatAlter(c, this.computeEffects, this.extraProperties)).toExplanationTree());
+
         return {
             ...this.toParseTree(),
             successful: true,
@@ -153,7 +147,38 @@ class TreeMatchReport implements SuccessfulMatchReport {
             $children: happiness,
         };
     }
+
+    private applyComputeEffects(target: Record<string, any>) {
+        this.computeEffects.forEach(ce => {
+            [...ce.alteredProperties, ...ce.newProperties]
+                .filter(p => !isSpecialMember(p))
+                .forEach(p => {
+                    target[p] = this.extraProperties[p];
+                });
+        });
+    }
 }
+
+function computationsThatAlter(c: TreeChild, computeEffects: ComputeEffectsReport[], finalValues: Record<string, any>): AlteringComputations {
+    if (!c.explicit) {
+        return { altered: false };
+    }
+    const computationSteps = computeEffects
+        .filter(ce => ce.alteredProperties.includes(c.name))
+        .map(ce => ce.stepName);
+
+    if (computationSteps.length === 0) {
+        return { altered: false };
+    }
+
+    return {
+        altered: true,
+        computationSteps,
+        finalValue: finalValues[c.name],
+    };
+}
+
+type AlteringComputations = { altered: false } | { altered: true, computationSteps: string[], finalValue: any };
 
 export function failedTreeMatchReport(matcher: MatchingLogic, params:
     {
@@ -165,6 +190,8 @@ export function failedTreeMatchReport(matcher: MatchingLogic, params:
         failingOffset?: number,
         successes?: TreeChild[],
         parseNodeName?: string,
+        extraProperties: Record<string, any>,
+        computeEffects: ComputeEffectsReport[],
     }): FailedMatchReport {
     const { matched, parseNodeName, reason, successes,
         failureName, failureReport } = params;
@@ -180,6 +207,8 @@ export function failedTreeMatchReport(matcher: MatchingLogic, params:
         { name: failureName, matchReport: failureMatchReport },
         reason,
         parseNodeName || matcher.$id,
+        params.extraProperties,
+        params.computeEffects,
     );
 }
 
@@ -188,18 +217,24 @@ class FailedTreeMatchReport implements FailedMatchReport {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly successfulChildren: TreeChild[],
-        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-        private readonly reason: string,
-        private readonly parseNodeName: string,
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly successfulChildren: TreeChild[],
+                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
+                private readonly computeEffects: ComputeEffectsReport[],
+
     ) {
     }
 
     public toExplanationTree(): MatchExplanationTreeNode {
-        // todo: wrap with name somehow
-        const happiness = this.successfulChildren.map(c => wrapChild(this.matcher, c).toExplanationTree());
+        const happiness = this.successfulChildren
+            .map(c => wrapChild(this.matcher,
+                c,
+                computationsThatAlter(c, this.computeEffects, this.extraProperties))
+                .toExplanationTree());
         const failure = this.failedChild.matchReport.toExplanationTree();
         return {
             successful: false,
@@ -212,9 +247,50 @@ class FailedTreeMatchReport implements FailedMatchReport {
     }
 }
 
-function wrapChild(matcher: MatchingLogic, child: TreeChild): SuccessfulMatchReport {
+function wrapChild(matcher: MatchingLogic, child: TreeChild, alteringComputations: AlteringComputations): SuccessfulMatchReport {
     if (!child.explicit) {
         return child.matchReport;
     }
-    return wrappingMatchReport(matcher, { parseNodeName: child.name, inner: child.matchReport });
+    if (!alteringComputations.altered) {
+        return wrappingMatchReport(matcher, { parseNodeName: child.name, inner: child.matchReport });
+    }
+
+    return new OverridingMatchReport(matcher, child.name, child.matchReport, alteringComputations);
+}
+
+class OverridingMatchReport extends SuccessfulMatchReportWrapper {
+    constructor(matcher: MatchingLogic,
+                parseNodeName: string,
+                original: SuccessfulMatchReport,
+                private readonly alteringComputations: AlteringComputations,
+    ) {
+        super(matcher, parseNodeName, original);
+    }
+
+    public toExplanationTree(): MatchExplanationTreeNode {
+        const children = [this.inner.toExplanationTree()];
+        let value;
+        if (this.alteringComputations.altered) {
+            value = this.alteringComputations.finalValue;
+            const alterationExplanation: MatchExplanationTreeNode = {
+                successful: true,
+                $name: "Compute",
+                $value: this.alteringComputations.finalValue,
+                $children: [],
+                $offset: 0, // could set it to offset at the time of the computation, hypothetically
+                reason: "Overwritten by function in " + this.alteringComputations.computationSteps.join(", "),
+            };
+            children.push(alterationExplanation);
+        } else {
+            this.inner.toValueStructure();
+        }
+        return {
+            successful: true,
+            $name: this.parseNodeName,
+            $offset: this.offset,
+            $value: value,
+            $children: children,
+            reason: "Value altered by computation",
+        };
+    }
 }
