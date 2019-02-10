@@ -174,8 +174,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): FullMatchReport {
+        thisMatchContext,
+        parseContext): FullMatchReport {
         const bindingTarget: Record<string, any> = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
@@ -198,7 +198,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure ?  // shim
                         report.toValueStructure() :
-                        function() {
+                        function () {
                             console.log("WARNING: guessing at structure");
                             return (toMatchPrefixResult(report) as PatternMatch).$value;
                         }();
@@ -271,9 +271,9 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 }
 
 function applyComputation(stepName: string,
-                          compute: (arg: Record<string, any>, ...others: any) => any,
-                          argument: Record<string, any>,
-                          additionalArgs: any[] = [],
+    compute: (arg: Record<string, any>, ...others: any) => any,
+    argument: Record<string, any>,
+    additionalArgs: any[] = [],
 ): ComputeEffectsReport {
     const beforeProperties = Object.entries(argument).map(([k, v]) => {
         return {

@@ -2,7 +2,6 @@ import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
-    isSuccessfulMatch,
     MatchFailureReport,
     MatchPrefixResult,
     matchPrefixSuccess,
@@ -13,8 +12,16 @@ import {
 } from "./PatternMatch";
 
 import { WhiteSpaceHandler } from "./Config";
+import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
+import { wrappingFailedMatchReport, wrappingMatchReport } from "./internal/matchReport/wrappingMatchReport";
 import { readyToMatch } from "./internal/Whitespace";
-import { isSuccessfulMatchReport, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult, toPatternMatchOrDismatchReport } from "./MatchReport";
+import {
+    FailedMatchReport,
+    FullMatchReport, isFailedMatchReport,
+    isSuccessfulMatchReport, MatchExplanationTreeNode, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, SuccessfulMatchReport, toMatchPrefixResult,
+} from "./MatchReport";
+import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 /**
  * Match zero or more of these
@@ -88,59 +95,167 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
     public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentInputState = is;
-        const matches: PatternMatch[] = [];
+        const matches: FullMatchReport[] = [];
+        let successfulRepetitionCount = 0;
         let matched = "";
-        const allResults: MatchPrefixResult[] = [];
         while (!currentInputState.exhausted()) {
             const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
+            if (!!eat.skipped) {
+                matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
+            }
             currentInputState = eat.state;
             matched += eat.skipped;
 
-            const result = this.matcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
-            const resultMpr = toMatchPrefixResult(result);
-            allResults.push(resultMpr);
-            if (!isSuccessfulMatchReport(result)) {
+            const report = this.matcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+            if (!isSuccessfulMatchReport(report)) {
+                if (isFailedMatchReport(report)) {
+                    matches.push(wrappingFailedMatchReport(this, {
+                        inner: report,
+                        parseNodeName: "Repetition",
+                        reason: `This must be the end of the repetition`,
+                    }));
+                } else {// It has failed, but is not a "real" failure yet
+                    console.log("JESS: not-real failure report from " + this.matcher.$id);
+                    matches.push(wrappingFailedMatchReport(this, {
+                        parseNodeName: "Repetition",
+                        inner: report as FailedMatchReport,
+                        reason: `This must be the end of the repetition`,
+                    }));
+                }
                 break;
             } else {
-                const match = result.toPatternMatch();
-                if (match.$matched === "") {
+                if (report.matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                         `I do not think this grammar means what you think it means`);
                 }
-                currentInputState = currentInputState.consume(match.$matched, `Rep matched [${match.$matched}]`);
-                matches.push(match);
-                matched += match.$matched;
+                successfulRepetitionCount++;
+                currentInputState = currentInputState.consume(report.matched, `Rep matched [${report.matched}]`);
+                matches.push(wrappingMatchReport(this, {
+                    inner: report,
+                    parseNodeName: "Repetition",
+                }));
+                matched += report.matched;
             }
 
             if (this.sepMatcher) {
                 const eaten = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
+                if (!!eat.skipped) {
+                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
+                }
                 currentInputState = eaten.state;
                 matched += eaten.skipped;
-                const sepMatchResult = this.sepMatcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
-                allResults.push(toMatchPrefixResult(sepMatchResult));
-                if (isSuccessfulMatchReport(sepMatchResult)) {
-                    const sepMatch = sepMatchResult.toPatternMatch();
-                    currentInputState = currentInputState.consume(sepMatch.$matched, `Rep separator [${sepMatch.$matched}]`);
-                    matched += (sepMatch).$matched;
-                } else {
+
+                const sepMatchReport = this.sepMatcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+                if (!isSuccessfulMatchReport(sepMatchReport)) {
+                    if (isFailedMatchReport(sepMatchReport)) {
+                        matches.push(wrappingFailedMatchReport(this, {
+                            inner: sepMatchReport,
+                            parseNodeName: "Separator",
+                            reason: `This must be the end of the repetition, no separator`,
+                        }));
+                    } else {// It has failed, but is not a "real" failure yet
+                        console.log("JESS: not-real failure report from " + this.matcher.$id);
+                        matches.push(wrappingFailedMatchReport(this, {
+                            parseNodeName: "Separator",
+                            inner: sepMatchReport as FailedMatchReport,
+                            reason: `This must be the end of the repetition, no separator`,
+                        }));
+                    }
                     break;
+                } else {
+                    // successful
+                    matches.push(wrappingMatchReport(this, {
+                        inner: sepMatchReport,
+                        parseNodeName: "Separator",
+                    }));
+                    currentInputState = currentInputState.consume(sepMatchReport.matched, `Rep separator`);
+                    matched += sepMatchReport.matched;
                 }
             }
         }
 
-        const values = matches.map(m => m.$value);
+        return (successfulRepetitionCount >= this.min) ?
+            new SuccessfulRepMatchReport(this, "Rep", matches, is.offset, matched) :
+            new FailedRepMatchReport(this, "Rep", matches, is.offset, matched,
+                `Required ${this.min} matches but only found ${successfulRepetitionCount}`);
+    }
+}
 
-        return (matches.length >= this.min) ?
-            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id,
-                matched,
-                is.offset,
-                values))) :
-            matchReportFromFailureReport(this, MatchFailureReport.from({
-                $matcherId: this.$id,
-                $offset: is.offset,
-                $matched: matched,
-                children: allResults,
-            }));
+function whitespaceChildMatch(skipped: string, matcher: Rep, offset: number): SuccessfulMatchReport {
+    const matchReport = successfulMatchReport(matcher, {
+        parseNodeName: "Whitespace",
+        matched: skipped,
+        offset,
+    });
+    return matchReport;
+}
+
+class SuccessfulRepMatchReport implements SuccessfulMatchReport {
+    public readonly successful = true;
+    public readonly kind = "real";
+    public offset: number;
+    public endingOffset: number;
+    constructor(
+        public readonly matcher: MatchingLogic,
+        private readonly parseNodeName: string,
+        private readonly innerMatchReports: FullMatchReport[],
+        originalOffset: number,
+        public readonly matched: string,
+    ) {
+        this.offset = originalOffset;
+        this.endingOffset = originalOffset + matched.length;
+    }
+    public toPatternMatch<T>(): PatternMatch & T {
+        throw new Error("Method not implemented.");
+    }
+    public toParseTree(): TreeNodeCompatible {
+        return {
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: this.innerMatchReports.filter(isSuccessfulMatchReport).map(r => r.toParseTree()),
+        };
+    }
+    public toValueStructure<T>(): T {
+        throw new Error("Method not implemented.");
+    }
+    public toExplanationTree(): MatchExplanationTreeNode {
+        return {
+            successful: true,
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: this.innerMatchReports.map(r => r.toExplanationTree()),
+        };
+    }
+}
+
+class FailedRepMatchReport implements FailedMatchReport {
+    public readonly successful = false;
+    public readonly kind = "real";
+    public offset: number;
+    public endingOffset: number;
+    constructor(
+        public readonly matcher: MatchingLogic,
+        private readonly parseNodeName: string,
+        private readonly innerMatchReports: FullMatchReport[],
+        originalOffset: number,
+        public readonly matched: string,
+        public readonly reason: string,
+    ) {
+        this.offset = originalOffset;
+        this.endingOffset = originalOffset + matched.length;
+    }
+
+    public toExplanationTree(): MatchExplanationTreeNode {
+        return {
+            successful: false,
+            reason: this.reason,
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: this.innerMatchReports.map(r => r.toExplanationTree()),
+        };
     }
 }
 

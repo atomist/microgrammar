@@ -1,5 +1,6 @@
 import * as assert from "assert";
-import { firstOf, Literal, optional } from "../../lib";
+import { stringifyTree } from "stringify-tree";
+import { atLeastOne, firstOf, Literal, optional } from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { MatchExplanationTreeNode, toExplanationTree } from "../../lib/MatchReport";
 import { microgrammar } from "../../lib/microgrammarConstruction";
@@ -94,8 +95,48 @@ describe("Failing matches report useful stuff", () => {
         assert.strictEqual(computeChild.$value, "lizard");
         assert.strictEqual(computeChild.reason, "Overwritten by function in unbanana");
     });
+
+    describe("Rep explanation trees", () => {
+        it("Shows the first failed match after successes", () => {
+            const mg = atLeastOne("banana");
+            const inputString = "banana carrot lizard";
+            const report = mg.matchPrefixReport(inputStateFromString(inputString), {}, {});
+            const treeNode = toExplanationTree(report);
+
+            assert.strictEqual(treeNode.$children.length, 3, stringifyExplanationTree(treeNode));
+
+            const firstChild = treeNode.$children[0];
+            assert.strictEqual(firstChild.$name, "Repetition");
+            assert.strictEqual(firstChild.$value, "banana");
+            assert.strictEqual(firstChild.$children.length, 1);
+            assert.strictEqual(firstChild.successful, true);
+
+            const firstGrandchild = firstChild.$children[0];
+            assert.strictEqual(firstGrandchild.$name, "Literal");
+            assert.strictEqual(firstGrandchild.$value, "banana");
+
+            const whitespaceChild = treeNode.$children[1];
+            assert.strictEqual(whitespaceChild.$name, "Whitespace");
+
+            const lastChild = treeNode.$children[2];
+            assert.strictEqual(lastChild.successful, false);
+            assert.strictEqual(lastChild.$name, "Repetition");
+            assert.strictEqual(lastChild.$children.length, 1);
+
+            const lastGrandchild = lastChild.$children[0];
+            assert.strictEqual(lastChild.successful, false);
+            assert.strictEqual(lastGrandchild.$name, "Literal");
+
+            assert(lastChild.reason.includes("end of the repetition"), lastChild.reason);
+
+        });
+    });
 });
 
 function childNamed(name: string, treeNode: MatchExplanationTreeNode): MatchExplanationTreeNode {
     return treeNode.$children.find(c => c.$name === name);
+}
+
+function stringifyExplanationTree(tn: MatchExplanationTreeNode): string {
+    return stringifyTree(tn, n => `${n.successful ? "☻" : "☹"}${n.$name} ${n.reason || "[" + n.$value + "]"}`, n => n.$children);
 }

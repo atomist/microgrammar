@@ -19,8 +19,8 @@ export abstract class SuccessfulMatchReportWrapper implements SuccessfulMatchRep
     public readonly kind = "real";
     public readonly successful = true;
     constructor(public readonly matcher: MatchingLogic,
-        protected readonly parseNodeName: string,
-        protected readonly inner: SuccessfulMatchReport) {
+                protected readonly parseNodeName: string,
+                protected readonly inner: SuccessfulMatchReport) {
 
     }
 
@@ -67,9 +67,9 @@ export abstract class SuccessfulMatchReportWrapper implements SuccessfulMatchRep
 
 class WrappingMatchReport extends SuccessfulMatchReportWrapper {
     constructor(matcher: MatchingLogic,
-        parseNodeName: string,
-        inner: SuccessfulMatchReport,
-        public readonly additional: FailedMatchReport[] = []) {
+                parseNodeName: string,
+                inner: SuccessfulMatchReport,
+                public readonly additional: FailedMatchReport[] = []) {
         super(matcher, parseNodeName, inner);
     }
 
@@ -91,6 +91,7 @@ export function wrappingFailedMatchReport(matcher: MatchingLogic, params: {
     return new WrappingFailedMatchReport(matcher,
         params.parseNodeName || matcher.$id,
         params.inner,
+        params.reason,
     );
 }
 
@@ -98,8 +99,9 @@ class WrappingFailedMatchReport implements FailedMatchReport {
     public readonly kind = "real";
     public readonly successful = false;
     constructor(public readonly matcher: MatchingLogic,
-        public readonly parseNodeName: string,
-        public readonly inner: FailedMatchReport) {
+                public readonly parseNodeName: string,
+                public readonly inner: FailedMatchReport,
+                private readonly reason?: string) {
     }
 
     get offset() {
@@ -116,6 +118,7 @@ class WrappingFailedMatchReport implements FailedMatchReport {
             $offset: this.inner.offset,
             $value: this.inner.matched,
             successful: false,
+            reason: this.reason,
             $children: [this.inner.toExplanationTree()],
         };
     }
