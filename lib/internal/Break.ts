@@ -8,9 +8,16 @@ import {
 } from "../MatchPrefixResult";
 import {
     isSuccessfulMatchReport,
-    MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, toMatchPrefixResult,
+    MatchReport,
+    matchReportFromFailureReport,
+    matchReportFromPatternMatch,
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
 } from "../MatchReport";
-import { PatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import {
+    PatternMatch,
+    TerminalPatternMatch,
+} from "../PatternMatch";
 import { readyToMatch } from "./Whitespace";
 
 /**

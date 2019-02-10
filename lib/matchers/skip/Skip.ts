@@ -6,8 +6,14 @@ import { Break } from "../../internal/Break";
 import { MatchingLogic } from "../../Matchers";
 
 import { InputState } from "../../InputState";
-import { MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
-import { matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../../MatchReport";
+import {
+    MatchPrefixResult,
+    matchPrefixSuccess,
+} from "../../MatchPrefixResult";
+import {
+    matchReportFromSuccessfulMatch,
+    toMatchPrefixResult,
+} from "../../MatchReport";
 import { TerminalPatternMatch } from "../../PatternMatch";
 import { Literal } from "../../Primitives";
 import { toMatchingLogic } from "../Concat";

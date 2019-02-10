@@ -1,5 +1,8 @@
 import * as assert from "assert";
-import { firstOf, optional } from "../../lib";
+import {
+    firstOf,
+    optional,
+} from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { toValueStructure } from "../../lib/MatchReport";
 import { microgrammar } from "../../lib/microgrammarConstruction";
