@@ -41,6 +41,8 @@ export function atLeastOne(o: any): Repetition {
     return new Rep1(o);
 }
 
+interface RepInnerMatchReport { kind: "rep" | "sep" | "whitespace"; inner: SuccessfulMatchReport; }
+interface RepFailedMatchReport { kind: "rep" | "sep"; inner: FailedMatchReport; }
 /**
  * Handle repetition, with or without a separator.
  * Prefer subclasses for simplicity and clarity.
@@ -95,89 +97,66 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
     public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentInputState = is;
-        const matches: FullMatchReport[] = [];
-        let successfulRepetitionCount = 0;
+        const successfulMatches: RepInnerMatchReport[] = [];
+        let failedMatchReport: RepFailedMatchReport;
         let matched = "";
-        while (!currentInputState.exhausted()) {
+
+        const consumeWhitespace = () => {
             const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
             if (!!eat.skipped) {
-                matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
+                successfulMatches.push({
+                    kind: "whitespace",
+                    inner: whitespaceChildMatch(eat.skipped, this, currentInputState.offset),
+                });
             }
             currentInputState = eat.state;
             matched += eat.skipped;
+        };
+        while (!currentInputState.exhausted()) {
+            consumeWhitespace();
 
             const report = this.matcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
             if (!isSuccessfulMatchReport(report)) {
-                if (isFailedMatchReport(report)) {
-                    matches.push(wrappingFailedMatchReport(this, {
-                        inner: report,
-                        parseNodeName: "Repetition",
-                        reason: `This must be the end of the repetition`,
-                    }));
-                } else {// It has failed, but is not a "real" failure yet
+                if (!isFailedMatchReport(report)) {
+
                     console.log("JESS: not-real failure report from " + this.matcher.$id);
-                    matches.push(wrappingFailedMatchReport(this, {
-                        parseNodeName: "Repetition",
-                        inner: report as FailedMatchReport,
-                        reason: `This must be the end of the repetition`,
-                    }));
                 }
+                failedMatchReport = { kind: "rep", inner: report as FailedMatchReport };
                 break;
             } else {
                 if (report.matched === "") {
                     throw new Error(`Matcher with id ${this.matcher.$id} within rep matched the empty string.\n` +
                         `I do not think this grammar means what you think it means`);
                 }
-                successfulRepetitionCount++;
                 currentInputState = currentInputState.consume(report.matched, `Rep matched [${report.matched}]`);
-                matches.push(wrappingMatchReport(this, {
-                    inner: report,
-                    parseNodeName: "Repetition",
-                }));
+                successfulMatches.push({ kind: "rep", inner: report });
                 matched += report.matched;
             }
 
             if (this.sepMatcher) {
-                const eaten = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
-                if (!!eat.skipped) {
-                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
-                }
-                currentInputState = eaten.state;
-                matched += eaten.skipped;
+                consumeWhitespace();
 
                 const sepMatchReport = this.sepMatcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
                 if (!isSuccessfulMatchReport(sepMatchReport)) {
-                    if (isFailedMatchReport(sepMatchReport)) {
-                        matches.push(wrappingFailedMatchReport(this, {
-                            inner: sepMatchReport,
-                            parseNodeName: "Separator",
-                            reason: `This must be the end of the repetition, no separator`,
-                        }));
-                    } else {// It has failed, but is not a "real" failure yet
+                    if (!isFailedMatchReport(sepMatchReport)) {
                         console.log("JESS: not-real failure report from " + this.matcher.$id);
-                        matches.push(wrappingFailedMatchReport(this, {
-                            parseNodeName: "Separator",
-                            inner: sepMatchReport as FailedMatchReport,
-                            reason: `This must be the end of the repetition, no separator`,
-                        }));
                     }
+                    failedMatchReport = { kind: "sep", inner: sepMatchReport as FailedMatchReport };
                     break;
                 } else {
                     // successful
-                    matches.push(wrappingMatchReport(this, {
-                        inner: sepMatchReport,
-                        parseNodeName: "Separator",
-                    }));
+                    successfulMatches.push({ kind: "sep", inner: report });
                     currentInputState = currentInputState.consume(sepMatchReport.matched, `Rep separator`);
                     matched += sepMatchReport.matched;
                 }
             }
         }
 
+        const successfulRepetitionCount = successfulMatches.filter(k => k.kind === "rep").length;
         return (successfulRepetitionCount >= this.min) ?
-            new SuccessfulRepMatchReport(this, "Rep", matches, is.offset, matched) :
-            new FailedRepMatchReport(this, "Rep", matches, is.offset, matched,
-                `Required ${this.min} matches but only found ${successfulRepetitionCount}`);
+            new SuccessfulRepMatchReport(this, "Rep", successfulMatches, is.offset, matched, failedMatchReport) :
+            new FailedRepMatchReport(this, "Rep", successfulMatches, is.offset, matched,
+                `Required ${this.min} matches but only found ${successfulRepetitionCount}`, failedMatchReport);
     }
 }
 
@@ -198,22 +177,27 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
     constructor(
         public readonly matcher: MatchingLogic,
         private readonly parseNodeName: string,
-        private readonly innerMatchReports: FullMatchReport[],
+        private readonly successfulMatchReports: RepInnerMatchReport[],
         originalOffset: number,
         public readonly matched: string,
+        private readonly innerFailedMatchReport?: RepFailedMatchReport,
     ) {
         this.offset = originalOffset;
         this.endingOffset = originalOffset + matched.length;
     }
     public toPatternMatch<T>(): PatternMatch & T {
-        throw new Error("Method not implemented.");
+        throw new Error("not implemented");
+        // const value = this.innerMatchReports.
+        //     return {
+
+        //     };
     }
     public toParseTree(): TreeNodeCompatible {
         return {
             $name: this.parseNodeName,
             $value: this.matched,
             $offset: this.offset,
-            $children: this.innerMatchReports.filter(isSuccessfulMatchReport).map(r => r.toParseTree()),
+            $children: this.innerMatchReports().filter(isSuccessfulMatchReport).map(r => r.toParseTree()),
         };
     }
     public toValueStructure<T>(): T {
@@ -225,9 +209,36 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
             $name: this.parseNodeName,
             $value: this.matched,
             $offset: this.offset,
-            $children: this.innerMatchReports.map(r => r.toExplanationTree()),
+            $children: this.innerMatchReports().map(r => r.toExplanationTree()),
         };
     }
+
+    private innerMatchReports = (): FullMatchReport[] => {
+        return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
+    }
+}
+
+function wrapMatchReports(matcher: MatchingLogic, successfulMatchReports: RepInnerMatchReport[], innerFailedMatchReport?: RepFailedMatchReport) {
+    const wrapOne = (sm: RepInnerMatchReport) => {
+        if (sm.kind === "whitespace") {
+            // these don't need wrapped
+            return sm.inner;
+        }
+        return wrappingMatchReport(matcher, {
+            inner: sm.inner,
+            parseNodeName: sm.kind === "rep" ? "Repetition" : "Separator",
+        });
+    };
+    const wrappedMatchReports: FullMatchReport[] = successfulMatchReports.map(wrapOne);
+    if (failedMatchReport) {
+        wrappedMatchReports.push(wrappingFailedMatchReport(matcher, {
+            inner: innerFailedMatchReport.inner,
+            parseNodeName: innerFailedMatchReport.kind === "rep" ? "Repetition" : "Separator",
+            reason: "Looks like this is the end of the repetition",
+        }));
+    }
+
+    return wrappedMatchReports;
 }
 
 class FailedRepMatchReport implements FailedMatchReport {
@@ -238,10 +249,11 @@ class FailedRepMatchReport implements FailedMatchReport {
     constructor(
         public readonly matcher: MatchingLogic,
         private readonly parseNodeName: string,
-        private readonly innerMatchReports: FullMatchReport[],
+        private readonly successfulMatchReports: RepInnerMatchReport[],
         originalOffset: number,
         public readonly matched: string,
         public readonly reason: string,
+        private readonly innerFailedMatchReport?: RepFailedMatchReport,
     ) {
         this.offset = originalOffset;
         this.endingOffset = originalOffset + matched.length;
@@ -254,8 +266,12 @@ class FailedRepMatchReport implements FailedMatchReport {
             $name: this.parseNodeName,
             $value: this.matched,
             $offset: this.offset,
-            $children: this.innerMatchReports.map(r => r.toExplanationTree()),
+            $children: this.innerMatchReports().map(r => r.toExplanationTree()),
         };
+    }
+
+    private innerMatchReports = (): FullMatchReport[] => {
+        return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
     }
 }
 
