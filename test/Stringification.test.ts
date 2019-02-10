@@ -15,10 +15,10 @@ describe("stringification and matchedStructure", () => {
         const result = mg.findMatches(content);
 
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
         const stringified = JSON.stringify(r0);
-        assert(stringified.indexOf("$resultingInputState") === -1);
+        assert.strictEqual(stringified.indexOf("$resultingInputState"), -1);
         assert(stringified.length < 1500);
     });
 
@@ -33,10 +33,10 @@ describe("stringification and matchedStructure", () => {
         });
         const result = mg.findMatches(content);
 
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
 
         const stringified = JSON.stringify(result[0]);
-        assert(stringified.indexOf("$resultingInputState") === -1);
+        assert.strictEqual(stringified.indexOf("$resultingInputState"), -1);
         assert(stringified.length < 1500);
     });
 
@@ -53,7 +53,7 @@ describe("stringification and matchedStructure", () => {
         const result = mg.findMatches(content);
         assert.strictEqual(result.length, 1);
         const cleanNested: Nested = result[0].matchedStructure<Nested>();
-        assert(cleanNested.person.name === "foo");
+        assert.strictEqual(cleanNested.person.name, "foo");
         assert.deepEqual(cleanNested, { person: { name: "foo" } });
     });
 

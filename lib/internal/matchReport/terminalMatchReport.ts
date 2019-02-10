@@ -13,7 +13,7 @@ export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: Succe
     return successfulMatchReport(matcher, {
         matched: sm.$matched,
         offset: sm.$offset,
-        valueRepresented: sm.$value,
+        valueRepresented: { value: sm.$value },
         parseNodeName: matcher.$id,
     });
 }
@@ -21,12 +21,12 @@ export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: Succe
 export function successfulMatchReport(matcher: MatchingLogic, params: {
     matched: string,
     offset: number,
-    valueRepresented?: any,
+    valueRepresented?: { value: any },
     parseNodeName?: string,
     reason?: string,
 }) {
     return new SuccessfulTerminalMatchReport(matcher, {
-        valueRepresented: params.matched ? params.matched : undefined,
+        valueRepresented: params.valueRepresented || { value: params.matched },
         parseNodeName: matcher.$id,
         ...params,
     });
@@ -39,7 +39,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     public readonly matched: string;
     public readonly offset: number;
     public readonly endingOffset: number;
-    public readonly valueRepresented: any;
+    public readonly valueRepresented: { value: any };
     public readonly parseNodeName: string;
     public readonly reason?: string;
 
@@ -48,7 +48,7 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
         params: {
             matched: string,
             offset: number,
-            valueRepresented: any,
+            valueRepresented: { value: any },
             parseNodeName: string,
             reason?: string,
         }) {
@@ -65,8 +65,8 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
             $matcherId: this.matcher.$id,
             $matched: this.matched,
             $offset: this.offset,
-            $value: this.valueRepresented,
-            matchedStructure: <TT>() => this.valueRepresented as TT, // really should be T
+            $value: this.valueRepresented.value,
+            matchedStructure: <TT>() => this.valueRepresented.value as TT, // really should be T
         };
 
         // hack for compatibility with isSuccessfulMatch
@@ -95,6 +95,6 @@ class SuccessfulTerminalMatchReport implements SuccessfulMatchReport {
     }
 
     public toValueStructure<T>(): T {
-        return this.valueRepresented;
+        return this.valueRepresented.value;
     }
 }

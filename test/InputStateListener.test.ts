@@ -60,7 +60,7 @@ describe("InputStateListener", () => {
         const input = "this is a { without $ and this is one after ${ and this is ${ and { too";
 
         const matches = m.findMatches(input, {}, { l: new Listener() });
-        assert(matches.length === 2);
+        assert.strictEqual(matches.length, 2);
     });
 
     it("uses state machine", () => {
@@ -96,7 +96,7 @@ public class Foo {
         `;
         const l = new CFamilyStateMachine();
         const matches = m.findMatches(input, {}, { l });
-        assert(matches.length === 2);
+        assert.strictEqual(matches.length, 2);
     });
 
     it("tracks nesting depth 4 statement", () => {

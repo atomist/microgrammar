@@ -20,9 +20,9 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.a === 24);
-            assert(matched.b === 7);
-            assert(matched.sum === 24 + 7);
+            assert.strictEqual(matched.a, 24);
+            assert.strictEqual(matched.b, 7);
+            assert.strictEqual(matched.sum, 24 + 7);
         } else {
             assert.fail("Did not match");
         }
@@ -38,9 +38,9 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.a === 24);
-            assert(matched.b === 7);
-            assert(matched.sum === 24 + 7);
+            assert.strictEqual(matched.a, 24);
+            assert.strictEqual(matched.b, 7);
+            assert.strictEqual(matched.sum, 24 + 7);
         } else {
             assert.fail("Did not match");
         }
@@ -55,9 +55,9 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.a === 24);
-            assert(matched.b === 7);
-            assert(matched.sum === 24 + 7);
+            assert.strictEqual(matched.a, 24);
+            assert.strictEqual(matched.b, 7);
+            assert.strictEqual(matched.sum, 24 + 7);
         } else {
             assert.fail("Did not match");
         }
@@ -74,8 +74,8 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.a === 24);
-            assert(matched.b === 7);
+            assert.strictEqual(matched.a, 24);
+            assert.strictEqual(matched.b, 7);
         } else {
             assert.fail("Did not match");
         }
@@ -90,8 +90,8 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.a === 24);
-            assert(matched.b === 7);
+            assert.strictEqual(matched.a, 24);
+            assert.strictEqual(matched.b, 7);
         } else {
             assert.fail("Did not match");
         }
@@ -126,7 +126,7 @@ describe("Context", () => {
         const mr = cc.matchPrefixReport(inputStateFromString("gary 7 35"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
             const matched = mr.toValueStructure() as any;
-            assert(matched.promoted === "gary");
+            assert.strictEqual(matched.promoted, "gary");
         } else {
             assert.fail("Did not match");
         }
@@ -142,9 +142,9 @@ describe("Context", () => {
             c: Integer,
         });
         const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-        assert(matches.length === 2);
-        assert(matches[0].promoted === "gary");
-        assert(matches[1].promoted === "elizabeth");
+        assert.strictEqual(matches.length, 2);
+        assert.strictEqual(matches[0].promoted, "gary");
+        assert.strictEqual(matches[1].promoted, "elizabeth");
     });
 
     it("doesn't pollute parent context in microgrammar", () => {
@@ -157,9 +157,9 @@ describe("Context", () => {
             c: Integer,
         });
         const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-        assert(matches.length === 2);
-        assert(matches[0].shouty === undefined);
-        assert(matches[1].shouty === undefined);
+        assert.strictEqual(matches.length, 2);
+        assert.strictEqual(matches[0].shouty, undefined);
+        assert.strictEqual(matches[1].shouty, undefined);
     });
 
     it("handles nested bound matches in microgrammar", () => {
@@ -172,9 +172,9 @@ describe("Context", () => {
             c: Integer,
         });
         const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-        assert(matches.length === 2);
-        assert(matches[0].nested.shouty === "GARY");
-        assert(matches[1].nested.shouty === "ELIZABETH");
+        assert.strictEqual(matches.length, 2);
+        assert.strictEqual(matches[0].nested.shouty, "GARY");
+        assert.strictEqual(matches[1].nested.shouty, "ELIZABETH");
     });
 
     it("can change previously bound match", () => {
@@ -202,8 +202,8 @@ describe("Context", () => {
             },
         });
         const matches = cc.findMatches("gary 7 35 &&&&WERw7erw7 elizabeth 7 48") as any[];
-        assert(matches.length === 2);
-        assert(matches[0].name === undefined);
+        assert.strictEqual(matches.length, 2);
+        assert.strictEqual(matches[0].name, undefined);
     });
 
 });

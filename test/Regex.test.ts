@@ -25,8 +25,8 @@ describe("Regex", () => {
         const is = inputStateFromString("friday 14");
         const m = regexp.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "friday");
-            assert(m.offset === 0);
+            assert.strictEqual(m.matched, "friday");
+            assert.strictEqual(m.offset, 0);
         } else {
             assert.fail("Didn't match");
         }
@@ -34,12 +34,12 @@ describe("Regex", () => {
 
     it("should add anchor if not present", () => {
         const regexp = new Regex(/[a-z]+/);
-        assert(regexp.regex.source === "^[a-z]+");
+        assert.strictEqual(regexp.regex.source, "^[a-z]+");
     });
 
     it("should not add anchor if present", () => {
         const regexp = new Regex(/^[a-z]+/);
-        assert(regexp.regex.source === "^[a-z]+");
+        assert.strictEqual(regexp.regex.source, "^[a-z]+");
     });
 
     it("failed match", () => {
@@ -56,9 +56,12 @@ describe("Regex", () => {
         const withSkip = new Break(regexp, true);
         const m = withSkip.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "**friday");
-            assert(m.offset === 2);
-            assert(m.toValueStructure() === "friday");
+            const pm = m.toPatternMatch();
+            assert.strictEqual(pm.$matched, "**friday");
+            // this is inconsistent; offset and matched aren't the same place.
+            // maintaining inconsistency for backwards compatibility
+            assert.strictEqual(pm.$offset, 2);
+            assert.strictEqual(pm.$value, "friday");
         } else {
             assert.fail("Didn't match");
         }
@@ -81,7 +84,7 @@ describe("Regex", () => {
         }
         const m = mg.firstMatch(long + ".");
         assert(m);
-        assert(m.r === long);
+        assert.strictEqual(m.r, long);
     }
 
 });

@@ -1,16 +1,17 @@
 import { InputState } from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import {
-    isSuccessfulMatch,
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../MatchPrefixResult";
 import {
     isSuccessfulMatchReport,
-    MatchReport, matchReportFromFailureReport, matchReportFromPatternMatch, matchReportFromSuccessfulMatch, toMatchPrefixResult,
+    MatchReport,
+    SuccessfulMatchReport,
+    toMatchPrefixResult,
 } from "../MatchReport";
-import { PatternMatch, TerminalPatternMatch } from "../PatternMatch";
+import { PatternMatch } from "../PatternMatch";
+import { successfulMatchReport } from "./matchReport/terminalMatchReport";
+import { SuccessfulMatchReportWrapper, wrappingFailedMatchReport } from "./matchReport/wrappingMatchReport";
 import { readyToMatch } from "./Whitespace";
 
 /**
@@ -25,6 +26,8 @@ import { readyToMatch } from "./Whitespace";
  */
 export class Break implements MatchingLogic {
 
+    public readonly parseNodeName: string = "Break";
+
     /**
      * Consume input until (or until and including) the terminal match
      * @param terminateOn desired terminal match
@@ -35,8 +38,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-                private readonly consumeTerminal: boolean = false,
-                private readonly badMatcher?: MatchingLogic) {
+        private readonly consumeTerminal: boolean = false,
+        private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {
@@ -74,8 +77,16 @@ export class Break implements MatchingLogic {
         while (!currentIs.exhausted() && !isSuccessfulMatchReport(terminalMatch)) { // if it fits, it sits
             // But we can't match the bad match if it's defined
             if (this.badMatcher) {
-                if (isSuccessfulMatch(this.badMatcher.matchPrefix(currentIs, thisMatchContext, parseContext))) {
-                    return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, matched));
+                // technically every time the bad matcher didn't match could be a child of this one's ExplanationTree.
+                // but that would be ridiculous.
+                const badMatchReport = this.badMatcher.matchPrefixReport(currentIs, thisMatchContext, parseContext);
+                if (isSuccessfulMatchReport(badMatchReport)) {
+                    return wrappingFailedMatchReport(this, {
+                        offset: is.offset,
+                        matched,
+                        parseNodeName: this.parseNodeName,
+                        inner: badMatchReport,
+                    });
                 }
             }
             matched += currentIs.peek(1);
@@ -84,18 +95,45 @@ export class Break implements MatchingLogic {
                 terminalMatch = this.terminateOn.matchPrefixReport(currentIs, thisMatchContext, parseContext);
             }
         }
-        // We have found the terminal if we get here
+        // We have found the terminal if we get here... or the end of the input.
         if (this.consumeTerminal && isSuccessfulMatchReport(terminalMatch)) {
-            // wait. we _modify the match_ ? wat
-            const match = terminalMatch.toPatternMatch();
-            match.$matched = matched + match.$matched;
-            return matchReportFromPatternMatch(this, {
-                ...match,
-                $matched: matched + terminalMatch.matched,
-            } as PatternMatch,
-                { offset: originalOffset });
+            return new BreakWithTerminalMatchReport(this, this.parseNodeName, terminalMatch, is.offset,
+                matched + terminalMatch.matched,
+            );
         }
-        return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, matched)));
+        // todo: if terminalMatch ended this, it needs to be a child
+        return successfulMatchReport(this, {
+            matched,
+            offset: is.offset,
+            parseNodeName: this.parseNodeName,
+        });
+    }
+}
+
+class BreakWithTerminalMatchReport extends SuccessfulMatchReportWrapper {
+    constructor(matcher: MatchingLogic,
+        parseNodeName: string,
+        inner: SuccessfulMatchReport,
+        private readonly offsetOverride: number,
+        private readonly matchedOverride: string) {
+        super(matcher, parseNodeName, inner);
+    }
+
+    get offset() {
+        return this.offsetOverride;
+    }
+
+    get matched() {
+        return this.matchedOverride;
+    }
+
+    public toPatternMatch<T>(): PatternMatch & T {
+        const terminal = this.inner.toPatternMatch<T>();
+        // historically, the pattern match returned by Break violates the invariant of $offset is the start of $matched
+        return {
+            ...terminal,
+            $matched: this.matched,
+        };
     }
 }
 

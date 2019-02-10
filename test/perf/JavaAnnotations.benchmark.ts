@@ -41,7 +41,7 @@ describe("Java Benchmark", () => {
 
         for (let i = 0; i < parseCount; i++) {
             const matches = ChangeControlledMethodGrammar.findMatches(src);
-            assert(matches.length === 8 + validTargetMethods);
+            assert.strictEqual(matches.length , 8 + validTargetMethods);
         }
     }).timeout(55000);
 

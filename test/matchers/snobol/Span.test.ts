@@ -20,8 +20,8 @@ describe("Span", () => {
       const is = inputStateFromString("friday 14");
       const m = span.matchPrefixReport(is, {}, {});
       if (isSuccessfulMatchReport(m)) {
-         assert(m.offset === 0);
-         assert(m.matched === "f");
+         assert.strictEqual(m.offset , 0);
+         assert.strictEqual(m.matched , "f");
       } else {
          assert.fail("Didn't match");
       }
@@ -32,8 +32,8 @@ describe("Span", () => {
       const is = inputStateFromString("friday 14");
       const m = span.matchPrefixReport(is, {}, {});
       if (isSuccessfulMatchReport(m)) {
-         assert(m.offset === 0);
-         assert(m.matched === "frida");
+         assert.strictEqual(m.offset , 0);
+         assert.strictEqual(m.matched , "frida");
       } else {
          assert.fail("Didn't match");
       }

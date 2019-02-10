@@ -53,7 +53,7 @@ describe("Alt", () => {
         const is = inputStateFromString("CXY");
         const m = alt.matchPrefix(is, {}, {});
         if (isSuccessfulMatch(m)) {
-            assert(m.$matched === "C");
+            assert.strictEqual(m.$matched, "C");
         } else {
             fail("No match");
         }

@@ -15,7 +15,7 @@ describe("SpecGrammar", () => {
         const specMatch = exactMatchReport(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
         if (isSuccessfulMatchReport(specMatch)) {
             const vs = specMatch.toValueStructure<MicrogrammarSpec>();
-            assert(vs.these.length === 1);
+            assert.strictEqual(vs.these.length , 1);
             assert.deepEqual(vs,
                 {
                     these: [{
@@ -32,11 +32,11 @@ describe("SpecGrammar", () => {
         const specString = "->${fruit}${arrow}${drink}!";
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar(DefaultFromStringOptions), specString);
         if (isPatternMatch(specMatch)) {
-            assert(specMatch.these.length === 3);
-            assert(specMatch.these[0].element.elementName === "fruit");
-            assert(specMatch.these[1].element.elementName === "arrow");
-            assert(specMatch.these[2].element.elementName === "drink");
-            assert(specMatch.trailing === "!");
+            assert.strictEqual(specMatch.these.length , 3);
+            assert.strictEqual(specMatch.these[0].element.elementName , "fruit");
+            assert.strictEqual(specMatch.these[1].element.elementName , "arrow");
+            assert.strictEqual(specMatch.these[2].element.elementName , "drink");
+            assert.strictEqual(specMatch.trailing , "!");
         } else {
             assert.fail();
         }

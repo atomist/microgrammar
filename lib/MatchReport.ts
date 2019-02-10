@@ -7,21 +7,20 @@ export { matchReportFromSuccessfulMatch } from "./internal/matchReport/terminalM
 export interface FullMatchReport {
     successful: boolean;
     kind: "real";
+    offset: number;
+    matched?: string;
     matcher: MatchingLogic; // is all of this really necessary?
     toExplanationTree(): MatchExplanationTreeNode;
 }
 
 export interface FailedMatchReport extends FullMatchReport {
     successful: false;
-    offset: number;
-    matched?: string;
     description?: string;
 }
 
 export interface SuccessfulMatchReport extends FullMatchReport {
     successful: true;
     matched: string;
-    offset: number;
     endingOffset: number;
     kind: "real"; // after wrappers are gone, this can go
     toPatternMatch<T>(): PatternMatch & T;

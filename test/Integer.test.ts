@@ -26,8 +26,8 @@ describe("Integer matching", () => {
         const is = inputStateFromString("1");
         const m = Integer.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "1");
-            assert(m.toPatternMatch().$value === 1);
+            assert.strictEqual(m.matched, "1");
+            assert.strictEqual(m.toPatternMatch().$value, 1);
         } else {
             assert.fail("Didn't match");
         }
@@ -37,8 +37,8 @@ describe("Integer matching", () => {
         const is = inputStateFromString("0");
         const m = Integer.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "0");
-            assert(m.toPatternMatch().$value === 0);
+            assert.strictEqual(m.matched, "0");
+            assert.strictEqual(m.toPatternMatch().$value, 0);
         } else {
             assert.fail("Didn't match");
         }
@@ -48,8 +48,8 @@ describe("Integer matching", () => {
         const is = inputStateFromString("01");
         const m = Integer.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "0");
-            assert(m.toPatternMatch().$value === 0);
+            assert.strictEqual(m.matched, "0");
+            assert.strictEqual(m.toPatternMatch().$value, 0);
         } else {
             assert.fail("Didn't match");
         }
@@ -59,8 +59,8 @@ describe("Integer matching", () => {
         const is = inputStateFromString("105x");
         const m = Integer.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "105");
-            assert(m.toPatternMatch().$value === 105);
+            assert.strictEqual(m.matched, "105");
+            assert.strictEqual(m.toPatternMatch().$value, 105);
         } else {
             assert.fail("Didn't match");
         }

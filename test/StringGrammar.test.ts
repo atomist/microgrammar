@@ -16,7 +16,7 @@ describe("StringGrammarTest", () => {
                 { theString: new Alt(stringGrammar, "la") }).findMatches("\"    winter is coming \" la la la");
         const match = strings[0];
         assert(isPatternMatch(match));
-        assert(match.$matched === "\"    winter is coming \"");
+        assert.strictEqual(match.$matched, "\"    winter is coming \"");
         assert(match.theString.text, "    winter is coming");
     });
 
@@ -24,7 +24,7 @@ describe("StringGrammarTest", () => {
         const result = new Alt(stringGrammar, "la").matchPrefixReport(
             inputStateFromString("\"    winter is coming \" la la la"), {}, {});
         if (isSuccessfulMatchReport(result)) {
-            assert(result.matched === "\"    winter is coming \"");
+            assert.strictEqual(result.matched, "\"    winter is coming \"");
             const pm = result.toPatternMatch();
             assert((pm as any).text, "    winter is coming");
         } else {

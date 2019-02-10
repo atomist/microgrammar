@@ -14,7 +14,7 @@ describe("JavaBlock microgrammars", () => {
             public void thing1() {1;}
             `;
         const method = METHOD_GRAMMAR.firstMatch(src);
-        assert(method.body.block === "1;");
+        assert.strictEqual(method.body.block , "1;");
     });
 
 });

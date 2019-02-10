@@ -1,6 +1,6 @@
 
 import { MatchingLogic } from "../../Matchers";
-import { FailedMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport } from "../../MatchReport";
+import { FailedMatchReport, FullMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport } from "../../MatchReport";
 import { TreeNodeCompatible } from "../../TreeNodeCompatible";
 
 export function wrappingMatchReport(matcher: MatchingLogic, params: {
@@ -84,14 +84,18 @@ class WrappingMatchReport extends SuccessfulMatchReportWrapper {
 }
 
 export function wrappingFailedMatchReport(matcher: MatchingLogic, params: {
-    inner: FailedMatchReport,
+    inner: FullMatchReport,
     parseNodeName?: string,
     reason?: string,
+    offset?: number,
+    matched?: string,
 }): FailedMatchReport {
     return new WrappingFailedMatchReport(matcher,
         params.parseNodeName || matcher.$id,
         params.inner,
         params.reason,
+        params.offset,
+        params.matched,
     );
 }
 
@@ -100,16 +104,18 @@ class WrappingFailedMatchReport implements FailedMatchReport {
     public readonly successful = false;
     constructor(public readonly matcher: MatchingLogic,
                 public readonly parseNodeName: string,
-                public readonly inner: FailedMatchReport,
-                private readonly reason?: string) {
+                public readonly inner: FullMatchReport,
+                private readonly reason?: string,
+                private readonly offsetOverride?: number,
+                private readonly matchedOverride?: string) {
     }
 
     get offset() {
-        return this.inner.offset;
+        return (this.offsetOverride === undefined) ? this.inner.offset : this.offsetOverride;
     }
 
     get matched() {
-        return this.inner.matched;
+        return (this.matchedOverride === undefined) ? this.inner.matched : this.matchedOverride;
     }
 
     public toExplanationTree(): MatchExplanationTreeNode {

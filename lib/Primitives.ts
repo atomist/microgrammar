@@ -30,7 +30,6 @@ export class Literal implements MatchingLogic {
         return (peek === this.literal) ?
             successfulMatchReport(this, {
                 matched: this.literal,
-                valueRepresented: this.literal,
                 parseNodeName: this.parseNodeName,
                 offset: is.offset,
             }) :
@@ -130,7 +129,7 @@ export abstract class AbstractRegex implements MatchingLogic {
                 matched,
                 offset: is.offset,
                 parseNodeName: this.parseNodeName,
-                valueRepresented: this.toValue(matched),
+                valueRepresented: { value: this.toValue(matched) },
                 reason: "Matched RegExp: " + this.regex.toString(),
             });
         } else {

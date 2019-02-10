@@ -31,7 +31,7 @@ describe("XML Benchmark", () => {
         for (let i = 0; i < parseCount; i++) {
             const xt = new XmlTracker();
             xt.consume(pom);
-            assert(xt.dependencies.length === 1 + addedDependencies);
+            assert.strictEqual(xt.dependencies.length , 1 + addedDependencies);
         }
     }).timeout(50000);
 

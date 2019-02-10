@@ -15,8 +15,8 @@ describe("Nesting in Microgrammar.fromString", () => {
             }), "and"),
         });
         const result = mg.findMatches(content) as any[];
-        assert(result.length === 1);
-        assert(result[0].catStatement.length === 2);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].catStatement.length , 2);
         assert(result[0].catStatement[0].bug = "fleas");
         assert(result[0].catStatement[1].bug = "worms");
     });
@@ -33,8 +33,8 @@ describe("Nesting in Microgrammar.fromString", () => {
                 catActivities: new Rep1Sep(dictionary.activity, "&"),
             });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].catProblems.length === 2);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].catProblems.length , 2);
         assert(result[0].catProblems[0].bug = "fleas");
         assert(result[0].catProblems[1].bug = "worms");
         assert.deepEqual(result[0].catActivities, ["grooming", "playing"]);

@@ -74,7 +74,7 @@ describe("Rep", () => {
         const is = inputStateFromString(content);
         const m = rep.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === toMatch);
+            assert.strictEqual(m.matched, toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -87,7 +87,7 @@ describe("Rep", () => {
         const is = inputStateFromString(content);
         const m = rep.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "And");
+            assert.strictEqual(m.matched, "And");
         } else {
             assert.fail("Didn't match");
         }
@@ -99,7 +99,7 @@ describe("Rep", () => {
         const content = toMatch + "!"; // The last char won't match
         const is = inputStateFromString(content);
         const m = rep.matchPrefix(is, {}, {}) as PatternMatch;
-        assert(m.$value.length === 4);
+        assert.strictEqual(m.$value.length, 4);
     });
 
     it("repsep matches several times", () => {
@@ -109,7 +109,7 @@ describe("Rep", () => {
         const is = inputStateFromString(content);
         const m = rep.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === toMatch);
+            assert.strictEqual(m.matched, toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -122,7 +122,7 @@ describe("Rep", () => {
         const is = inputStateFromString(content);
         const m = rep.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === toMatch);
+            assert.strictEqual(m.matched, toMatch);
         } else {
             assert.fail("Didn't match");
         }
@@ -162,7 +162,7 @@ describe("Rep", () => {
         const m = rep.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             const mmmm = m.toPatternMatch();
-            assert(mmmm.$value.length === 3);
+            assert.strictEqual(mmmm.$value.length, 3);
         } else {
             assert.fail("Didn't match");
         }

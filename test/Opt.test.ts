@@ -19,7 +19,7 @@ describe("Opt", () => {
         const m = alt.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             const mmmm = m.toPatternMatch();
-            assert(mmmm.$value === undefined);
+            assert.strictEqual(mmmm.$value, undefined);
         } else {
             assert.fail("Didn't match");
         }
@@ -31,7 +31,7 @@ describe("Opt", () => {
         const m = alt.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             const mmmm = m.toPatternMatch();
-            assert(mmmm.$value === "A");
+            assert.strictEqual(mmmm.$value, "A");
         } else {
             assert.fail("Didn't match");
         }
@@ -43,7 +43,7 @@ describe("Opt", () => {
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
-        assert(result.$matched === "");
+        assert.strictEqual(result.$matched, "");
     });
 
     it("test raw opt present", () => {
@@ -52,7 +52,7 @@ describe("Opt", () => {
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
-        assert(result.$matched === "x");
+        assert.strictEqual(result.$matched, "x");
     });
 
     it("not pull up single property", () => {
@@ -67,7 +67,7 @@ describe("Opt", () => {
         );
 
         const result = mg.firstMatch(content) as any;
-        assert(result.x.x === "x");
+        assert.strictEqual(result.x.x, "x");
     });
 
     it("pull up single property", () => {
@@ -83,7 +83,7 @@ describe("Opt", () => {
 
         const result = mg.firstMatch(content) as any;
         assert(result);
-        assert(result.x === "x");
+        assert.strictEqual(result.x, "x");
     });
 
 });

@@ -56,6 +56,7 @@ export class Opt implements MatchingLogic {
                 matched: "",
                 offset: is.offset,
                 parseNodeName: this.parseNodeName,
+                valueRepresented: { value: undefined },
                 reason: "Input stream is exhausted. Good thing this was optional.",
             });
         }
@@ -79,8 +80,8 @@ class WrappingEmptyMatchReport implements SuccessfulMatchReport {
     public readonly endingOffset: number;
 
     constructor(public readonly matcher: MatchingLogic,
-                private readonly parseNodeName: string,
-                private readonly inner: FailedMatchReport) {
+        private readonly parseNodeName: string,
+        private readonly inner: FailedMatchReport) {
         this.offset = inner.offset;
         this.endingOffset = inner.offset;
     }
@@ -212,8 +213,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-                public readonly matchTest: (pm: PatternMatch) => boolean,
-                public readonly inputStateTest: (is: InputState) => boolean) {
+        public readonly matchTest: (pm: PatternMatch) => boolean,
+        public readonly inputStateTest: (is: InputState) => boolean) {
 
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;
@@ -249,7 +250,7 @@ class WhenMatcher implements MatchingLogic {
         }
         return successfulMatchReport(this, {
             matched: result.matched, offset: result.offset,
-            valueRepresented: result.toPatternMatch().$value,
+            valueRepresented: { value: result.toPatternMatch().$value },
             parseNodeName: "When",
         });
     }

@@ -73,7 +73,7 @@ describe("Break", () => {
         const is = inputStateFromString("friday 14");
         const m = b.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "friday ");
+            assert.strictEqual(m.matched, "friday ");
         } else {
             assert.fail("did not match");
         }
@@ -81,7 +81,7 @@ describe("Break", () => {
         const is2 = inputStateFromString("friday 44");
         const m2 = b.matchPrefixReport(is2, {}, {});
         if (isSuccessfulMatchReport(m2)) {
-            assert(m2.matched === "friday ");
+            assert.strictEqual(m2.matched, "friday ");
         } else {
             assert.fail("did not match");
         }
@@ -93,7 +93,7 @@ describe("Break", () => {
         const m = b.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             assert.strictEqual(m.matched, "friday 14");
-            assert(m.toPatternMatch().$value === "14");
+            assert.strictEqual(m.toPatternMatch().$value, "14");
         } else {
             assert.fail("Didn't match");
         }
@@ -104,8 +104,8 @@ describe("Break", () => {
         const is = inputStateFromString("friday 14");
         const m = b.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "friday 14");
-            assert(m.toValueStructure() === 14);
+            assert.strictEqual(m.matched, "friday 14");
+            assert.strictEqual(m.toValueStructure(), 14);
         } else {
             assert.fail("did not match");
         }
@@ -131,7 +131,7 @@ describe("Break", () => {
         const is = inputStateFromString("friday 14");
         const m = c.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert(m.matched === "friday 14");
+            assert.strictEqual(m.matched, "friday 14");
 
         } else {
             assert.fail("Didn't match");

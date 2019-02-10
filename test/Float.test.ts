@@ -13,8 +13,8 @@ describe("Float", () => {
         const m = Float.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
             const match = m.toPatternMatch();
-            assert(match.$matched === "1");
-            assert(match.$value === 1.0);
+            assert.strictEqual(match.$matched, "1");
+            assert.strictEqual(match.$value, 1.0);
         } else {
             assert.fail("Didn't match");
         }
@@ -25,8 +25,8 @@ describe("Float", () => {
         const m = Float.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
             const match = m.toPatternMatch();
-            assert(match.$matched === "105");
-            assert(match.$value === 105.0);
+            assert.strictEqual(match.$matched, "105");
+            assert.strictEqual(match.$value, 105.0);
         } else {
             assert.fail("Didn't match");
         }
@@ -37,8 +37,8 @@ describe("Float", () => {
         const m = Float.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
             const match = m.toPatternMatch();
-            assert(match.$matched === "105.25555");
-            assert(match.$value === 105.25555);
+            assert.strictEqual(match.$matched, "105.25555");
+            assert.strictEqual(match.$value, 105.25555);
         } else {
             assert.fail("Didn't match");
         }
@@ -49,8 +49,8 @@ describe("Float", () => {
         const m = Float.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
             const match = m.toPatternMatch();
-            assert(match.$matched === "-105.25555");
-            assert(match.$value === -105.25555);
+            assert.strictEqual(match.$matched, "-105.25555");
+            assert.strictEqual(match.$value, -105.25555);
         } else {
             assert.fail("Didn't match");
         }
@@ -61,8 +61,8 @@ describe("Float", () => {
         const m = Float.matchPrefixReport(is);
         if (isSuccessfulMatchReport(m)) {
             const match = m.toPatternMatch();
-            assert(match.$matched === "-.25555");
-            assert(match.$value === -0.25555);
+            assert.strictEqual(match.$matched, "-.25555");
+            assert.strictEqual(match.$value, -0.25555);
         } else {
             assert.fail("Didn't match");
         }

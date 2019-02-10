@@ -5,15 +5,17 @@ import {
 } from "../matchers/Concat";
 import { Literal } from "../Primitives";
 
+import { stringifyTree } from "stringify-tree";
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
+import { MatchExplanationTreeNode, toExplanationTree } from "../MatchReport";
 import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
 import {
     CompleteFromStringOptions,
     completeWithDefaults,
 } from "./CompleteFromStringOptions";
-import { exactMatch } from "./ExactMatch";
+import { exactMatch, exactMatchReport } from "./ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,
@@ -42,6 +44,11 @@ export class MicrogrammarSpecParser {
         const specToUse = this.preprocess(spec, optionsToUse);
         const match = exactMatch<MicrogrammarSpec>(specGrammar(optionsToUse), specToUse);
         if (!isPatternMatch(match)) {
+            function stringifyExplanationTree(tn: MatchExplanationTreeNode): string {
+                return stringifyTree(tn, n => `${n.successful ? "☻" : "☹"}${n.$name} ${n.reason || "[" + n.$value + "]"}`, n => n.$children);
+            }
+            console.log("Failed to parse microgrammar: " + specToUse);
+            console.log(stringifyExplanationTree(toExplanationTree(exactMatchReport(specGrammar(optionsToUse), specToUse))));
             throw new Error(`Unable to parse microgrammar: ${specToUse}`);
         }
         const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,

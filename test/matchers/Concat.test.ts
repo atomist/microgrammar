@@ -156,8 +156,8 @@ describe("Concat", () => {
         if (isSuccessfulMatchReport(result)) {
             const mmmm = result.toValueStructure() as any;
             assert(mmmm.names[0], "Lizzy");
-            assert(mmmm.spouse.names[0] === "Katrina");
-            assert(mmmm.spouse.names[1] === "Terri");
+            assert.strictEqual(mmmm.spouse.names[0] , "Katrina");
+            assert.strictEqual(mmmm.spouse.names[1] , "Terri");
 
         } else {
             assert.fail("Didn't match");
@@ -179,8 +179,8 @@ describe("Concat", () => {
         if (isSuccessfulMatchReport(result)) {
             const mmmm = result.toValueStructure() as any;
             assert(mmmm.gentlemen.names[0], "Jardine");
-            assert(mmmm.players.names[0] === "Bradman");
-            assert(mmmm.players.names[1] === "Woodfull");
+            assert.strictEqual(mmmm.players.names[0] , "Bradman");
+            assert.strictEqual(mmmm.players.names[1] , "Woodfull");
 
         } else {
             assert.fail("Didn't match");
@@ -199,8 +199,8 @@ describe("Concat", () => {
         if (isSuccessfulMatchReport(result)) {
             const mmmm = result.toValueStructure() as any;
             assert(mmmm.gentlemen[0], "Jardine");
-            assert(mmmm.players[0] === "Bradman");
-            assert(mmmm.players[1] === "Woodfull");
+            assert.strictEqual(mmmm.players[0] , "Bradman");
+            assert.strictEqual(mmmm.players[1] , "Woodfull");
 
         } else {
             assert.fail("Didn't match");
@@ -227,12 +227,12 @@ describe("Concat", () => {
         if (isSuccessfulMatchReport(result)) {
             const mmmm = result.toValueStructure() as any;
             assert(mmmm.gentlemen.names[0].name, "Jardine");
-            assert(mmmm.players.names[0].name === "Bradman");
-            assert(mmmm.players.names[1].name === "Woodfull");
+            assert.strictEqual(mmmm.players.names[0].name , "Bradman");
+            assert.strictEqual(mmmm.players.names[1].name , "Woodfull");
             assert(mmmm.players.names[1].plays[0] = "bat");
             // Don't pollute higher level namespace
-            assert(mmmm.name === undefined);
-            assert(mmmm.gentlemen.name === undefined, "Don't pollute parent namespace");
+            assert.strictEqual(mmmm.name , undefined);
+            assert.strictEqual(mmmm.gentlemen.name , undefined, "Don't pollute parent namespace");
 
         } else {
             assert.fail("Didn't match");
@@ -316,10 +316,10 @@ describe("Concat", () => {
         const result = mg.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(result)) {
             const r = result.toValueStructure() as any;
-            assert(r.lead === "Katrina");
-            assert(r.band === "Waves");
-            assert(r.decade === 80);
-            assert(r.country === "England");
+            assert.strictEqual(r.lead , "Katrina");
+            assert.strictEqual(r.band , "Waves");
+            assert.strictEqual(r.decade , 80);
+            assert.strictEqual(r.country , "England");
         } else {
             fail("Match expected");
         }

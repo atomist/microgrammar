@@ -12,7 +12,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("AB") as any;
         assert(m);
-        assert(m.a === "A");
+        assert.strictEqual(m.a , "A");
     });
 
     it("pull up missing scala optional", () => {
@@ -23,7 +23,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch(content) as any;
         assert(m);
-        assert(m.a === undefined);
+        assert.strictEqual(m.a , undefined);
     });
 
     it("pull up matching object optional", () => {
@@ -50,7 +50,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("This 666") as any;
         assert(m);
-        assert(m.a === undefined);
+        assert.strictEqual(m.a , undefined);
     });
 
     it("rejects attempt to flatten complex structure", () => {
