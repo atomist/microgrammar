@@ -186,11 +186,16 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
         this.endingOffset = originalOffset + matched.length;
     }
     public toPatternMatch<T>(): PatternMatch & T {
-        throw new Error("not implemented");
-        // const value = this.innerMatchReports.
-        //     return {
-
-        //     };
+        const value = this.successfulMatchReports.filter(k => k.kind === "rep").map(k => k.inner.toPatternMatch().$value);
+        return {
+            $value: value,
+            $matcherId: this.matcher.$id,
+            $matched: this.matched,
+            $offset: this.offset,
+            matchedStructure: () => {
+                return this.toValueStructure();
+            },
+        } as PatternMatch & T;
     }
     public toParseTree(): TreeNodeCompatible {
         return {
@@ -201,7 +206,7 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
         };
     }
     public toValueStructure<T>(): T {
-        throw new Error("Method not implemented.");
+        return this.successfulMatchReports.filter(k => k.kind === "rep").map(k => k.inner.toValueStructure()) as any as T;
     }
     public toExplanationTree(): MatchExplanationTreeNode {
         return {
