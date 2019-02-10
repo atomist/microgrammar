@@ -7,7 +7,10 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { MatchReport, toMatchPrefixResult } from "./MatchReport";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "./MatchReport";
 import { TerminalPatternMatch } from "./PatternMatch";
 
 /**

@@ -1,8 +1,13 @@
-import { InputState, Listeners } from "../InputState";
+import {
+    InputState,
+    Listeners,
+} from "../InputState";
 import { MatchingLogic } from "../Matchers";
 import {
-    FailedMatchReport, isSuccessfulMatchReport,
-    MatchReport, toPatternMatchOrDismatchReport,
+    FailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchReport,
+    toPatternMatchOrDismatchReport,
 } from "../MatchReport";
 import {
     DismatchReport,

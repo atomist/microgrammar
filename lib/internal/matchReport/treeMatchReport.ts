@@ -1,10 +1,23 @@
 import _ = require("lodash");
 import { MatchingLogic } from "../../Matchers";
-import { FailedMatchReport, FullMatchReport, MatchExplanationTreeNode, MatchReport, SuccessfulMatchReport } from "../../MatchReport";
-import { isSpecialMember, isTreePatternMatch, PatternMatch } from "../../PatternMatch";
+import {
+    FailedMatchReport,
+    FullMatchReport,
+    MatchExplanationTreeNode,
+    MatchReport,
+    SuccessfulMatchReport,
+} from "../../MatchReport";
+import {
+    isSpecialMember,
+    isTreePatternMatch,
+    PatternMatch,
+} from "../../PatternMatch";
 import { TreeNodeCompatible } from "./../../TreeNodeCompatible";
 import { failedMatchReport } from "./failedMatchReport";
-import { SuccessfulMatchReportWrapper, wrappingMatchReport } from "./wrappingMatchReport";
+import {
+    SuccessfulMatchReportWrapper,
+    wrappingMatchReport,
+} from "./wrappingMatchReport";
 
 export function successfulTreeMatchReport(matcher: MatchingLogic, params:
     {

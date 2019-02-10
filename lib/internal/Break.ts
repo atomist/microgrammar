@@ -11,7 +11,10 @@ import {
 } from "../MatchReport";
 import { PatternMatch } from "../PatternMatch";
 import { successfulMatchReport } from "./matchReport/terminalMatchReport";
-import { SuccessfulMatchReportWrapper, wrappingFailedMatchReport } from "./matchReport/wrappingMatchReport";
+import {
+    SuccessfulMatchReportWrapper,
+    wrappingFailedMatchReport,
+} from "./matchReport/wrappingMatchReport";
 import { readyToMatch } from "./Whitespace";
 
 /**

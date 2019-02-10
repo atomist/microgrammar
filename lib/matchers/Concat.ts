@@ -6,7 +6,10 @@ import {
 import { InputState } from "../InputState";
 import { Break } from "../internal/Break";
 import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
-import { ComputeEffectsReport, successfulTreeMatchReport } from "../internal/matchReport/treeMatchReport";
+import {
+    ComputeEffectsReport,
+    successfulTreeMatchReport,
+} from "../internal/matchReport/treeMatchReport";
 import { readyToMatch } from "../internal/Whitespace";
 import {
     LazyMatchingLogic,
@@ -18,8 +21,10 @@ import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    FullMatchReport, isFailedMatchReport,
-    isSuccessfulMatchReport, MatchReport,
+    FullMatchReport,
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchReport,
     toMatchPrefixResult,
 } from "../MatchReport";
 import { Microgrammar } from "../Microgrammar";
@@ -31,7 +36,11 @@ import {
     Literal,
     Regex,
 } from "../Primitives";
-import { failedTreeMatchReport, namedChild, TreeChild } from "./../internal/matchReport/treeMatchReport";
+import {
+    failedTreeMatchReport,
+    namedChild,
+    TreeChild,
+} from "./../internal/matchReport/treeMatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
