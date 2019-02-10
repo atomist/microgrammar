@@ -232,8 +232,10 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                 // It's a function taking the contexts.
                 // See if we should stop matching.
                 if (isMatchVeto(step)) {
+                    const effects = applyComputation(step.$id, step.veto, bindingTarget, [thisMatchContext, parseContext]);
+                    computeEffects.push(effects);
                     // tslint:disable-next-line:no-boolean-literal-compare
-                    if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
+                    if (effects.computeResult === false) {
                         return failedTreeMatchReport(this, {
                             originalOffset: initialInputState.offset,
                             parseNodeName: this.parseNodeName,
@@ -269,8 +271,9 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 }
 
 function applyComputation(stepName: string,
-                          compute: (arg: Record<string, any>) => any,
+                          compute: (arg: Record<string, any>, ...others: any) => any,
                           argument: Record<string, any>,
+                          additionalArgs: any[] = [],
 ): ComputeEffectsReport {
     const beforeProperties = Object.entries(argument).map(([k, v]) => {
         return {
@@ -278,7 +281,7 @@ function applyComputation(stepName: string,
             before: stringify(v),
         };
     });
-    const computeResult = compute(argument);
+    const computeResult = compute(argument, ...additionalArgs);
     if (computeResult !== undefined) {
         argument[stepName] = computeResult;
     }
