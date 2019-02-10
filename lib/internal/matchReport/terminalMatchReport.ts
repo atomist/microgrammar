@@ -1,6 +1,11 @@
 import { MatchingLogic } from "../../Matchers";
 import { SuccessfulMatch } from "../../MatchPrefixResult";
-import { FullMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport, toParseTree } from "../../MatchReport";
+import {
+    FullMatchReport,
+    MatchExplanationTreeNode,
+    SuccessfulMatchReport,
+    toParseTree,
+} from "../../MatchReport";
 import { PatternMatch } from "../../PatternMatch";
 
 // replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess

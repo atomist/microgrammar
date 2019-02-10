@@ -1,6 +1,10 @@
 
 import { MatchingLogic } from "../../Matchers";
-import { FailedMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport } from "../../MatchReport";
+import {
+    FailedMatchReport,
+    MatchExplanationTreeNode,
+    SuccessfulMatchReport,
+} from "../../MatchReport";
 import { TreeNodeCompatible } from "../../TreeNodeCompatible";
 
 export function wrappingMatchReport(matcher: MatchingLogic, params: {
