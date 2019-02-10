@@ -1,8 +1,6 @@
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
-import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
 
 import { Microgrammar } from "../lib/Microgrammar";
-import { PatternMatch } from "../lib/PatternMatch";
 import { Regex } from "../lib/Primitives";
 
 import * as assert from "power-assert";
@@ -47,8 +45,8 @@ describe("Regex", () => {
     it("failed match", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("14 friday");
-        const m = regexp.matchPrefix(is);
-        assert(!isSuccessfulMatch(m));
+        const m = regexp.matchPrefixReport(is);
+        assert(!isSuccessfulMatchReport(m));
     });
 
     // Demonstrate how to achieve old style skipping behavior
@@ -56,13 +54,11 @@ describe("Regex", () => {
         const regexp = new Regex(/[a-z]+/);
         const is = inputStateFromString("**friday 14");
         const withSkip = new Break(regexp, true);
-        const m = withSkip.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const match = m as any as PatternMatch;
-            assert(match.$matched === "**friday");
-            assert(match.$offset === 2);
-            assert(match.$value === "friday");
-
+        const m = withSkip.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert(m.matched === "**friday");
+            assert(m.offset === 2);
+            assert(m.toValueStructure() === "friday");
         } else {
             assert.fail("Didn't match");
         }

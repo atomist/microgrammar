@@ -2,13 +2,10 @@ import { InputState } from "./InputState";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "./MatchPrefixResult";
 import {
     PatternMatch,
-    TerminalPatternMatch,
 } from "./PatternMatch";
 
 import { WhiteSpaceHandler } from "./Config";
@@ -19,7 +16,8 @@ import { readyToMatch } from "./internal/Whitespace";
 import {
     FailedMatchReport,
     FullMatchReport, isFailedMatchReport,
-    isSuccessfulMatchReport, MatchExplanationTreeNode, MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, SuccessfulMatchReport, toMatchPrefixResult,
+    isSuccessfulMatchReport, MatchExplanationTreeNode, MatchReport,
+    SuccessfulMatchReport, toMatchPrefixResult,
 } from "./MatchReport";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 

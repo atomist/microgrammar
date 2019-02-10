@@ -7,7 +7,7 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "./MatchReport";
+import { MatchReport, toMatchPrefixResult } from "./MatchReport";
 import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
@@ -73,6 +73,8 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     public readonly regex: RegExp;
 
+    protected readonly parseNodeName: string;
+
     get $id() {
         return `Regex: ${this.regex.source}`;
     }
@@ -84,13 +86,14 @@ export abstract class AbstractRegex implements MatchingLogic {
      * @param lookahead number of characters to pull from the input to try to match.
      * We'll keep grabbing more if a match is found for the whole string
      */
-    constructor(regex: RegExp, private readonly lookahead: number = LOOK_AHEAD_SIZE) {
+    constructor(regex: RegExp, private readonly lookahead: number = LOOK_AHEAD_SIZE, parseNodeName?: string) {
         this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
+        this.parseNodeName = parseNodeName || "Regex";
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
         const output = toMatchPrefixResult(this.matchPrefixReport(is));
-        if (!output) { // debugging
+        if (!output) { // debugging shim
             throw new Error("That should never return undefined");
         }
         return output;
@@ -123,14 +126,19 @@ export abstract class AbstractRegex implements MatchingLogic {
 
         if (theRegexMatchedSomething()) {
             const matched = results[0];
-            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(
-                this.$id,
+            return successfulMatchReport(this, {
                 matched,
-                is.offset,
-                this.toValue(matched))));
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                valueRepresented: this.toValue(matched),
+                reason: "Matched RegExp: " + this.regex.toString(),
+            });
         } else {
-            return matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, "",
-                `Did not match regex /${this.regex.source}/ in [${lookAt}]`));
+            return failedMatchReport(this, {
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                reason: `Did not match regex /${this.regex.source}/ in [${lookAt}]`,
+            });
         }
     }
 
