@@ -18,8 +18,6 @@ import {
 import { readyToMatch } from "./internal/Whitespace";
 import {
     FailedMatchReport,
-    FullMatchReport,
-    isFailedMatchReport,
     isSuccessfulMatchReport,
     MatchExplanationTreeNode,
     MatchReport,
@@ -216,7 +214,7 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
         };
     }
 
-    private readonly innerMatchReports = (): FullMatchReport[] => {
+    private readonly innerMatchReports = (): MatchReport[] => {
         return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
     }
 }
@@ -232,7 +230,7 @@ function wrapMatchReports(matcher: MatchingLogic, successfulMatchReports: RepInn
             parseNodeName: sm.kind === "rep" ? "Repetition" : "Separator",
         });
     };
-    const wrappedMatchReports: FullMatchReport[] = successfulMatchReports.map(wrapOne);
+    const wrappedMatchReports: MatchReport[] = successfulMatchReports.map(wrapOne);
     if (failedMatchReport) {
         wrappedMatchReports.push(wrappingFailedMatchReport(matcher, {
             inner: innerFailedMatchReport.inner,
@@ -273,7 +271,7 @@ class FailedRepMatchReport implements FailedMatchReport {
         };
     }
 
-    private readonly innerMatchReports = (): FullMatchReport[] => {
+    private readonly innerMatchReports = (): MatchReport[] => {
         return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
     }
 }

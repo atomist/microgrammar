@@ -2,9 +2,9 @@
 import { MatchingLogic } from "../../Matchers";
 import {
     FailedMatchReport,
-    FullMatchReport,
     MatchExplanationTreeNode,
     SuccessfulMatchReport,
+    MatchReport,
 } from "../../MatchReport";
 import { TreeNodeCompatible } from "../../TreeNodeCompatible";
 
@@ -24,8 +24,8 @@ export abstract class SuccessfulMatchReportWrapper implements SuccessfulMatchRep
     public readonly kind = "real";
     public readonly successful = true;
     constructor(public readonly matcher: MatchingLogic,
-                protected readonly parseNodeName: string,
-                protected readonly inner: SuccessfulMatchReport) {
+        protected readonly parseNodeName: string,
+        protected readonly inner: SuccessfulMatchReport) {
 
     }
 
@@ -72,9 +72,9 @@ export abstract class SuccessfulMatchReportWrapper implements SuccessfulMatchRep
 
 class WrappingMatchReport extends SuccessfulMatchReportWrapper {
     constructor(matcher: MatchingLogic,
-                parseNodeName: string,
-                inner: SuccessfulMatchReport,
-                public readonly additional: FailedMatchReport[] = []) {
+        parseNodeName: string,
+        inner: SuccessfulMatchReport,
+        public readonly additional: FailedMatchReport[] = []) {
         super(matcher, parseNodeName, inner);
     }
 
@@ -89,7 +89,7 @@ class WrappingMatchReport extends SuccessfulMatchReportWrapper {
 }
 
 export function wrappingFailedMatchReport(matcher: MatchingLogic, params: {
-    inner: FullMatchReport,
+    inner: MatchReport,
     parseNodeName?: string,
     reason?: string,
     offset?: number,
@@ -108,11 +108,11 @@ class WrappingFailedMatchReport implements FailedMatchReport {
     public readonly kind = "real";
     public readonly successful = false;
     constructor(public readonly matcher: MatchingLogic,
-                public readonly parseNodeName: string,
-                public readonly inner: FullMatchReport,
-                private readonly reason?: string,
-                private readonly offsetOverride?: number,
-                private readonly matchedOverride?: string) {
+        public readonly parseNodeName: string,
+        public readonly inner: MatchReport,
+        private readonly reason?: string,
+        private readonly offsetOverride?: number,
+        private readonly matchedOverride?: string) {
     }
 
     get offset() {

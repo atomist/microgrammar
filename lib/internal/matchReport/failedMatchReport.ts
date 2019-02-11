@@ -1,7 +1,6 @@
 import { MatchingLogic } from "../../Matchers";
 import {
     FailedMatchReport,
-    FullMatchReport,
     MatchExplanationTreeNode,
     MatchReport,
 } from "../../MatchReport";
@@ -11,7 +10,7 @@ export function failedMatchReport(matcher: MatchingLogic, params: {
     offset: number;
     parseNodeName?: string;
     reason: string;
-    children?: FullMatchReport[];
+    children?: MatchReport[];
 }): FailedMatchReport {
     return new FailedTerminalMatchReport(matcher, {
         parseNodeName: matcher.$id,
@@ -27,14 +26,14 @@ class FailedTerminalMatchReport implements FailedMatchReport {
     public readonly offset: number;
     public readonly parseNodeName: string;
     public readonly reason: string;
-    public readonly children: FullMatchReport[];
+    public readonly children: MatchReport[];
 
     constructor(public readonly matcher: MatchingLogic, params: {
         matched?: string;
         offset: number;
         parseNodeName: string;
         reason: string;
-        children: FullMatchReport[];
+        children: MatchReport[];
     }) {
         this.matched = params.matched;
         this.offset = params.offset;

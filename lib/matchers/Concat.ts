@@ -21,7 +21,6 @@ import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    FullMatchReport,
     isSuccessfulMatchReport,
     MatchReport,
     toMatchPrefixResult,
@@ -182,7 +181,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 
     public matchPrefixReport(initialInputState: InputState,
         thisMatchContext,
-        parseContext): FullMatchReport {
+        parseContext): MatchReport {
         const bindingTarget: Record<string, any> = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;

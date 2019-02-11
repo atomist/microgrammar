@@ -9,8 +9,6 @@ import {
 } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
-export type FullMatchReport = FailedMatchReport | SuccessfulMatchReport;
-
 export interface FailedMatchReport {
     kind: "real";
     offset: number;
@@ -34,23 +32,25 @@ export interface SuccessfulMatchReport {
     toValueStructure<T = any>(): T;
 }
 
-export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {
+export function isSuccessfulMatchReport(fmr: MatchReport): fmr is SuccessfulMatchReport {
     return fmr.successful;
 }
 
-export function isFailedMatchReport(fmr: FullMatchReport | MatchReport): fmr is FailedMatchReport {
+export function isFailedMatchReport(fmr: MatchReport): fmr is FailedMatchReport {
     return fmr.kind === "real" && !fmr.successful;
 }
 
 /**
  * All the data about the match, enough to generate either a PatternMatch
- * or a TreeNodeCompatible or a DismatchReport.
+ * or a value structure (with fields as declared in microgrammar terms)
+ * or a TreeNodeCompatible parse tree
+ * or a TreeNodeCompatible report of why it matched or didn't.
  *
  * I can't get from one of these structures to another, because the child
  * structures are different. So, let's output one structure that can
  * be turned into any of them.
  */
-export type MatchReport = FullMatchReport;
+export type MatchReport = SuccessfulMatchReport | FailedMatchReport;
 
 export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     PatternMatch & T | DismatchReport {

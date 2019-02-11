@@ -1,9 +1,7 @@
 import { MatchingLogic } from "../../Matchers";
 import {
-    FullMatchReport,
     MatchExplanationTreeNode,
     SuccessfulMatchReport,
-    toParseTree,
 } from "../../MatchReport";
 import { PatternMatch } from "../../PatternMatch";
 

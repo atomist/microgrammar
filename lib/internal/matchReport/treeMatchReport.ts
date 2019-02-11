@@ -1,10 +1,7 @@
-import _ = require("lodash");
 import { MatchingLogic } from "../../Matchers";
 import {
     FailedMatchReport,
-    FullMatchReport,
     MatchExplanationTreeNode,
-    MatchReport,
     SuccessfulMatchReport,
 } from "../../MatchReport";
 import {
