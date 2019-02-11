@@ -25,7 +25,7 @@ export interface SuccessfulMatchReport {
     toExplanationTree(): MatchExplanationTreeNode;
     toPatternMatch<T>(): PatternMatch & T;
     toParseTree(): TreeNodeCompatible;
-    toValueStructure<T>(): T;
+    toValueStructure<T = any>(): T;
 }
 
 export function isSuccessfulMatchReport(fmr: FullMatchReport | MatchReport): fmr is SuccessfulMatchReport {

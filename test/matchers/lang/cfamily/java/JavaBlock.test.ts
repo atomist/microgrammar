@@ -53,7 +53,7 @@ describe("JavaBlock", () => {
         const is = inputStateFromString(balanced + "// this is a comment }");
         const m = JavaBlock.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert.strictEqual(m.matched , balanced);
+            assert.strictEqual(m.matched, balanced);
 
         } else {
             assert.fail("Didn't match");
@@ -71,12 +71,12 @@ describe("JavaBlock", () => {
         });
         const m: any = javaBlockContaining(inner.matcher).matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert.strictEqual(m.matched , balanced);
-            const mmmm = m.toPatternMatch();
-            assert.strictEqual(mmmm.block.left , "x");
-            assert.strictEqual(mmmm.block.$valueMatches.left.$offset , 2);
-            assert.strictEqual(mmmm.block.right , "y");
-            assert.strictEqual(mmmm.block.$valueMatches.right.$offset , 6);
+            assert.strictEqual(m.matched, balanced);
+            const mmmm = m.toPatternMatch<any>();
+            assert.strictEqual(mmmm.block.left, "x");
+            assert.strictEqual(mmmm.block.$valueMatches.left.$offset, 2);
+            assert.strictEqual(mmmm.block.right, "y");
+            assert.strictEqual(mmmm.block.$valueMatches.right.$offset, 6);
 
         } else {
             assert.fail("Didn't match");
@@ -87,7 +87,7 @@ describe("JavaBlock", () => {
         const is = inputStateFromString(what);
         const m = JavaBlock.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
-            assert.strictEqual(m.matched , what);
+            assert.strictEqual(m.matched, what);
         } else {
             assert.fail("Didn't match");
         }

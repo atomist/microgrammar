@@ -35,8 +35,8 @@ describe("Microgrammar async", () => {
         });
         const result = await validMg.findMatchesAsync(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert.strictEqual(result.length , 1);
-        assert.strictEqual(result[0].$matched , "foo");
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].$matched, "foo");
     });
 
     it("XML element", async () => {
@@ -48,9 +48,9 @@ describe("Microgrammar async", () => {
         });
         const result = await mg.findMatchesAsync(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert.strictEqual(r0.name , "foo");
+        assert.strictEqual(r0.name, "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
@@ -158,14 +158,6 @@ describe("Microgrammar async", () => {
             notxml: "notxml",
         });
         const result = await mg.findMatchesAsync(content);
-        if (result.length === 0) {
-            const dismatchReport = mg.exactMatchReport(content);
-            if (dismatchReport.successful) {
-                throw new Error("WTF, exactMatch works");
-            }
-            const explanation = toExplanationTree(dismatchReport);
-            console.log(explanation);
-        }
         assert.strictEqual(result.length, 1);
     });
 
@@ -179,7 +171,7 @@ describe("Microgrammar async", () => {
             notxml: "notxml",
         });
         const result = await mg.findMatchesAsync(content);
-        assert.strictEqual(result.length , 0);
+        assert.strictEqual(result.length, 0);
     });
 
 });

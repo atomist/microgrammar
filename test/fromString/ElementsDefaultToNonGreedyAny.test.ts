@@ -10,8 +10,8 @@ describe("Elements default to non-greedy any", () => {
         const mg = Microgrammar.fromString("->${fruit}<-");
         const result = mg.exactMatchReport(content);
         if (isSuccessfulMatchReport(result)) {
-            const mmmm = result.toValueStructure();
-            assert.strictEqual(mmmm.fruit , "banana");
+            const mmmm: any = result.toValueStructure();
+            assert.strictEqual(mmmm.fruit, "banana");
         } else {
             assert.fail("Didn't match");
         }
@@ -23,8 +23,8 @@ describe("Elements default to non-greedy any", () => {
         const result: any = mg.firstMatch(content);
         if (isPatternMatch(result)) {
             const mmmm = result as any;
-            assert.strictEqual(mmmm.fruit , "banana");
-            assert.strictEqual(mmmm.drink , "juice");
+            assert.strictEqual(mmmm.fruit, "banana");
+            assert.strictEqual(mmmm.drink, "juice");
         } else {
             assert.fail("Didn't match");
         }
@@ -35,8 +35,8 @@ describe("Elements default to non-greedy any", () => {
         const mg = Microgrammar.fromString("->${fruit}${arrow}${drink}!",
             { arrow: "<-" });
         const result: any = mg.firstMatch(content);
-        assert.strictEqual(result.drink , "juice");
-        assert.strictEqual(result.fruit , "banana");
+        assert.strictEqual(result.drink, "juice");
+        assert.strictEqual(result.fruit, "banana");
     });
 
     it("doesn't mind whitespace", () => {
@@ -45,7 +45,7 @@ describe("Elements default to non-greedy any", () => {
         const result: any = mg.exactMatch(content);
         if (isPatternMatch(result)) {
             const mmmm = result as any;
-            assert.strictEqual(mmmm.fruit.trim() , "banana");
+            assert.strictEqual(mmmm.fruit.trim(), "banana");
         } else {
             assert.fail("Didn't match");
         }
@@ -57,7 +57,7 @@ describe("Elements default to non-greedy any", () => {
         const result: any = mg.exactMatch(content);
         if (isPatternMatch(result)) {
             const mmmm = result as any;
-            assert.strictEqual(mmmm.fruit , "banana");
+            assert.strictEqual(mmmm.fruit, "banana");
         } else {
             assert.fail("Didn't match");
         }

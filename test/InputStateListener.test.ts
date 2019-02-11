@@ -106,7 +106,6 @@ public class Foo {
         const m = Microgrammar.fromDefinitions<any>({
             toFlag: when(JavaBlock, _ => true,
                 is => {
-                    console.log("depthCount is " + (is.listeners.depthCount as any).depth);
                     return (is.listeners.depthCount as NestingDepthStateMachine).depth >= 4;
                 }),
             // toFlag: JavaBlock,
