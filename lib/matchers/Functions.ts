@@ -53,7 +53,7 @@ class FlatteningMatcher implements MatchingLogic {
 class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
 
     constructor(matcher: MatchingLogic,
-                inner: SuccessfulMatchReport) {
+        inner: SuccessfulMatchReport) {
         super(matcher, "Flatten", inner);
     }
 
@@ -108,9 +108,6 @@ function successfulPatternMatch(params: {
         $value,
         matchedStructure: <TT>() => $value as TT,
     };
-
-    // shim. hack for compatibility with isSuccessfulMatch
-    (pm as any).$successfulMatch = true;
 
     return pm;
 }

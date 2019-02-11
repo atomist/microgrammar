@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
-import { toExplanationTree } from "../lib/MatchReport";
 import {
     matchesIn,
     Microgrammar,

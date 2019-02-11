@@ -92,9 +92,6 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     public matchPrefix(is: InputState): MatchPrefixResult {
         const output = toMatchPrefixResult(this.matchPrefixReport(is));
-        if (!output) { // debugging shim
-            throw new Error("That should never return undefined");
-        }
         return output;
     }
 
