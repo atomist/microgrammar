@@ -7,6 +7,9 @@ import {
     ChangeControlledMethodGrammar,
     GrammarWithOnlyARep,
 } from "./annotationGrammar";
+import { isSuccessfulMatchReport, isFailedMatchReport } from "../../lib/MatchReport";
+import { stringifyTree } from "stringify-tree";
+import { stringifyExplanationTree } from "../../lib/MicrogrammarParseError";
 
 describe("AnyAnnotationGrammar", () => {
 
@@ -54,6 +57,28 @@ describe("GrammarWithOnlyARep", () => {
         assert.strictEqual(methods[0].annotations[1].name, "Donkey");
         assert.strictEqual(methods[0].annotations[1].content, `"24", name = "Eeyore"`);
     });
+
+    // it("makes a parse tree", () => {
+    //     const src = `@ChangeControlled @Donkey("24", name = "Eeyore")`;
+    //     const report = GrammarWithOnlyARep.exactMatchReport(src);
+    //     if (isSuccessfulMatchReport(report)) {
+    //         console.log(stringifyTree(report.toParseTree(), n => `${n.$name} [${n.$value}]`, n => n.$children));
+    //         console.log(JSON.stringify(report.toValueStructure(), null, 2))
+    //         console.log(stringifyExplanationTree(report.toExplanationTree()));
+    //     } else {
+    //         assert.fail("did not match");
+    //     }
+    // });
+
+    // it("makes an explanation tree", () => {
+    //     const src = `@ChangeControlled @Donkey["24", name = "Eeyore")`;
+    //     const report = GrammarWithOnlyARep.exactMatchReport(src);
+    //     if (isFailedMatchReport(report)) {
+    //         console.log(stringifyExplanationTree(report.toExplanationTree()));
+    //     } else {
+    //         assert.fail("should not match");
+    //     }
+    // });
 
     it("match valid annotations", () => {
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
