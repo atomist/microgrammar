@@ -28,6 +28,17 @@ export * from "./lib/matchers/snobol/Span";
 
 export { isSuccessfulMatch } from "./lib/MatchPrefixResult";
 
+export {
+    MatchReport,
+    SuccessfulMatchReport,
+    FailedMatchReport,
+    isSuccessfulMatchReport,
+    isFailedMatchReport,
+    MatchExplanationTreeNode,
+} from "./lib/MatchReport";
+
+export { MicrogrammarParseError } from "./lib/MicrogrammarParseError";
+
 export * from "./lib/Microgrammar";
 
 export * from "./lib/Grammar";

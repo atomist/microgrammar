@@ -5,28 +5,24 @@ import {
 } from "../matchers/Concat";
 import { Literal } from "../Primitives";
 
-import { stringifyTree } from "stringify-tree";
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
 import {
-    MatchExplanationTreeNode,
-    toExplanationTree,
     isSuccessfulMatchReport,
 } from "../MatchReport";
-import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
 import {
     CompleteFromStringOptions,
     completeWithDefaults,
 } from "./CompleteFromStringOptions";
 import {
-    exactMatch,
     exactMatchReport,
 } from "./ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,
 } from "./SpecGrammar";
+import { MicrogrammarParseError } from "../MicrogrammarParseError";
 
 /**
  * Convenient function to create a microgrammar from a spec within another grammar
@@ -39,22 +35,6 @@ export function fromString(spec: string, components: object = {}, options: FromS
     return new MicrogrammarSpecParser().fromString(spec, components, options);
 }
 
-export class MicrogrammarParseError extends Error {
-
-    constructor(
-        message: string,
-        public readonly explanationTree: MatchExplanationTreeNode) {
-        super(message);
-    }
-
-    public explanationTreeString() {
-        return stringifyExplanationTree(this.explanationTree);
-    }
-}
-
-export function stringifyExplanationTree(tn: MatchExplanationTreeNode): string {
-    return stringifyTree(tn, n => `${n.successful ? "☻" : "☹"}${n.$name} ${n.reason || "[" + n.$value + "]"}`, n => n.$children);
-}
 
 /**
  * Parses microgrammars expressed as strings.
