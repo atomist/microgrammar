@@ -103,7 +103,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
     public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentInputState = is;
         const successfulMatches: RepInnerMatchReport[] = [];
-        let failedMatchReport: RepFailedMatchReport;
+        let failingMatchReport: RepFailedMatchReport;
         let matched = "";
 
         const consumeWhitespace = () => {
@@ -122,11 +122,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
             const report = this.matcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
             if (!isSuccessfulMatchReport(report)) {
-                if (!isFailedMatchReport(report)) {
-
-                    console.log("JESS: not-real failure report from " + this.matcher.$id);
-                }
-                failedMatchReport = { kind: "rep", inner: report };
+                failingMatchReport = { kind: "rep", inner: report };
                 break;
             } else {
                 if (report.matched === "") {
@@ -143,10 +139,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
                 const sepMatchReport = this.sepMatcher.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
                 if (!isSuccessfulMatchReport(sepMatchReport)) {
-                    if (!isFailedMatchReport(sepMatchReport)) {
-                        console.log("JESS: not-real failure report from " + this.matcher.$id);
-                    }
-                    failedMatchReport = { kind: "sep", inner: sepMatchReport };
+                    failingMatchReport = { kind: "sep", inner: sepMatchReport };
                     break;
                 } else {
                     // successful
@@ -159,9 +152,9 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
         const successfulRepetitionCount = successfulMatches.filter(k => k.kind === "rep").length;
         return (successfulRepetitionCount >= this.min) ?
-            new SuccessfulRepMatchReport(this, "Rep", successfulMatches, is.offset, matched, failedMatchReport) :
+            new SuccessfulRepMatchReport(this, "Rep", successfulMatches, is.offset, matched, failingMatchReport) :
             new FailedRepMatchReport(this, "Rep", successfulMatches, is.offset, matched,
-                `Required ${this.min} matches but only found ${successfulRepetitionCount}`, failedMatchReport);
+                `Required ${this.min} matches but only found ${successfulRepetitionCount}`, failingMatchReport);
     }
 }
 

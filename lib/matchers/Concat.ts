@@ -22,7 +22,6 @@ import {
 } from "../MatchPrefixResult";
 import {
     FullMatchReport,
-    isFailedMatchReport,
     isSuccessfulMatchReport,
     MatchReport,
     toMatchPrefixResult,
@@ -30,7 +29,6 @@ import {
 import { Microgrammar } from "../Microgrammar";
 import {
     isSpecialMember,
-    PatternMatch,
 } from "../PatternMatch";
 import {
     Literal,
@@ -206,7 +204,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         `Concat step [${report.matcher.$id}] matched ${report.matched}`);
                     matched += report.matched;
                     bindingTarget[step.$id] = report.toValueStructure();
-                } else if (isFailedMatchReport(report)) {
+                } else {
                     return failedTreeMatchReport(this, {
                         originalOffset: initialInputState.offset,
                         parseNodeName: this.parseNodeName,
@@ -215,19 +213,6 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                         successes: matches,
                         failureName: step.name,
                         failureReport: report,
-                        extraProperties: bindingTarget,
-                        computeEffects,
-                    });
-                } else {
-                    // It has failed, but is not a "real" failure yet
-                    console.log("JESS: not-real failure report from " + step.$id);
-                    return failedTreeMatchReport(this, {
-                        originalOffset: initialInputState.offset,
-                        parseNodeName: this.parseNodeName,
-                        matched,
-                        reason: `Failed at step '${step.name}'`,
-                        successes: matches,
-                        failureName: step.name,
                         extraProperties: bindingTarget,
                         computeEffects,
                     });

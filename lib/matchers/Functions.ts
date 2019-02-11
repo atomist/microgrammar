@@ -8,17 +8,15 @@ import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    FailedMatchReport,
     isSuccessfulMatchReport,
-    MatchExplanationTreeNode,
     MatchReport,
     SuccessfulMatchReport,
     toMatchPrefixResult,
 } from "../MatchReport";
 import {
-    PatternMatch, isTreePatternMatch,
+    PatternMatch,
+    isTreePatternMatch,
 } from "../PatternMatch";
-import { TreeNodeCompatible } from "../TreeNodeCompatible";
 import { toMatchingLogic } from "./Concat";
 
 /**
@@ -57,6 +55,7 @@ class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
     }
 
     public toPatternMatch<T>(): PatternMatch & T {
+        // it is possible this could be simplified but not sure how to get it compatible.
         const match = this.inner.toPatternMatch<T>();
         if (isTreePatternMatch(match)) {
             const propNames =
@@ -66,7 +65,6 @@ class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
             }
             const onlyPropertyName = propNames[0];
             const relevantSubMatch = match.$valueMatches[onlyPropertyName];
-            // TODO how do we update this?
             return successfulPatternMatch({
                 matcherId: this.matcher.$id, matched: match.$matched, offset: match.$offset,
                 valueRepresented: { value: relevantSubMatch.$value },

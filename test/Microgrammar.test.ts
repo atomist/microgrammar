@@ -528,10 +528,6 @@ describe("Microgrammar", () => {
         expect(m.pigs).to.have.members(["Porker"]);
 
         const matches2 = mg.findMatches("**** Felix, Oscar****Porker");
-        if (matches2.length < 1) {
-            const explanation = toExplanationTree(mg.exactMatchReport("**** Felix, Oscar****Porker"));
-            console.log(stringifyTree(explanation, n => `${n.$name} ${n.reason}`, c => c.$children));
-        }
         const m2 = matches2[0];
         expect(m2.dogs).to.equal(undefined);
         expect(m2.cats).to.have.members(["Felix", "Oscar"]);

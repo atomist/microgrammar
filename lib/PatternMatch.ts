@@ -1,5 +1,3 @@
-import { Matcher } from "./Matchers";
-
 /**
  * Returned when we failed to match prefix
  */

@@ -11,6 +11,7 @@ import { FromStringOptions } from "../FromStringOptions";
 import {
     MatchExplanationTreeNode,
     toExplanationTree,
+    isSuccessfulMatchReport,
 } from "../MatchReport";
 import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
@@ -38,6 +39,23 @@ export function fromString(spec: string, components: object = {}, options: FromS
     return new MicrogrammarSpecParser().fromString(spec, components, options);
 }
 
+export class MicrogrammarParseError extends Error {
+
+    constructor(
+        message: string,
+        public readonly explanationTree: MatchExplanationTreeNode) {
+        super(message);
+    }
+
+    public explanationTreeString() {
+        return stringifyExplanationTree(this.explanationTree);
+    }
+}
+
+export function stringifyExplanationTree(tn: MatchExplanationTreeNode): string {
+    return stringifyTree(tn, n => `${n.successful ? "☻" : "☹"}${n.$name} ${n.reason || "[" + n.$value + "]"}`, n => n.$children);
+}
+
 /**
  * Parses microgrammars expressed as strings.
  */
@@ -48,16 +66,12 @@ export class MicrogrammarSpecParser {
     public fromString(spec: string, components: object, options: FromStringOptions): Concat {
         const optionsToUse = completeWithDefaults(options);
         const specToUse = this.preprocess(spec, optionsToUse);
-        const match = exactMatch<MicrogrammarSpec>(specGrammar(optionsToUse), specToUse);
-        if (!isPatternMatch(match)) {
-            function stringifyExplanationTree(tn: MatchExplanationTreeNode): string {
-                return stringifyTree(tn, n => `${n.successful ? "☻" : "☹"}${n.$name} ${n.reason || "[" + n.$value + "]"}`, n => n.$children);
-            }
-            console.log("Failed to parse microgrammar: " + specToUse);
-            console.log(stringifyExplanationTree(toExplanationTree(exactMatchReport(specGrammar(optionsToUse), specToUse))));
-            throw new Error(`Unable to parse microgrammar: ${specToUse}`);
+        const report = exactMatchReport(specGrammar(optionsToUse), specToUse);
+        if (!isSuccessfulMatchReport(report)) {
+            throw new MicrogrammarParseError(`Unable to parse microgrammar: ${specToUse}`,
+                report.toExplanationTree());
         }
-        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,
+        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(report.toValueStructure<MicrogrammarSpec>(),
             // tslint:disable-next-line:no-boolean-literal-compare
             (components as WhiteSpaceHandler).$consumeWhiteSpaceBetweenTokens !== false);
         const matcherSequence2 = this.populateSpecifiedElements(components, matcherSequence1);
