@@ -19,17 +19,18 @@ import { inputStateFromStream } from "./InputStateFactory";
 import { failedMatchReport } from "./matchReport/failedMatchReport";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-                              parseContext = {},
-                              l?: Listeners): PatternMatch & T | DismatchReport {
+    parseContext = {},
+    l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(exactMatchReport(matcher, input, parseContext, l));
 }
 
 export function exactMatchReport(matcher: MatchingLogic, input: string | InputStream,
-                                 parseContext = {},
-                                 l?: Listeners): MatchReport {
+    parseContext = {},
+    l?: Listeners): MatchReport {
     const inputState = inputStateFromStream(toInputStream(input), l);
 
     const result = matcher.matchPrefixReport(inputState, {}, parseContext);
+
 
     if (!isSuccessfulMatchReport(result)) {
         return result;
@@ -52,6 +53,7 @@ function advanceTo(endingOffset: number, inputState: InputState): InputState {
     let currentInputState = inputState;
     while (!currentInputState.exhausted() && currentInputState.offset <= endingOffset) {
         currentInputState = currentInputState.advance();
+
     }
     return currentInputState;
 }
