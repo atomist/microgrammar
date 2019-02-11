@@ -10,6 +10,8 @@ import {
     matchReportFromSuccessfulMatch, toMatchPrefixResult,
 } from "../../MatchReport";
 import { TerminalPatternMatch } from "../../PatternMatch";
+import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
+import { failedMatchReport } from "../../internal/matchReport/failedMatchReport";
 
 /**
  * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -38,7 +40,13 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs))) :
-            matchReportFromFailureReport(this, new MatchFailureReport(this.$id, is.offset, matched));
+            successfulMatchReport(this,
+                // why is the value an inputstate?
+                { matched, offset: is.offset, valueRepresented: { value: currentIs } }) :
+            failedMatchReport(this, {
+                offset: is.offset, matched,
+                reason:
+                    `No characters found. Looking for [${this.characters}], found [${currentIs.peek(1)}]`,
+            });
     }
 }

@@ -39,9 +39,7 @@ describe("GrammarWithOnlyARep", () => {
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore") public void magic() {}`;
         const match = rep.matchPrefix(inputStateFromString(src), {}, {});
         if (isSuccessfulMatch(match)) {
-            const mmmm = match.match as any;
-            assert.strictEqual(mmmm.$matched.trim(), `@ChangeControlled @Donkey("24", name = "Eeyore")`);
-
+            assert.strictEqual(match.$matched.trim(), `@ChangeControlled @Donkey("24", name = "Eeyore")`);
         } else {
             assert.fail("Didn't match");
         }
