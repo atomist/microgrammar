@@ -31,8 +31,8 @@ export abstract class PatternMatch {
      * @param $offset offset from 0 in input
      */
     constructor(public readonly $matcherId: string,
-                public $matched: string,
-                public readonly $offset: number) {
+        public $matched: string,
+        public readonly $offset: number) {
     }
 
     /**
@@ -50,96 +50,20 @@ export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is Patte
 }
 
 /**
- * Simple pattern pattern. No submatches.
- */
-export class TerminalPatternMatch extends PatternMatch {
-
-    constructor(matcherId: string,
-                matched: string,
-                offset: number,
-                public readonly $value: any) {
-        super(matcherId, matched, offset);
-    }
-
-}
-
-/**
- * Return when an optional matcher matches
- */
-export class UndefinedPatternMatch extends PatternMatch {
-
-    public $value = undefined;
-
-    constructor(matcherId: string,
-                offset: number) {
-        super(matcherId, "", offset);
-    }
-}
-
-/**
  * Represents a complex pattern match. Sets properties to expose structure.
  * In the case of string properties, where we can't add provide the whole PatternMatch,
  * we store that in a parallel object $valueMatches
+ * @Deprecated
+ * Prefer SuccessfulMatchReport; use matchReport.toValueStructure() to get the object structure
+ * or matchReport.toParseTree() to learn about how it matches
  */
-export class TreePatternMatch extends PatternMatch {
-
-    // JESS: can we not have a $value
+export abstract class TreePatternMatch extends PatternMatch {
 
     public readonly $valueMatches = {};
 
     public readonly $value: {};
 
-    constructor(matcherId: string,
-                matched: string,
-                offset: number,
-                matchers: Matcher[],
-                subMatches: PatternMatch[],
-                capturedStructure: {}) {
-        super(matcherId, matched, offset);
-        this.$value = {};
-
-        // Copy top level context properties
-        for (const p in capturedStructure) {
-            if (!isSpecialMember(p) && typeof capturedStructure[p] !== "function") {
-                this[p] = capturedStructure[p];
-            }
-        }
-
-        for (let i = 0; i < subMatches.length; i++) {
-            const match = subMatches[i];
-            const name = matchers[i].name;
-            if (!isSpecialMember(name)) {
-                const value = subMatches[i].$value;
-                this.$value[matchers[i].name] = value;
-                if (isTreePatternMatch(match)) {
-                    this[name] = match;
-                } else {
-                    // if the context defined it already, let that stand
-                    if (this[name] === undefined) {
-                        this[name] = value;
-                    }
-                    // We've got nowhere to put the matching information on a simple value,
-                    // so create a parallel property on the parent with an out of band name
-                    this.$valueMatches[matchers[i].name] = subMatches[i];
-                }
-            }
-        }
-    }
-
-    public submatches(): object {
-        const output = {};
-        for (const key of Object.getOwnPropertyNames(this)) {
-            if (key.charAt(0) !== "$") {
-                const value = this[key];
-                if (isPatternMatch(value)) {
-                    output[key] = value;
-                } else {
-                    output[key] = this.$valueMatches[key];
-                }
-            }
-        }
-        return output;
-    }
+    public abstract submatches(): object;
 
 }
 

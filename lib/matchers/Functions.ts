@@ -16,8 +16,7 @@ import {
     toMatchPrefixResult,
 } from "../MatchReport";
 import {
-    isTreePatternMatch,
-    PatternMatch,
+    PatternMatch, isTreePatternMatch,
 } from "../PatternMatch";
 import { TreeNodeCompatible } from "../TreeNodeCompatible";
 import { toMatchingLogic } from "./Concat";

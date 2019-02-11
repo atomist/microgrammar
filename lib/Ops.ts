@@ -8,7 +8,6 @@ import {
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
 } from "./MatchPrefixResult";
 import {
