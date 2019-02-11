@@ -176,8 +176,6 @@ export class Alt implements MatchingLogic {
                 });
             } else if (isFailedMatchReport(m)) {
                 failedMatches.push(m);
-            } else {
-                console.log("Warning: not retaining failed match report from " + m.matcher.$id);
             }
         }
         return failedMatchReport(this, {
@@ -215,7 +213,6 @@ class WhenMatcher implements MatchingLogic {
     constructor(public readonly inner: MatchingLogic,
         public readonly matchTest: (pm: PatternMatch) => boolean,
         public readonly inputStateTest: (is: InputState) => boolean) {
-
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;
     }

@@ -4,25 +4,26 @@ import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 export { matchReportFromSuccessfulMatch } from "./internal/matchReport/terminalMatchReport";
-export interface FullMatchReport {
-    successful: boolean;
+export type FullMatchReport = FailedMatchReport | SuccessfulMatchReport;
+
+export interface FailedMatchReport {
     kind: "real";
     offset: number;
     matched?: string;
     matcher: MatchingLogic; // is all of this really necessary?
+    successful: false;
+    description?: string; // should be "reason"
     toExplanationTree(): MatchExplanationTreeNode;
 }
 
-export interface FailedMatchReport extends FullMatchReport {
-    successful: false;
-    description?: string;
-}
-
-export interface SuccessfulMatchReport extends FullMatchReport {
+export interface SuccessfulMatchReport {
+    kind: "real";
+    offset: number;
+    matcher: MatchingLogic; // is all of this really necessary?
     successful: true;
     matched: string;
     endingOffset: number;
-    kind: "real"; // after wrappers are gone, this can go
+    toExplanationTree(): MatchExplanationTreeNode;
     toPatternMatch<T>(): PatternMatch & T;
     toParseTree(): TreeNodeCompatible;
     toValueStructure<T>(): T;
@@ -44,50 +45,20 @@ export function isFailedMatchReport(fmr: FullMatchReport | MatchReport): fmr is 
  * structures are different. So, let's output one structure that can
  * be turned into any of them.
  */
-export type MatchReport = { matcher: MatchingLogic, successful: boolean } & ({
-    kind: "wrappedPatternMatch",
-    patternMatch: PatternMatch,
-    matched: string,
-    toPatternMatch(): PatternMatch,
-    toValueStructure(): any,
-} | {
-    kind: "wrappedDismatchReport",
-    dismatchReport: DismatchReport,
-} | {
-    kind: "wrappedMatchFailureReport",
-    matchFailureReport: MatchFailureReport,
-} | {
-    kind: "wrappedSuccessfulMatch",
-    successfulMatch: SuccessfulMatch,
-    matched: string,
-    toPatternMatch(): PatternMatch,
-} | { kind: "real" });
+export type MatchReport = FullMatchReport
 
 export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     PatternMatch & T | DismatchReport {
-    switch (mr.kind) {
-        case "wrappedDismatchReport":
-            return mr.dismatchReport;
-        case "wrappedMatchFailureReport":
-            return mr.matchFailureReport;
-        case "wrappedPatternMatch":
-            return mr.patternMatch as PatternMatch & T;
-        case "wrappedSuccessfulMatch":
-            // it is not normal to call this
-            // return mr.successfulMatch.match as PatternMatch & T;
-            throw new Error("I didn't think this kind of match would get this called on it.");
-        case "real":
-            if (isSuccessfulMatchReport(mr)) {
-                return mr.toPatternMatch<T>();
-            } else {
-                if (isFailedMatchReport(mr)) {
-                    return {
-                        description: "Looks like it didn't match",
-                        explanationTree: mr.toExplanationTree(),
-                    } as DismatchReport;
-                }
-                throw new Error("not implemented");
-            }
+    if (isSuccessfulMatchReport(mr)) {
+        return mr.toPatternMatch<T>();
+    } else {
+        if (isFailedMatchReport(mr)) {
+            return {
+                description: "Looks like it didn't match",
+                explanationTree: mr.toExplanationTree(),
+            } as DismatchReport;
+        }
+        throw new Error("not implemented");
     }
 }
 
@@ -129,13 +100,7 @@ export interface MatchExplanationTreeNode extends TreeNodeCompatible {
  * @param mr a MatchReport from Grammar.exactMatchReport
  */
 export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
-    if (isFailedMatchReport(mr)) {
-        return mr.toExplanationTree();
-    } else if (isSuccessfulMatchReport(mr)) {
-        return mr.toExplanationTree();
-    } else {
-        throw new Error("I can't build a dismatch tree from " + mr.kind);
-    }
+    return mr.toExplanationTree();
 }
 
 /**
@@ -154,63 +119,14 @@ export function toValueStructure<T = any>(mr: MatchReport): T {
 
 // shim
 export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
-    switch (mr.kind) {
-        case "wrappedDismatchReport":
-            throw new Error("But the match failed: " + mr.dismatchReport.description);
-        case "wrappedMatchFailureReport":
-            return mr.matchFailureReport;
-        case "wrappedPatternMatch":
-            return mr.patternMatch as PatternMatch;
-        case "wrappedSuccessfulMatch":
-            return mr.successfulMatch;
-        case "real":
-            if (isSuccessfulMatchReport(mr)) {
-                return mr.toPatternMatch();
-            } else if (isFailedMatchReport(mr)) {
-                return new MatchFailureReport(mr.matcher.$id,
-                    mr.offset,
-                    mr.matched,
-                    mr.description);
-            } else {
-                throw new Error("Unhandled");
-            }
+    if (isSuccessfulMatchReport(mr)) {
+        return mr.toPatternMatch();
+    } else if (isFailedMatchReport(mr)) {
+        return new MatchFailureReport(mr.matcher.$id,
+            mr.offset,
+            mr.matched,
+            mr.description);
+    } else {
+        throw new Error("Unhandled");
     }
-}
-
-
-// I'm implementing terminal first
-export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: SuccessfulMatch): MatchReport {
-    const mr: MatchReport = {
-        matcher,
-        kind: "wrappedSuccessfulMatch",
-        successfulMatch: sm,
-        toPatternMatch() {
-            (sm.match as any).$successfulMatch = true;  // shim
-            return sm.match;
-        },
-        matched: sm.$matched,
-        successful: true,
-    };
-    return mr;
-}
-
-/**
- * Desired cases
- */
-export function successfulTreeMatchReport(params:
-    {
-        matcher: MatchingLogic,
-        name: string,
-        matched: string,
-        offset: number,
-        children: { [k: string]: MatchReport },
-        childrenToExposeAsProperties: string[],
-        additionalProperties: { [k: string]: any },
-    },
-) {
-
-    // theory: this is enough data to replace TreePatternMatch.
-
-    //
-
 }
