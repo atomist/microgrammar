@@ -8,14 +8,20 @@ import { Literal } from "../Primitives";
 import { stringifyTree } from "stringify-tree";
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
-import { MatchExplanationTreeNode, toExplanationTree } from "../MatchReport";
+import {
+    MatchExplanationTreeNode,
+    toExplanationTree,
+} from "../MatchReport";
 import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
 import {
     CompleteFromStringOptions,
     completeWithDefaults,
 } from "./CompleteFromStringOptions";
-import { exactMatch, exactMatchReport } from "./ExactMatch";
+import {
+    exactMatch,
+    exactMatchReport,
+} from "./ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,

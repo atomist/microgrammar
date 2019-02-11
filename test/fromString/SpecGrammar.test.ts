@@ -1,6 +1,9 @@
 import assert = require("power-assert");
 import { DefaultFromStringOptions } from "../../lib/internal/CompleteFromStringOptions";
-import { exactMatch, exactMatchReport } from "../../lib/internal/ExactMatch";
+import {
+    exactMatch,
+    exactMatchReport,
+} from "../../lib/internal/ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,

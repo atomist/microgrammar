@@ -1,16 +1,24 @@
 import { InputState } from "../InputState";
-import { SuccessfulMatchReportWrapper, wrappingFailedMatchReport } from "../internal/matchReport/wrappingMatchReport";
+import {
+    SuccessfulMatchReportWrapper,
+    wrappingFailedMatchReport,
+} from "../internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "../Matchers";
 import {
     MatchPrefixResult,
 } from "../MatchPrefixResult";
 import {
-    FailedMatchReport, isSuccessfulMatchReport, MatchExplanationTreeNode,
+    FailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchExplanationTreeNode,
     MatchReport,
     SuccessfulMatchReport,
     toMatchPrefixResult,
 } from "../MatchReport";
-import { isTreePatternMatch, PatternMatch } from "../PatternMatch";
+import {
+    isTreePatternMatch,
+    PatternMatch,
+} from "../PatternMatch";
 import { TreeNodeCompatible } from "../TreeNodeCompatible";
 import { toMatchingLogic } from "./Concat";
 

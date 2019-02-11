@@ -1,5 +1,10 @@
 import { MatchingLogic } from "../../Matchers";
-import { FullMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport, toParseTree } from "../../MatchReport";
+import {
+    FullMatchReport,
+    MatchExplanationTreeNode,
+    SuccessfulMatchReport,
+    toParseTree,
+} from "../../MatchReport";
 import { PatternMatch } from "../../PatternMatch";
 
 export function successfulMatchReport(matcher: MatchingLogic, params: {

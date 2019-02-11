@@ -1,8 +1,16 @@
 import * as assert from "assert";
 import { stringifyTree } from "stringify-tree";
-import { atLeastOne, firstOf, Literal, optional } from "../../lib";
+import {
+    atLeastOne,
+    firstOf,
+    Literal,
+    optional,
+} from "../../lib";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
-import { MatchExplanationTreeNode, toExplanationTree } from "../../lib/MatchReport";
+import {
+    MatchExplanationTreeNode,
+    toExplanationTree,
+} from "../../lib/MatchReport";
 import { microgrammar } from "../../lib/microgrammarConstruction";
 
 describe("Failing matches report useful stuff", () => {

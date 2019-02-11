@@ -5,7 +5,10 @@ import { MatchingLogic } from "./Matchers";
 import {
     MatchPrefixResult,
 } from "./MatchPrefixResult";
-import { MatchReport, toMatchPrefixResult } from "./MatchReport";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "./MatchReport";
 
 /**
  * Match a literal string

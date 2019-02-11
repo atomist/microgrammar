@@ -11,13 +11,20 @@ import {
 import { WhiteSpaceHandler } from "./Config";
 import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
-import { wrappingFailedMatchReport, wrappingMatchReport } from "./internal/matchReport/wrappingMatchReport";
+import {
+    wrappingFailedMatchReport,
+    wrappingMatchReport,
+} from "./internal/matchReport/wrappingMatchReport";
 import { readyToMatch } from "./internal/Whitespace";
 import {
     FailedMatchReport,
-    FullMatchReport, isFailedMatchReport,
-    isSuccessfulMatchReport, MatchExplanationTreeNode, MatchReport,
-    SuccessfulMatchReport, toMatchPrefixResult,
+    FullMatchReport,
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchExplanationTreeNode,
+    MatchReport,
+    SuccessfulMatchReport,
+    toMatchPrefixResult,
 } from "./MatchReport";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 

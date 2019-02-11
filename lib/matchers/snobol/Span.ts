@@ -6,7 +6,8 @@ import {
     MatchPrefixResult,
 } from "../../MatchPrefixResult";
 import {
-    MatchReport, toMatchPrefixResult,
+    MatchReport,
+    toMatchPrefixResult,
 } from "../../MatchReport";
 
 /**

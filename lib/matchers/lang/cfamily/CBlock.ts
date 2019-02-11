@@ -5,7 +5,10 @@ import { MatchingLogic } from "../../../Matchers";
 import {
     MatchPrefixResult,
 } from "../../../MatchPrefixResult";
-import { MatchReport, toMatchPrefixResult } from "../../../MatchReport";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "../../../MatchReport";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";

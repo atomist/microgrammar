@@ -1,7 +1,10 @@
 import { InputState } from "./InputState";
 import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
-import { wrappingFailedMatchReport, wrappingMatchReport } from "./internal/matchReport/wrappingMatchReport";
+import {
+    wrappingFailedMatchReport,
+    wrappingMatchReport,
+} from "./internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
@@ -10,8 +13,12 @@ import {
 } from "./MatchPrefixResult";
 import {
     FailedMatchReport,
-    isFailedMatchReport, isSuccessfulMatchReport, MatchExplanationTreeNode,
-    MatchReport, SuccessfulMatchReport, toMatchPrefixResult,
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchExplanationTreeNode,
+    MatchReport,
+    SuccessfulMatchReport,
+    toMatchPrefixResult,
 } from "./MatchReport";
 import {
     PatternMatch,

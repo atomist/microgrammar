@@ -15,7 +15,10 @@ import { DoubleString } from "../lib/matchers/lang/cfamily/States";
 import {
     MatchPrefixResult,
 } from "../lib/MatchPrefixResult";
-import { MatchReport, toMatchPrefixResult } from "../lib/MatchReport";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
 
