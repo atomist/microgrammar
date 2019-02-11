@@ -73,13 +73,13 @@ class TreeMatchReport implements SuccessfulMatchReport {
     public readonly kind = "real";
     public readonly endingOffset: number;
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly children: TreeChild[],
-        private readonly reason: string,
-        private readonly parseNodeName: string,
-        private readonly extraProperties: Record<string, any>,
-        private readonly computeEffects: ComputeEffectsReport[],
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly children: TreeChild[],
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
+                private readonly computeEffects: ComputeEffectsReport[],
     ) {
         this.endingOffset = offset + matched.length;
     }
@@ -227,14 +227,14 @@ class FailedTreeMatchReport implements FailedMatchReport {
     public readonly successful = false;
 
     constructor(public readonly matcher: MatchingLogic,
-        public readonly matched: string,
-        public readonly offset: number,
-        private readonly successfulChildren: TreeChild[],
-        private readonly failedChild: { name: string, matchReport: FailedMatchReport },
-        private readonly reason: string,
-        private readonly parseNodeName: string,
-        private readonly extraProperties: Record<string, any>,
-        private readonly computeEffects: ComputeEffectsReport[],
+                public readonly matched: string,
+                public readonly offset: number,
+                private readonly successfulChildren: TreeChild[],
+                private readonly failedChild: { name: string, matchReport: FailedMatchReport },
+                private readonly reason: string,
+                private readonly parseNodeName: string,
+                private readonly extraProperties: Record<string, any>,
+                private readonly computeEffects: ComputeEffectsReport[],
 
     ) {
     }
@@ -270,9 +270,9 @@ function wrapChild(matcher: MatchingLogic, child: TreeChild, alteringComputation
 
 class OverridingMatchReport extends SuccessfulMatchReportWrapper {
     constructor(matcher: MatchingLogic,
-        parseNodeName: string,
-        original: SuccessfulMatchReport,
-        private readonly alteringComputations: AlteringComputations,
+                parseNodeName: string,
+                original: SuccessfulMatchReport,
+                private readonly alteringComputations: AlteringComputations,
     ) {
         super(matcher, parseNodeName, original);
     }

@@ -9,9 +9,9 @@ import { stringifyTree } from "stringify-tree";
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
 import {
+    isSuccessfulMatchReport,
     MatchExplanationTreeNode,
     toExplanationTree,
-    isSuccessfulMatchReport,
 } from "../MatchReport";
 import { isPatternMatch } from "../PatternMatch";
 import { Break } from "./Break";
