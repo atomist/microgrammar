@@ -2,7 +2,10 @@ import * as assert from "power-assert";
 import { stringifyTree } from "stringify-tree";
 import { inputStateFromString } from "../../lib/internal/InputStateFactory";
 import { isSuccessfulMatch } from "../../lib/MatchPrefixResult";
-import { isFailedMatchReport, isSuccessfulMatchReport } from "../../lib/MatchReport";
+import {
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+} from "../../lib/MatchReport";
 import { stringifyExplanationTree } from "../../lib/MicrogrammarParseError";
 import { Rep } from "../../lib/Rep";
 import {
