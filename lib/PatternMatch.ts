@@ -29,8 +29,8 @@ export abstract class PatternMatch {
      * @param $offset offset from 0 in input
      */
     constructor(public readonly $matcherId: string,
-        public $matched: string,
-        public readonly $offset: number) {
+                public $matched: string,
+                public readonly $offset: number) {
     }
 
     /**

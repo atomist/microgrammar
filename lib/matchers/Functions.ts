@@ -14,8 +14,8 @@ import {
     toMatchPrefixResult,
 } from "../MatchReport";
 import {
-    PatternMatch,
     isTreePatternMatch,
+    PatternMatch,
 } from "../PatternMatch";
 import { toMatchingLogic } from "./Concat";
 
@@ -50,7 +50,7 @@ class FlatteningMatcher implements MatchingLogic {
 class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
 
     constructor(matcher: MatchingLogic,
-        inner: SuccessfulMatchReport) {
+                inner: SuccessfulMatchReport) {
         super(matcher, "Flatten", inner);
     }
 

@@ -10,6 +10,7 @@ import { FromStringOptions } from "../FromStringOptions";
 import {
     isSuccessfulMatchReport,
 } from "../MatchReport";
+import { MicrogrammarParseError } from "../MicrogrammarParseError";
 import { Break } from "./Break";
 import {
     CompleteFromStringOptions,
@@ -22,7 +23,6 @@ import {
     MicrogrammarSpec,
     specGrammar,
 } from "./SpecGrammar";
-import { MicrogrammarParseError } from "../MicrogrammarParseError";
 
 /**
  * Convenient function to create a microgrammar from a spec within another grammar
@@ -34,7 +34,6 @@ import { MicrogrammarParseError } from "../MicrogrammarParseError";
 export function fromString(spec: string, components: object = {}, options: FromStringOptions = {}): Concat {
     return new MicrogrammarSpecParser().fromString(spec, components, options);
 }
-
 
 /**
  * Parses microgrammars expressed as strings.

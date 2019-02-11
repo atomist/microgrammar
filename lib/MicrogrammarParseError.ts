@@ -1,5 +1,5 @@
-import { MatchExplanationTreeNode } from "./MatchReport";
 import { stringifyTree } from "stringify-tree";
+import { MatchExplanationTreeNode } from "./MatchReport";
 
 export class MicrogrammarParseError extends Error {
 
