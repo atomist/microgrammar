@@ -10,7 +10,7 @@ describe("Elements default to non-greedy any", () => {
         const mg = Microgrammar.fromString("->${fruit}<-");
         const result = mg.exactMatchReport(content);
         if (isSuccessfulMatchReport(result)) {
-            const mmmm = result.toValueStructure() as any;
+            const mmmm = result.toValueStructure();
             assert.strictEqual(mmmm.fruit , "banana");
         } else {
             assert.fail("Didn't match");

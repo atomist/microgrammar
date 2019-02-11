@@ -80,7 +80,7 @@ export class Microgrammar<T> implements Grammar<T> {
      * @return {Updatable<T>}
      */
     public static updatable<T>(matches: Array<T & PatternMatch>,
-        content: string): Updatable<T> {
+                               content: string): Updatable<T> {
         return new Updatable<T>(matches, content);
     }
 
@@ -115,8 +115,8 @@ export class Microgrammar<T> implements Grammar<T> {
      * @return {Microgrammar<T>}
      */
     public static fromString<T = any>(spec: string,
-        components: TermsDefinition<T> = {} as any,
-        options: FromStringOptions = {}): Microgrammar<T> {
+                                      components: TermsDefinition<T> = {} as any,
+                                      options: FromStringOptions = {}): Microgrammar<T> {
         return new Microgrammar<T>(
             new MicrogrammarSpecParser().fromString(spec, components, options));
     }
@@ -131,8 +131,8 @@ export class Microgrammar<T> implements Grammar<T> {
      * @return {Microgrammar<T>}
      */
     public static fromStringAs<T = any>(spec: string,
-        components: TermsDefinition<T> = {} as any,
-        options: FromStringOptions = {}): Microgrammar<AnyKeysOf<T>> {
+                                        components: TermsDefinition<T> = {} as any,
+                                        options: FromStringOptions = {}): Microgrammar<AnyKeysOf<T>> {
         return this.fromString(spec, components, options);
     }
 
@@ -164,9 +164,9 @@ export class Microgrammar<T> implements Grammar<T> {
      * @return {PatternMatch[]}
      */
     public findMatches(input: string | InputStream,
-        parseContext?: {},
-        l?: Listeners,
-        stopAfterMatch: (pm: PatternMatch) => boolean = () => false): Array<T & PatternMatch> {
+                       parseContext?: {},
+                       l?: Listeners,
+                       stopAfterMatch: (pm: PatternMatch) => boolean = () => false): Array<T & PatternMatch> {
         const lm = new LazyMatcher(this.matcher, stopAfterMatch);
         lm.consume(input, parseContext, l);
         return lm.matches as Array<T & PatternMatch>;
@@ -179,7 +179,7 @@ export class Microgrammar<T> implements Grammar<T> {
      * @return {Promise<Array<T & PatternMatch>>}
      */
     public async findMatchesAsync(input: string | InputStream,
-        parseContext?: {}): Promise<Array<T & PatternMatch>> {
+                                  parseContext?: {}): Promise<Array<T & PatternMatch>> {
         const matches = [];
         for (const m of matchesIn(this.matcher, input, parseContext)) {
             matches.push(m);

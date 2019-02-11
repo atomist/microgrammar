@@ -6,11 +6,11 @@ import { Break } from "../../internal/Break";
 import { MatchingLogic } from "../../Matchers";
 
 import { InputState } from "../../InputState";
+import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
 import { MatchPrefixResult } from "../../MatchPrefixResult";
 import { toMatchPrefixResult } from "../../MatchReport";
 import { Literal } from "../../Primitives";
 import { toMatchingLogic } from "../Concat";
-import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
 
 /**
  * Match the rest of the input.

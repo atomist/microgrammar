@@ -19,7 +19,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.a, 24);
             assert.strictEqual(matched.b, 7);
             assert.strictEqual(matched.sum, 24 + 7);
@@ -37,7 +37,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.a, 24);
             assert.strictEqual(matched.b, 7);
             assert.strictEqual(matched.sum, 24 + 7);
@@ -54,7 +54,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.a, 24);
             assert.strictEqual(matched.b, 7);
             assert.strictEqual(matched.sum, 24 + 7);
@@ -73,7 +73,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.a, 24);
             assert.strictEqual(matched.b, 7);
         } else {
@@ -89,7 +89,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("24 7"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.a, 24);
             assert.strictEqual(matched.b, 7);
         } else {
@@ -125,7 +125,7 @@ describe("Context", () => {
         });
         const mr = cc.matchPrefixReport(inputStateFromString("gary 7 35"), {}, {});
         if (isSuccessfulMatchReport(mr)) {
-            const matched = mr.toValueStructure() as any;
+            const matched = mr.toValueStructure();
             assert.strictEqual(matched.promoted, "gary");
         } else {
             assert.fail("Did not match");

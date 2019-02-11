@@ -38,14 +38,14 @@ class FlatteningMatcher implements MatchingLogic {
         if (isSuccessfulMatchReport(r)) {
             return new FlatteningMatchReport(this, r);
         }
-        return wrappingFailedMatchReport(this, { inner: (r as FailedMatchReport), parseNodeName: "Flatten" });
+        return wrappingFailedMatchReport(this, { inner: (r), parseNodeName: "Flatten" });
     }
 }
 
 class FlatteningMatchReport extends SuccessfulMatchReportWrapper {
 
     constructor(matcher: MatchingLogic,
-        inner: SuccessfulMatchReport) {
+                inner: SuccessfulMatchReport) {
         super(matcher, "Flatten", inner);
     }
 

@@ -38,8 +38,8 @@ export class Break implements MatchingLogic {
      * If we see this pattern before, the match breaks.
      */
     constructor(public terminateOn: MatchingLogic,
-        private readonly consumeTerminal: boolean = false,
-        private readonly badMatcher?: MatchingLogic) {
+                private readonly consumeTerminal: boolean = false,
+                private readonly badMatcher?: MatchingLogic) {
     }
 
     get $id() {
@@ -112,10 +112,10 @@ export class Break implements MatchingLogic {
 
 class BreakWithTerminalMatchReport extends SuccessfulMatchReportWrapper {
     constructor(matcher: MatchingLogic,
-        parseNodeName: string,
-        inner: SuccessfulMatchReport,
-        private readonly offsetOverride: number,
-        private readonly matchedOverride: string) {
+                parseNodeName: string,
+                inner: SuccessfulMatchReport,
+                private readonly offsetOverride: number,
+                private readonly matchedOverride: string) {
         super(matcher, parseNodeName, inner);
     }
 

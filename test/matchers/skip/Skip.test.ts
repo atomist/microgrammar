@@ -57,7 +57,7 @@ describe("Skip", () => {
         const m = b.matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             assert.strictEqual(m.matched, "HEY YOU ${thing}");
-            const pm = m.toPatternMatch() as any;
+            const pm = m.toPatternMatch();
             assert.strictEqual(pm.name, "thing",
                 "Couldn't find name property: Structure was " + JSON.stringify(pm, null, 2));
         } else {

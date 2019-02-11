@@ -44,7 +44,7 @@ export function isFailedMatchReport(fmr: FullMatchReport | MatchReport): fmr is 
  * structures are different. So, let's output one structure that can
  * be turned into any of them.
  */
-export type MatchReport = FullMatchReport
+export type MatchReport = FullMatchReport;
 
 export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
     PatternMatch & T | DismatchReport {

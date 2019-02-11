@@ -67,7 +67,7 @@ export class Opt implements MatchingLogic {
         }
         return new WrappingEmptyMatchReport(this,
             this.parseNodeName,
-            (maybe as FailedMatchReport), // shim: someday there will be only the two
+            (maybe), // shim: someday there will be only the two
         );
     }
 }
@@ -80,8 +80,8 @@ class WrappingEmptyMatchReport implements SuccessfulMatchReport {
     public readonly endingOffset: number;
 
     constructor(public readonly matcher: MatchingLogic,
-        private readonly parseNodeName: string,
-        private readonly inner: FailedMatchReport) {
+                private readonly parseNodeName: string,
+                private readonly inner: FailedMatchReport) {
         this.offset = inner.offset;
         this.endingOffset = inner.offset;
     }
@@ -211,8 +211,8 @@ class WhenMatcher implements MatchingLogic {
     public readonly $id: string;
 
     constructor(public readonly inner: MatchingLogic,
-        public readonly matchTest: (pm: PatternMatch) => boolean,
-        public readonly inputStateTest: (is: InputState) => boolean) {
+                public readonly matchTest: (pm: PatternMatch) => boolean,
+                public readonly inputStateTest: (is: InputState) => boolean) {
         this.$id = `When[${inner.$id}]`;
         this.canStartWith = inner.canStartWith;
     }
@@ -230,7 +230,7 @@ class WhenMatcher implements MatchingLogic {
         if (!isSuccessfulMatchReport(result)) {
             return wrappingFailedMatchReport(this, {
                 offset: is.offset,
-                inner: result as FailedMatchReport, // shim
+                inner: result, // shim
             });
         }
         if (!this.matchTest(result.toPatternMatch())) {

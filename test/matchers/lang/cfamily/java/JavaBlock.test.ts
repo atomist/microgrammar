@@ -72,7 +72,7 @@ describe("JavaBlock", () => {
         const m: any = javaBlockContaining(inner.matcher).matchPrefixReport(is, {}, {});
         if (isSuccessfulMatchReport(m)) {
             assert.strictEqual(m.matched , balanced);
-            const mmmm = m.toPatternMatch() as any;
+            const mmmm = m.toPatternMatch();
             assert.strictEqual(mmmm.block.left , "x");
             assert.strictEqual(mmmm.block.$valueMatches.left.$offset , 2);
             assert.strictEqual(mmmm.block.right , "y");

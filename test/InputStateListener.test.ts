@@ -4,6 +4,8 @@ import {
     InputState,
     InputStateListener,
 } from "../lib/InputState";
+import { failedMatchReport } from "../lib/internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "../lib/internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../lib/Matchers";
 import { CFamilyLangHelper } from "../lib/matchers/lang/cfamily/CFamilyLangHelper";
 import { CFamilyStateMachine } from "../lib/matchers/lang/cfamily/CFamilyStateMachine";
@@ -16,8 +18,6 @@ import {
 import { MatchReport, toMatchPrefixResult } from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
-import { successfulMatchReport } from "../lib/internal/matchReport/terminalMatchReport";
-import { failedMatchReport } from "../lib/internal/matchReport/failedMatchReport";
 
 describe("InputStateListener", () => {
 

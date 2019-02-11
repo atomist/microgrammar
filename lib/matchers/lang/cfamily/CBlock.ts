@@ -1,5 +1,6 @@
 import { InputState } from "../../../InputState";
 import { inputStateFromString } from "../../../internal/InputStateFactory";
+import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../../../Matchers";
 import {
     MatchPrefixResult,
@@ -8,7 +9,6 @@ import { MatchReport, toMatchPrefixResult } from "../../../MatchReport";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";
-import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 
 /**
  * The rest of a C family block, going to a matching depth of +1 curlies or braces.
@@ -23,8 +23,8 @@ export class CBlock implements MatchingLogic {
     private readonly pop: string;
 
     constructor(private readonly stateMachineFactory: () => LangStateMachine,
-        kind: "block" | "parens",
-        private readonly inner?: MatchingLogic) {
+                kind: "block" | "parens",
+                private readonly inner?: MatchingLogic) {
         switch (kind) {
             case "block":
                 [this.push, this.pop] = ["{", "}"];
@@ -93,7 +93,7 @@ export function block(stateMachineFactory: () => LangStateMachine) {
 }
 
 export function blockContaining(m: MatchingLogic,
-    stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
+                                stateMachineFactory: () => LangStateMachine = () => new CFamilyStateMachine()) {
     return Concat.of({
         $id: "{...}",
         _lp: "{",

@@ -38,17 +38,16 @@ export class MatchFailureReport implements MatchPrefixResult {
     }
 
     public constructor(public readonly $matcherId: string,
-        public readonly $offset: number,
-        public readonly $matched: string,
-        public readonly cause?: string,
-        public readonly children?: MatchFailureReport[]) {
+                       public readonly $offset: number,
+                       public readonly $matched: string,
+                       public readonly cause?: string,
+                       public readonly children?: MatchFailureReport[]) {
     }
 
     get description(): string {
         return `Match failed on ${this.$matcherId}: ${this.cause}`;
     }
 }
-
 
 export function isSuccessfulMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
     return mpr && (mpr as PatternMatch).$value !== undefined && !!(mpr as PatternMatch).matchedStructure;

@@ -1,9 +1,9 @@
 import assert = require("power-assert");
 import { inputStateFromString } from "../lib/internal/InputStateFactory";
 import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 import { PatternMatch } from "../lib/PatternMatch";
 import { LowercaseBoolean } from "../lib/Primitives";
-import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("LowercaseBoolean", () => {
 

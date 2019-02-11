@@ -119,7 +119,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
 
                     console.log("JESS: not-real failure report from " + this.matcher.$id);
                 }
-                failedMatchReport = { kind: "rep", inner: report as FailedMatchReport };
+                failedMatchReport = { kind: "rep", inner: report };
                 break;
             } else {
                 if (report.matched === "") {
@@ -139,7 +139,7 @@ export class Repetition implements MatchingLogic, WhiteSpaceHandler {
                     if (!isFailedMatchReport(sepMatchReport)) {
                         console.log("JESS: not-real failure report from " + this.matcher.$id);
                     }
-                    failedMatchReport = { kind: "sep", inner: sepMatchReport as FailedMatchReport };
+                    failedMatchReport = { kind: "sep", inner: sepMatchReport };
                     break;
                 } else {
                     // successful
@@ -216,7 +216,7 @@ class SuccessfulRepMatchReport implements SuccessfulMatchReport {
         };
     }
 
-    private innerMatchReports = (): FullMatchReport[] => {
+    private readonly innerMatchReports = (): FullMatchReport[] => {
         return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
     }
 }
@@ -273,7 +273,7 @@ class FailedRepMatchReport implements FailedMatchReport {
         };
     }
 
-    private innerMatchReports = (): FullMatchReport[] => {
+    private readonly innerMatchReports = (): FullMatchReport[] => {
         return wrapMatchReports(this.matcher, this.successfulMatchReports, this.innerFailedMatchReport);
     }
 }

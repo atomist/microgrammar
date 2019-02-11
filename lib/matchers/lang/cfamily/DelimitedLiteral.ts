@@ -1,4 +1,6 @@
 import { InputState } from "../../../InputState";
+import { failedMatchReport } from "../../../internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../../../Matchers";
 import {
     MatchPrefixResult,
@@ -12,8 +14,6 @@ import {
     EscapeNextCharacter,
     Normal,
 } from "./States";
-import { failedMatchReport } from "../../../internal/matchReport/failedMatchReport";
-import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 
 // TODO: pass in an inner matcher, support nesting
 export class DelimitedLiteral implements MatchingLogic {
@@ -22,7 +22,7 @@ export class DelimitedLiteral implements MatchingLogic {
     public readonly parseNodeName = "DelimitedLiteral";
 
     constructor(public readonly delimiter: string,
-        public readonly escapeChar: string = "\\",
+                public readonly escapeChar: string = "\\",
     ) {
         if (delimiter.length !== 1) {
             throw new Error("That is not gonna work. Delimiters are 1 char");
@@ -76,8 +76,8 @@ const Done = new LangState("DONE", false, false);
 class DelimiterWithEscapeChar extends LangStateMachine {
 
     constructor(public readonly endChar: string,
-        public readonly escapeChar: string,
-        state: LangState = Normal) {
+                public readonly escapeChar: string,
+                state: LangState = Normal) {
         super(state);
     }
 

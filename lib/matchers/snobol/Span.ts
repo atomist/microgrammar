@@ -1,4 +1,6 @@
 import { InputState } from "../../InputState";
+import { failedMatchReport } from "../../internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../../Matchers";
 import {
     MatchPrefixResult,
@@ -6,8 +8,6 @@ import {
 import {
     MatchReport, toMatchPrefixResult,
 } from "../../MatchReport";
-import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
-import { failedMatchReport } from "../../internal/matchReport/failedMatchReport";
 
 /**
  * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
