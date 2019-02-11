@@ -11,7 +11,7 @@ import {
 import {
     FailedMatchReport,
     isFailedMatchReport, isSuccessfulMatchReport, MatchExplanationTreeNode,
-    MatchReport, matchReportFromFailureReport, SuccessfulMatchReport, toMatchPrefixResult,
+    MatchReport, SuccessfulMatchReport, toMatchPrefixResult,
 } from "./MatchReport";
 import {
     PatternMatch,
@@ -223,30 +223,25 @@ class WhenMatcher implements MatchingLogic {
 
     public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (!this.inputStateTest(is)) {
-            return matchReportFromFailureReport(this, MatchFailureReport.from({
-                $matcherId: this.$id,
-                $offset: is.offset,
-                cause: "Input state test returned false",
-            }));
+            return failedMatchReport(this, {
+                parseNodeName: "When",
+                offset: is.offset,
+                reason: "Input state test returned false",
+            });
         }
         const result = this.inner.matchPrefixReport(is, thisMatchContext, parseContext);
-        const resultMpr = toMatchPrefixResult(result); // shim
         if (!isSuccessfulMatchReport(result)) {
-            return matchReportFromFailureReport(this, MatchFailureReport.from({
-                $matcherId: this.$id,
-                $offset: is.offset,
-                children: [resultMpr],
-                cause: (resultMpr as MatchFailureReport).description,
-            }));
+            return wrappingFailedMatchReport(this, {
+                offset: is.offset,
+                inner: result as FailedMatchReport, // shim
+            });
         }
         if (!this.matchTest(result.toPatternMatch())) {
-            return matchReportFromFailureReport(this, MatchFailureReport.from({
-                $matcherId: this.$id,
-                $offset: is.offset,
-                $matched: result.matched,
-                children: [resultMpr],
-                cause: "Match test returned false",
-            }));
+            return wrappingFailedMatchReport(this, {
+                offset: is.offset,
+                inner: result,
+                reason: "Match test returned false",
+            });
         }
         return successfulMatchReport(this, {
             matched: result.matched, offset: result.offset,

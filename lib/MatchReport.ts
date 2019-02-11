@@ -177,57 +177,6 @@ export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
     }
 }
 
-/**
- * Current Cases
- */
-export function matchReportFromError(matcher: MatchingLogic, description: string): MatchReport {
-    const mr: MatchReport = {
-        matcher,
-        kind: "wrappedDismatchReport",
-        dismatchReport: {
-            description,
-        },
-        successful: false,
-    };
-    return mr;
-}
-
-export function matchReportFromPatternMatch(matcher: MatchingLogic, pm: PatternMatch,
-    opts: { offset?: number } = {},
-    // because in a break, the outer match stores this differently than the PatternMatch
-): MatchReport {
-    if (!pm.$value) {
-        throw new Error("You can't have a pattern match without a $value");
-    }
-    const mr: MatchReport = {
-        matcher,
-        kind: "wrappedPatternMatch",
-        patternMatch: pm,
-        matched: pm.$matched,
-        successful: true,
-        toPatternMatch() { return pm; },
-        toValueStructure() { return pm.matchedStructure(); },
-    };
-    return mr;
-}
-
-// replace: matchReportFromFailureReport(MatchFailureReport.from
-export function matchReportFromFailureReport(matcher: MatchingLogic, mfr: MatchFailureReport): MatchReport {
-    const mr: MatchReport = {
-        matcher,
-        kind: "wrappedMatchFailureReport",
-        matchFailureReport: mfr,
-        successful: false,
-        toExplanationTree() {
-            return {
-                $name: matcher.$id,
-                reason: mfr.description,
-                $children: [],
-            };
-        },
-    } as MatchReport;
-    return mr;
-}
 
 // I'm implementing terminal first
 export function matchReportFromSuccessfulTreeMatch(matcher: MatchingLogic, sm: SuccessfulMatch): MatchReport {

@@ -15,10 +15,12 @@ import {
     MatchPrefixResult,
     matchPrefixSuccess,
 } from "../lib/MatchPrefixResult";
-import { MatchReport, matchReportFromFailureReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../lib/MatchReport";
+import { MatchReport, toMatchPrefixResult } from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
 import { TerminalPatternMatch } from "../lib/PatternMatch";
+import { successfulMatchReport } from "../lib/internal/matchReport/terminalMatchReport";
+import { failedMatchReport } from "../lib/internal/matchReport/failedMatchReport";
 
 describe("InputStateListener", () => {
 
@@ -49,9 +51,14 @@ describe("InputStateListener", () => {
             public matchPrefixReport(is: InputState, mc, parseContext): MatchReport {
                 const l = is.listeners.l as Listener;
                 if (is.peek(1) === "{" && l.seen.match(/\$$/)) {
-                    return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch("mc", "{", is.offset, "{")));
+                    return successfulMatchReport(this, { parseNodeName: "MatchCurly", matched: "{", offset: is.offset });
                 }
-                return matchReportFromFailureReport(this, new MatchFailureReport("id", is.offset, "", "wrong"));
+                return failedMatchReport(this, {
+                    parseNodeName: "MatchCurly",
+                    offset: is.offset,
+                    matched: "",
+                    reason: "No curly",
+                });
             }
         }
         const m = Microgrammar.fromDefinitions({
@@ -74,10 +81,9 @@ describe("InputStateListener", () => {
             public matchPrefixReport(is: InputState, mc, parseContext): MatchReport {
                 const mpl = is.listeners.l as CFamilyStateMachine;
                 if (is.peek(1) === "@" && mpl.state !== DoubleString) {
-                    return matchReportFromSuccessfulMatch(this,
-                        matchPrefixSuccess(new TerminalPatternMatch("mc", "@", is.offset, "@")));
+                    return successfulMatchReport(this, { matched: "@", offset: is.offset });
                 }
-                return matchReportFromFailureReport(this, new MatchFailureReport("id", is.offset, "", "wrong"));
+                return failedMatchReport(this, { offset: is.offset, reason: "wrong" });
             }
         }
 
