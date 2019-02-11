@@ -11,14 +11,11 @@ import { JavaBlock } from "../lib/matchers/lang/cfamily/java/JavaBody";
 import { NestingDepthStateMachine } from "../lib/matchers/lang/cfamily/NestingDepthStateMachine";
 import { DoubleString } from "../lib/matchers/lang/cfamily/States";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../lib/MatchPrefixResult";
 import { MatchReport, toMatchPrefixResult } from "../lib/MatchReport";
 import { Microgrammar } from "../lib/Microgrammar";
 import { when } from "../lib/Ops";
-import { TerminalPatternMatch } from "../lib/PatternMatch";
 import { successfulMatchReport } from "../lib/internal/matchReport/terminalMatchReport";
 import { failedMatchReport } from "../lib/internal/matchReport/failedMatchReport";
 

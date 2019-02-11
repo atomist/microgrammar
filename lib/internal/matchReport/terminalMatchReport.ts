@@ -1,22 +1,6 @@
 import { MatchingLogic } from "../../Matchers";
-import { SuccessfulMatch } from "../../MatchPrefixResult";
 import { FullMatchReport, MatchExplanationTreeNode, SuccessfulMatchReport, toParseTree } from "../../MatchReport";
 import { PatternMatch } from "../../PatternMatch";
-
-// replace:  matchReportFromSuccessfulMatch(matchPrefixSuccess
-export function matchReportFromSuccessfulMatch(matcher: MatchingLogic, sm: SuccessfulMatch): FullMatchReport {
-    // const mr: MatchReport = {
-    //     matcher,
-    //     kind: "wrappedSuccessfulMatch",
-    //     successfulMatch: sm,
-    // };
-    return successfulMatchReport(matcher, {
-        matched: sm.$matched,
-        offset: sm.$offset,
-        valueRepresented: { value: sm.$value },
-        parseNodeName: matcher.$id,
-    });
-}
 
 export function successfulMatchReport(matcher: MatchingLogic, params: {
     matched: string,

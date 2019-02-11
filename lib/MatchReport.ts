@@ -1,9 +1,8 @@
 import { MatchingLogic } from "./Matchers";
-import { MatchFailureReport, MatchPrefixResult, SuccessfulMatch } from "./MatchPrefixResult";
+import { MatchFailureReport, MatchPrefixResult } from "./MatchPrefixResult";
 import { DismatchReport, PatternMatch } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
-export { matchReportFromSuccessfulMatch } from "./internal/matchReport/terminalMatchReport";
 export type FullMatchReport = FailedMatchReport | SuccessfulMatchReport;
 
 export interface FailedMatchReport {
@@ -117,16 +116,12 @@ export function toValueStructure<T = any>(mr: MatchReport): T {
     }
 }
 
-// shim
 export function toMatchPrefixResult(mr: MatchReport): MatchPrefixResult {
     if (isSuccessfulMatchReport(mr)) {
         return mr.toPatternMatch();
-    } else if (isFailedMatchReport(mr)) {
-        return new MatchFailureReport(mr.matcher.$id,
-            mr.offset,
-            mr.matched,
-            mr.description);
-    } else {
-        throw new Error("Unhandled");
     }
+    return new MatchFailureReport(mr.matcher.$id,
+        mr.offset,
+        mr.matched,
+        mr.description);
 }

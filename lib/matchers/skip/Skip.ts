@@ -6,11 +6,11 @@ import { Break } from "../../internal/Break";
 import { MatchingLogic } from "../../Matchers";
 
 import { InputState } from "../../InputState";
-import { MatchPrefixResult, matchPrefixSuccess } from "../../MatchPrefixResult";
-import { matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../../MatchReport";
-import { TerminalPatternMatch } from "../../PatternMatch";
+import { MatchPrefixResult } from "../../MatchPrefixResult";
+import { toMatchPrefixResult } from "../../MatchReport";
 import { Literal } from "../../Primitives";
 import { toMatchingLogic } from "../Concat";
+import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
 
 /**
  * Match the rest of the input.
@@ -28,10 +28,12 @@ export const RestOfInput: MatchingLogic = {
 };
 
 function restOfInputMatchPrefixReport(is: InputState) {
-    const consumed = is.skipWhile(s => true, 1);
-    return matchReportFromSuccessfulMatch(RestOfInput, matchPrefixSuccess(
-        // tslint:disable:no-invalid-this
-        new TerminalPatternMatch("RestOfInput", consumed.skipped, is.offset, consumed.skipped)));
+    const consumed = is.skipWhile(() => true, 1);
+    return successfulMatchReport(RestOfInput, {
+        parseNodeName: "RestOfInput",
+        matched: consumed.skipped,
+        offset: is.offset,
+    });
 }
 
 /**

@@ -3,12 +3,9 @@ import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
 import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "./MatchPrefixResult";
 import { MatchReport, toMatchPrefixResult } from "./MatchReport";
-import { TerminalPatternMatch } from "./PatternMatch";
 
 /**
  * Match a literal string

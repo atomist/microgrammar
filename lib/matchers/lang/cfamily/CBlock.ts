@@ -3,13 +3,12 @@ import { inputStateFromString } from "../../../internal/InputStateFactory";
 import { MatchingLogic } from "../../../Matchers";
 import {
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
-import { MatchReport, matchReportFromSuccessfulMatch, toMatchPrefixResult } from "../../../MatchReport";
-import { TerminalPatternMatch } from "../../../PatternMatch";
+import { MatchReport, toMatchPrefixResult } from "../../../MatchReport";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";
+import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 
 /**
  * The rest of a C family block, going to a matching depth of +1 curlies or braces.
@@ -68,11 +67,11 @@ export class CBlock implements MatchingLogic {
             }
         }
         if (!this.inner) {
-            return matchReportFromSuccessfulMatch(this, matchPrefixSuccess(new TerminalPatternMatch(
-                this.$id,
+            return successfulMatchReport(this, {
+                parseNodeName: "CBlock",
                 matched,
-                is.offset,
-                matched)));
+                offset: is.offset,
+            });
         }
 
         // We supply the offset to preserve it in this match
