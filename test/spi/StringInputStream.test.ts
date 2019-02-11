@@ -12,10 +12,10 @@ describe("StringInputStream", () => {
     it("works with 1 character", () => {
         const si = new StringInputStream("a");
         assert(!si.exhausted());
-        assert(si.offset === 0);
+        assert.strictEqual(si.offset , 0);
         const read = si.read(10);
-        assert(read === "a");
-        assert(si.offset === 1);
+        assert.strictEqual(read , "a");
+        assert.strictEqual(si.offset , 1);
         assert(si.exhausted());
     });
 

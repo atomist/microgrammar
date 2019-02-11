@@ -8,14 +8,14 @@ describe("canonicalize", () => {
         const src =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("should strip out syntactically unnecessary whitespace: space in {}", () => {
         const src =
             `public class Foo { }`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === `public class Foo{}`);
+        assert.strictEqual(stripped , `public class Foo{}`);
     });
 
     it("should strip out comments and whitespace", () => {
@@ -30,7 +30,7 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("should strip out multiple comments and whitespace", () => {
@@ -48,7 +48,7 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("should strip out multiple multiple comments and whitespace", () => {
@@ -68,7 +68,7 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{int i;}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("should strip out multiple multiple comments and whitespace without space before //", () => {
@@ -88,7 +88,7 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{int i;}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("should strip out multiple multiple comments and whitespace without space before /*", () => {
@@ -108,7 +108,7 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{int i;}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("ignore /* within //", () => {
@@ -128,21 +128,21 @@ describe("canonicalize", () => {
         const expected =
             `public class Foo{int i;}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === expected);
+        assert.strictEqual(stripped , expected);
     });
 
     it("don't strip whitespace inside strings", () => {
         const src =
             `public class Foo{private String="xxx    \t x";}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("isn't fooled by apparent comments within strings", () => {
         const src =
             `public class Foo{private String="xxx       \n\n  // \teiwuiurwieuriwuer /* */   \t x";}`;
         const stripped = new CFamilyLangHelper().canonicalize(src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
 });

@@ -23,6 +23,7 @@ export interface MatchPrefixResult {
 }
 
 export class MatchFailureReport implements MatchPrefixResult {
+    // todo: simplify. include explanationTree
 
     public static from(params: {
         $matcherId: string,
@@ -48,35 +49,6 @@ export class MatchFailureReport implements MatchPrefixResult {
     }
 }
 
-/**
- * Holds a PatternMatch in the event of success.
- * If this contains a context, then the parent matcher can use that to populate its own;
- * otherwise, it can use the value of the match
- */
-export class SuccessfulMatch implements MatchPrefixResult {
-
-    public constructor(public readonly match: PatternMatch,
-                       public readonly capturedStructure?: {}) {
-        if (match === undefined) {
-            throw new Error("You can't be successful with an undefined match");
-        }
-    }
-
-    get $offset() { return this.match.$offset; }
-
-    get $matcherId() { return this.match.$matcherId; }
-
-    get $matched() {
-        return this.match.$matched;
-    } // convenience
-
-    get $value() { return this.match.$value; } // convenience
-}
-
-export function matchPrefixSuccess(match: PatternMatch, context?: {}): MatchPrefixResult {
-    return new SuccessfulMatch(match, context);
-}
-
-export function isSuccessfulMatch(mpr: MatchPrefixResult): mpr is SuccessfulMatch {
-    return mpr && (mpr as SuccessfulMatch).match !== undefined;
+export function isSuccessfulMatch(mpr: MatchPrefixResult): mpr is PatternMatch {
+    return mpr && (mpr as PatternMatch).$value !== undefined && !!(mpr as PatternMatch).matchedStructure;
 }

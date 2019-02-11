@@ -11,6 +11,7 @@ import {
     yadaYadaThenThisButNotThat,
 } from "../../../lib/matchers/skip/Skip";
 import { isSuccessfulMatch } from "../../../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../../../lib/MatchReport";
 
 describe("Skip", () => {
 
@@ -23,9 +24,9 @@ describe("Skip", () => {
     it("yada yada is acceptable", () => {
         const m = desirable.firstMatch("bad pig whatever the hell spa and then happiness , perhaps") as any;
         assert(m);
-        assert(m.beast === "pig");
-        assert(m.activity === "spa");
-        assert(m.last === "happiness");
+        assert.strictEqual(m.beast, "pig");
+        assert.strictEqual(m.activity, "spa");
+        assert.strictEqual(m.last, "happiness");
     });
 
     it("yada yada is unacceptable", () => {
@@ -36,13 +37,13 @@ describe("Skip", () => {
     it("rest of line to end of line", () => {
         const input = "The quick brown\nfox jumps over\nthe lazy dog";
         const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}, {});
-        assert(isSuccessfulMatch(pm) && pm.$matched === "The quick brown");
+        assert.strictEqual(isSuccessfulMatch(pm) && pm.$matched, "The quick brown");
     });
 
     it("rest of line consumes remaining input", () => {
         const input = "The quick brown fox jumps over the lazy dog";
         const pm = RestOfLine.matchPrefix(inputStateFromString(input), {}, {});
-        assert(isSuccessfulMatch(pm) && pm.$matched === input);
+        assert.strictEqual(isSuccessfulMatch(pm) && pm.$matched, input);
     });
 
     it("skipTo jumps to complicated matcher and preserves structure", () => {
@@ -53,11 +54,12 @@ describe("Skip", () => {
             _end: "}",
         });
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "HEY YOU ${thing}");
-            assert(mmmm.name === "thing", "Couldn't find name property: Structure was " + JSON.stringify(mmmm));
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ${thing}");
+            const pm = m.toPatternMatch<any>();
+            assert.strictEqual(pm.name, "thing",
+                "Couldn't find name property: Structure was " + JSON.stringify(pm, null, 2));
         } else {
             assert.fail("Didn't match:" + JSON.stringify(m));
         }

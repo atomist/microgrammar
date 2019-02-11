@@ -37,8 +37,8 @@ describe("MicrogrammarFromString", () => {
         const mg = Microgrammar.fromString("foo");
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
-        assert(result[0].$matched === "foo");
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].$matched, "foo");
     });
 
     it("XML element", () => {
@@ -48,9 +48,9 @@ describe("MicrogrammarFromString", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.name === "foo");
+        assert.strictEqual(r0.name, "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
@@ -60,13 +60,13 @@ describe("MicrogrammarFromString", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 2);
+        assert.strictEqual(result.length, 2);
         const r0 = result[0] as any;
-        assert(r0.name === first);
+        assert.strictEqual(r0.name, first);
         // expect(r0.matched).to.equal("<foo>")
         const r1 = result[1] as any;
-        assert(r1.name === second);
-        assert(r1.$matched === "<bar>");
+        assert.strictEqual(r1.name, second);
+        assert.strictEqual(r1.$matched, "<bar>");
         // expect(r1.name.matched).to.equal("bar");
     }
 
@@ -106,10 +106,10 @@ describe("MicrogrammarFromString", () => {
         });
         const result = mg.findMatches(content);
         // console.log("xxx Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.$matched === content);
-        assert(r0.first.namex === "first");
+        assert.strictEqual(r0.$matched, content);
+        assert.strictEqual(r0.first.namex, "first");
 
     });
 
@@ -119,8 +119,8 @@ describe("MicrogrammarFromString", () => {
             namex: /[a-zA-Z0-9]+/,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].namex === "first");
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].namex, "first");
     });
 
     it("2 elements: whitespace sensitive: match", () => {
@@ -130,7 +130,7 @@ describe("MicrogrammarFromString", () => {
             namex: /[a-zA-Z0-9]+/,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 0);
+        assert.strictEqual(result.length, 0);
     });
 
     it("2 elements: whitespace sensitive: no match", () => {
@@ -140,7 +140,7 @@ describe("MicrogrammarFromString", () => {
             namex: /[a-zA-Z0-9]+/,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 0);
+        assert.strictEqual(result.length, 0);
     });
 
     it("2 elements: whitespace sensitive: match with return", () => {
@@ -149,7 +149,7 @@ describe("MicrogrammarFromString", () => {
             namex: /[a-zA-Z0-9]+/,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
     });
 
     it("stop after match", () => {
@@ -161,15 +161,15 @@ describe("MicrogrammarFromString", () => {
             name: /[A-Z][a-z]+/,
         });
         const result = mg.findMatches("Greg Tony");
-        assert(result.length === 2);
-        assert(result[0].name === "Greg");
-        assert(result[1].name === "Tony");
+        assert.strictEqual(result.length, 2);
+        assert.strictEqual(result[0].name, "Greg");
+        assert.strictEqual(result[1].name, "Tony");
         const result2 = mg.findMatches("David Theresa", {}, {}, pm => true);
-        assert(result2.length === 1);
-        assert(result2[0].name === "David");
+        assert.strictEqual(result2.length, 1);
+        assert.strictEqual(result2[0].name, "David");
         const result3 = mg.firstMatch("Gough Malcolm");
-        assert(result3.name === "Gough");
-        assert(result3.$offset === 0);
+        assert.strictEqual(result3.name, "Gough");
+        assert.strictEqual(result3.$offset, 0);
     });
 
     it("1 XML elements via nested microgrammar with optional present", () => {
@@ -185,10 +185,10 @@ describe("MicrogrammarFromString", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.first.name === "first");
-        assert(r0.second.name === "second");
+        assert.strictEqual(r0.first.name, "first");
+        assert.strictEqual(r0.second.name, "second");
     });
 
     it("1 XML elements via nested microgrammar with optional not present", () => {
@@ -203,12 +203,12 @@ describe("MicrogrammarFromString", () => {
             second: new Opt(element),
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
         assert(isPatternMatch(r0));
-        assert(r0.$matched === content);
-        assert(r0.first.$matched === "<first>");
-        assert(r0.second === undefined);
+        assert.strictEqual(r0.$matched, content);
+        assert.strictEqual(r0.first.$matched, "<first>");
+        assert.strictEqual(r0.second, undefined);
     });
 
     it("2 XML elements via nested microgrammar with whitespace", () => {
@@ -225,10 +225,10 @@ describe("MicrogrammarFromString", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.first.name === "first");
-        assert(r0.second.name === "second");
+        assert.strictEqual(r0.first.name, "first");
+        assert.strictEqual(r0.second.name, "second");
     });
 
     const versionString = "<version>${version}</version>";
@@ -251,36 +251,36 @@ describe("MicrogrammarFromString", () => {
     it("parse dependencies in real world POM", () => {
         const matches = dependencyGrammar().findMatches(RealWorldPom) as any as VersionedArtifact[];
         assert(matches.length > 0);
-        assert(matches[0].group === "com.krakow");
-        assert(matches[0].artifact === "lib1");
-        assert(matches[0].version === "0.1.1");
+        assert.strictEqual(matches[0].group, "com.krakow");
+        assert.strictEqual(matches[0].artifact, "lib1");
+        assert.strictEqual(matches[0].version, "0.1.1");
     });
 
     it("parse dependencies in ill formed POM", () => {
         const matches =
             dependencyGrammar().findMatches("<this is a load of bollocks") as any as VersionedArtifact[];
-        assert(matches.length === 0);
+        assert.strictEqual(matches.length, 0);
     });
 
     it("parse plugins in real world POM", () => {
         const matches = PLUGIN_GRAMMAR.findMatches(RealWorldPom) as any as VersionedArtifact[];
         assert(matches.length > 0);
-        assert(matches[0].group === "org.apache.maven.plugins");
-        assert(matches[0].artifact === "maven-surefire-plugin");
-        assert(matches[0].version === "2.19.1");
+        assert.strictEqual(matches[0].group, "org.apache.maven.plugins");
+        assert.strictEqual(matches[0].artifact, "maven-surefire-plugin");
+        assert.strictEqual(matches[0].version, "2.19.1");
     });
 
     it("parse plugins without version in real world POM", () => {
         const matches = ALL_PLUGIN_GRAMMAR.findMatches(RealWorldPom) as any as VersionedArtifact[];
         assert(matches.length > 0);
-        assert(matches[0].group === "org.springframework.boot");
-        assert(matches[0].artifact === "spring-boot-maven-plugin");
+        assert.strictEqual(matches[0].group, "org.springframework.boot");
+        assert.strictEqual(matches[0].artifact, "spring-boot-maven-plugin");
     });
 
     it("find version of real world POM", () => {
         const matches = ARTIFACT_VERSION_GRAMMAR.findMatches(RealWorldPom) as any as VersionedArtifact[];
         assert(matches.length > 0);
-        assert(matches[0].version === "0.1.0-SNAPSHOT");
+        assert.strictEqual(matches[0].version, "0.1.0-SNAPSHOT");
     });
 
     function namesGrammar() {
@@ -293,14 +293,14 @@ describe("MicrogrammarFromString", () => {
 
     it("extract empty rep structure", () => {
         const matches = namesGrammar().findMatches("****") as any[];
-        assert(matches.length === 1);
-        assert(matches[0].dogs.length === 0);
-        assert(matches[0].cats.length === 0);
+        assert.strictEqual(matches.length, 1);
+        assert.strictEqual(matches[0].dogs.length, 0);
+        assert.strictEqual(matches[0].cats.length, 0);
     });
 
     it("extract non-empty rep structure", () => {
         const matches = namesGrammar().findMatches("Fido **** Felix, Oscar") as any[];
-        assert(matches.length === 1);
+        assert.strictEqual(matches.length, 1);
         assert.deepEqual(matches[0].dogs, ["Fido"]);
         assert.deepEqual(matches[0].cats, ["Felix", "Oscar"]);
     });
@@ -311,9 +311,9 @@ describe("MicrogrammarFromString", () => {
             currency: /[A-Z]{3}/,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.currency === "AUD");
+        assert.strictEqual(r0.currency, "AUD");
     });
 
     it("uses dictionary in long sentence", () => {
@@ -324,9 +324,9 @@ describe("MicrogrammarFromString", () => {
         const content = "The recent movement in the AUD has gained you $762.49";
         const mg = Microgrammar.fromString<any>("The recent movement in the ${currency} has gained you $${amount}", dictionary);
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].currency === "AUD");
-        assert(result[0].amount === 762.49);
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].currency, "AUD");
+        assert.strictEqual(result[0].amount, 762.49);
     });
 
 });

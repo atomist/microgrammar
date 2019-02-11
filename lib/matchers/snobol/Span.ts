@@ -1,11 +1,14 @@
 import { InputState } from "../../InputState";
+import { failedMatchReport } from "../../internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "../../internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../../Matchers";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../../MatchPrefixResult";
-import { TerminalPatternMatch } from "../../PatternMatch";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "../../MatchReport";
 
 /**
  * Inspired by Snobol SPAN: http://www.snobol4.org/docs/burks/tutorial/ch4.htm
@@ -21,7 +24,12 @@ export class Span implements MatchingLogic {
         return `Span[${this.characters}]`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         let currentIs = is;
         let matched = "";
         while (!currentIs.exhausted() && this.characters.indexOf(currentIs.peek(1)) > -1) {
@@ -29,7 +37,13 @@ export class Span implements MatchingLogic {
             currentIs = currentIs.advance();
         }
         return (currentIs !== is) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, matched, is.offset, currentIs)) :
-            new MatchFailureReport(this.$id, is.offset, matched);
+            successfulMatchReport(this,
+                // why is the value an inputstate?
+                { matched, offset: is.offset, valueRepresented: { value: currentIs } }) :
+            failedMatchReport(this, {
+                offset: is.offset, matched,
+                reason:
+                    `No characters found. Looking for [${this.characters}], found [${currentIs.peek(1)}]`,
+            });
     }
 }

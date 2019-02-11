@@ -33,9 +33,9 @@ describe("Left recursion", () => {
         const input = "2";
         const r = mg.exactMatch(input);
         if (isPatternMatch(r)) {
-            // assert(r.type.name === "Thing");
-            // assert(r.type.param.name === "List");
-            // assert(r.type.param.param.name === "That");
+            // assert.strictEqual(r.type.name , "Thing");
+            // assert.strictEqual(r.type.param.name , "List");
+            // assert.strictEqual(r.type.param.param.name , "That");
         } else {
             fail("No match");
         }
@@ -45,9 +45,9 @@ describe("Left recursion", () => {
         const input = "2 + 2";
         const r = mg.exactMatch(input);
         if (isPatternMatch(r)) {
-            // assert(r.type.name === "Thing");
-            // assert(r.type.param.name === "List");
-            // assert(r.type.param.param.name === "That");
+            // assert.strictEqual(r.type.name , "Thing");
+            // assert.strictEqual(r.type.param.name , "List");
+            // assert.strictEqual(r.type.param.param.name , "That");
         } else {
             fail("No match");
         }

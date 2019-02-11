@@ -39,7 +39,7 @@ describe("Circularity", () => {
         const input = "Thing";
         const r = typeGrammar.exactMatch(input);
         if (isPatternMatch(r)) {
-            assert(r.type.name === "Thing");
+            assert.strictEqual(r.type.name, "Thing");
             assert(!r.type.param);
         } else {
             fail("No match");
@@ -50,8 +50,8 @@ describe("Circularity", () => {
         const input = "Thing<That>";
         const r = typeGrammar.exactMatch(input);
         if (isPatternMatch(r)) {
-            assert(r.type.name === "Thing");
-            assert(r.type.param.name === "That");
+            assert.strictEqual(r.type.name, "Thing");
+            assert.strictEqual(r.type.param.name, "That");
             assert(!r.type.param.param);
         } else {
             fail("No match");
@@ -62,9 +62,9 @@ describe("Circularity", () => {
         const input = "Thing<List<That>>";
         const r = typeGrammar.exactMatch(input);
         if (isPatternMatch(r)) {
-            assert(r.type.name === "Thing");
-            assert(r.type.param.name === "List");
-            assert(r.type.param.param.name === "That");
+            assert.strictEqual(r.type.name, "Thing");
+            assert.strictEqual(r.type.param.name, "List");
+            assert.strictEqual(r.type.param.param.name, "That");
         } else {
             fail("No match");
         }

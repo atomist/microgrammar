@@ -1,5 +1,4 @@
 import { Concat } from "../../lib/matchers/Concat";
-import { PatternMatch } from "../../lib/PatternMatch";
 import {
     Integer,
     Literal,
@@ -14,18 +13,16 @@ import { Alt } from "../../lib/Ops";
 
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../../lib/Config";
-import { isSuccessfulMatch } from "../../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../../lib/MatchReport";
 
 describe("Break", () => {
 
     it("break matches exhausted", () => {
         const b = new Break(new Literal("14"));
         const is = inputStateFromString("");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "");
         } else {
             assert.fail("Didn't match");
         }
@@ -34,10 +31,9 @@ describe("Break", () => {
     it("break matches another matcher", () => {
         const b = new Break(new Regex(/[a-z]/));
         const is = inputStateFromString("HEY YOU banana");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "HEY YOU ");
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ");
 
         } else {
             assert.fail("Didn't match");
@@ -53,10 +49,9 @@ describe("Break", () => {
                 _end: "}",
             }));
         const is = inputStateFromString("HEY YOU ${thing} and more stuff");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "HEY YOU ");
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "HEY YOU ");
         } else {
             assert.fail("Didn't match");
         }
@@ -65,11 +60,9 @@ describe("Break", () => {
     it("break matches", () => {
         const b = new Break(new Literal("14"));
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "friday ");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday ");
         } else {
             assert.fail("Didn't match");
         }
@@ -78,25 +71,29 @@ describe("Break", () => {
     it("break to Alt", () => {
         const b = new Break(new Alt("14", "44"));
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {});
-        assert(isSuccessfulMatch(m));
-        assert((m as PatternMatch).$matched === "friday ");
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday ");
+        } else {
+            assert.fail("did not match");
+        }
 
         const is2 = inputStateFromString("friday 44");
-        const m2 = b.matchPrefix(is2, {}, {});
-        assert(isSuccessfulMatch(m2));
-        assert((m2 as PatternMatch).$matched === "friday ");
+        const m2 = b.matchPrefixReport(is2, {}, {});
+        if (isSuccessfulMatchReport(m2)) {
+            assert.strictEqual(m2.matched, "friday ");
+        } else {
+            assert.fail("did not match");
+        }
     });
 
     it("break matches and consumes", () => {
         const b = new Break(new Literal("14"), true);
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {}) as any;
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$matched === "friday 14");
-            assert(mmmm.$value === "14");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday 14");
+            assert.strictEqual(m.toPatternMatch().$value, "14");
         } else {
             assert.fail("Didn't match");
         }
@@ -105,20 +102,21 @@ describe("Break", () => {
     it("break and consume uses value", () => {
         const b = new Break(Integer, true);
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {}) as any;
-        assert(isSuccessfulMatch(m));
-        assert(m.$matched === "friday 14");
-        assert(m.$value === 14);
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday 14");
+            assert.strictEqual(m.toValueStructure(), 14);
+        } else {
+            assert.fail("did not match");
+        }
     });
 
     it("break matches nothing as it comes immediately", () => {
         const b = new Break(new Literal("friday"));
         const is = inputStateFromString("friday 14");
-        const m = b.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "");
-
+        const m = b.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "");
         } else {
             assert.fail("Didn't match");
         }
@@ -131,10 +129,9 @@ describe("Break", () => {
             number: new Span("41"),
         });
         const is = inputStateFromString("friday 14");
-        const m = c.matchPrefix(is, {}, {});
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert((mmmm).$matched === "friday 14");
+        const m = c.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            assert.strictEqual(m.matched, "friday 14");
 
         } else {
             assert.fail("Didn't match");

@@ -1,11 +1,14 @@
 import { InputState } from "./InputState";
+import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "./Matchers";
 import {
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "./MatchPrefixResult";
-import { TerminalPatternMatch } from "./PatternMatch";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "./MatchReport";
 
 /**
  * Match a literal string
@@ -13,16 +16,29 @@ import { TerminalPatternMatch } from "./PatternMatch";
 export class Literal implements MatchingLogic {
 
     public $id = `Literal[${this.literal}]`;
+    public readonly parseNodeName = "Literal";
 
     constructor(public literal: string) {
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is));
+    }
+
+    public matchPrefixReport(is: InputState): MatchReport {
         const peek = is.peek(this.literal.length);
         return (peek === this.literal) ?
-            matchPrefixSuccess(new TerminalPatternMatch(this.$id, this.literal, is.offset, this.literal)) :
-            new MatchFailureReport(this.$id, is.offset, "", // It would be more fun to show the common portion
-                `Did not match literal [${this.literal}]: saw [${peek}]`);
+            successfulMatchReport(this, {
+                matched: this.literal,
+                parseNodeName: this.parseNodeName,
+                offset: is.offset,
+            }) :
+            failedMatchReport(this, {
+                offset: is.offset,
+                matched: commonPortion(this.literal, peek),
+                reason: `Did not match literal [${this.literal}]: saw [${peek}]`,
+                parseNodeName: this.parseNodeName,
+            });
     }
 
     public canStartWith(char: string): boolean {
@@ -32,6 +48,14 @@ export class Literal implements MatchingLogic {
     get requiredPrefix(): string {
         return this.literal;
     }
+}
+
+function commonPortion(str1: string, str2: string) {
+    let i = 0;
+    while (i < str1.length && i < str2.length && str1[i] === str2[i]) {
+        i++;
+    }
+    return str1.slice(0, i);
 }
 
 export function isLiteral(ml: MatchingLogic): ml is Literal {
@@ -48,6 +72,8 @@ export abstract class AbstractRegex implements MatchingLogic {
 
     public readonly regex: RegExp;
 
+    protected readonly parseNodeName: string;
+
     get $id() {
         return `Regex: ${this.regex.source}`;
     }
@@ -59,11 +85,17 @@ export abstract class AbstractRegex implements MatchingLogic {
      * @param lookahead number of characters to pull from the input to try to match.
      * We'll keep grabbing more if a match is found for the whole string
      */
-    constructor(regex: RegExp, private readonly lookahead: number = LOOK_AHEAD_SIZE) {
+    constructor(regex: RegExp, private readonly lookahead: number = LOOK_AHEAD_SIZE, parseNodeName?: string) {
         this.regex = regex.source.charAt(0) !== "^" ? new RegExp("^" + regex.source) : regex;
+        this.parseNodeName = parseNodeName || "Regex";
     }
 
     public matchPrefix(is: InputState): MatchPrefixResult {
+        const output = toMatchPrefixResult(this.matchPrefixReport(is));
+        return output;
+    }
+
+    public matchPrefixReport(is: InputState): MatchReport {
         let results: RegExpExecArray;
         let lookAt: string;
         let charactersToSee = 0;
@@ -90,14 +122,19 @@ export abstract class AbstractRegex implements MatchingLogic {
 
         if (theRegexMatchedSomething()) {
             const matched = results[0];
-            return matchPrefixSuccess(new TerminalPatternMatch(
-                this.$id,
+            return successfulMatchReport(this, {
                 matched,
-                is.offset,
-                this.toValue(matched)));
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                valueRepresented: { value: this.toValue(matched) },
+                reason: "Matched RegExp: " + this.regex.toString(),
+            });
         } else {
-            return new MatchFailureReport(this.$id, is.offset, "",
-                `Did not match regex /${this.regex.source}/ in [${lookAt}]`);
+            return failedMatchReport(this, {
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                reason: `Did not match regex /${this.regex.source}/ in [${lookAt}]`,
+            });
         }
     }
 

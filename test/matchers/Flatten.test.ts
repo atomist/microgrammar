@@ -12,7 +12,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("AB") as any;
         assert(m);
-        assert(m.a === "A");
+        assert.strictEqual(m.a , "A");
     });
 
     it("pull up missing scala optional", () => {
@@ -23,7 +23,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch(content) as any;
         assert(m);
-        assert(m.a === undefined);
+        assert.strictEqual(m.a , undefined);
     });
 
     it("pull up matching object optional", () => {
@@ -36,7 +36,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("possum*") as any;
         assert(m);
-        assert(m.a === "possum");
+        assert.strictEqual(m.a, "possum");
     });
 
     it("pull up missing object optional", () => {
@@ -50,7 +50,7 @@ describe("flatten", () => {
         });
         const m = g.firstMatch("This 666") as any;
         assert(m);
-        assert(m.a === undefined);
+        assert.strictEqual(m.a , undefined);
     });
 
     it("rejects attempt to flatten complex structure", () => {
@@ -63,11 +63,11 @@ describe("flatten", () => {
             letter: "T",
         });
         assert.throws(() => g.firstMatch("dog T and other stuff"),
-        e => {
-            assert(e.message.indexOf("Cannot flatten a structure") !== -1);
-            assert(e.message.indexOf("name,c") !== -1);
-            return true;
-        });
+            e => {
+                assert(e.message.indexOf("Cannot flatten a structure") !== -1);
+                assert(e.message.indexOf("name,c") !== -1);
+                return true;
+            });
     });
 
     it("consume correctly from object optional", () => {
@@ -80,10 +80,9 @@ describe("flatten", () => {
             a: flatten(optional(struct)),
         });
         const m = g.findMatches("!possum* !dinosaur*") as any;
-        assert(m[0].a === "possum");
-        assert(m.length === 2);
-        assert(m[0].a === "possum");
-        assert(m[1].a === "dinosaur");
+        assert.strictEqual(m.length, 2);
+        assert.strictEqual(m[0].a, "possum");
+        assert.strictEqual(m[1].a, "dinosaur");
     });
 
 });

@@ -6,28 +6,27 @@ import { Rep } from "../lib/Rep";
 
 import * as assert from "power-assert";
 import { isSuccessfulMatch } from "../lib/MatchPrefixResult";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("StringGrammarTest", () => {
 
     it("broken in concat", () => {
         const strings =
             Microgrammar.fromDefinitions<any>(
-                {theString: new Alt(stringGrammar, "la")}).findMatches("\"    winter is coming \" la la la");
+                { theString: new Alt(stringGrammar, "la") }).findMatches("\"    winter is coming \" la la la");
         const match = strings[0];
         assert(isPatternMatch(match));
-        assert(match.$matched === "\"    winter is coming \"");
+        assert.strictEqual(match.$matched, "\"    winter is coming \"");
         assert(match.theString.text, "    winter is coming");
     });
 
     it("not broken without concat", () => {
-        const result = new Alt(stringGrammar, "la").matchPrefix(inputStateFromString("\"    winter is coming \" la la la"), {}, {});
-        if (isSuccessfulMatch(result)) {
-            const match = result.match;
-            if (isPatternMatch(match)) {
-                assert(isPatternMatch(match));
-                assert(match.$matched === "\"    winter is coming \"");
-            }
-            assert((match as any).text, "    winter is coming");
+        const result = new Alt(stringGrammar, "la").matchPrefixReport(
+            inputStateFromString("\"    winter is coming \" la la la"), {}, {});
+        if (isSuccessfulMatchReport(result)) {
+            assert.strictEqual(result.matched, "\"    winter is coming \"");
+            const pm = result.toPatternMatch();
+            assert((pm as any).text, "    winter is coming");
         } else {
             assert.fail("did not match");
         }

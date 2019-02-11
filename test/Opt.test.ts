@@ -9,17 +9,17 @@ import { PatternMatch } from "../lib/PatternMatch";
 import { Literal } from "../lib/Primitives";
 
 import * as assert from "power-assert";
+import { isSuccessfulMatchReport } from "../lib/MatchReport";
 
 describe("Opt", () => {
 
     it("should match when matcher doesn't match", () => {
         const alt = new Opt("A");
         const is = inputStateFromString("friday 14");
-        const m = alt.matchPrefix(is, {}, {}) as PatternMatch;
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$value === undefined);
-
+        const m = alt.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            const mmmm = m.toPatternMatch();
+            assert.strictEqual(mmmm.$value, undefined);
         } else {
             assert.fail("Didn't match");
         }
@@ -28,11 +28,10 @@ describe("Opt", () => {
     it("should match when matcher matches", () => {
         const alt = new Opt("A");
         const is = inputStateFromString("AB");
-        const m = alt.matchPrefix(is, {}, {}) as PatternMatch;
-        if (isSuccessfulMatch(m)) {
-            const mmmm = m.match as any;
-            assert(mmmm.$value === "A");
-
+        const m = alt.matchPrefixReport(is, {}, {});
+        if (isSuccessfulMatchReport(m)) {
+            const mmmm = m.toPatternMatch();
+            assert.strictEqual(mmmm.$value, "A");
         } else {
             assert.fail("Didn't match");
         }
@@ -44,7 +43,7 @@ describe("Opt", () => {
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
-        assert(result.$matched === "");
+        assert.strictEqual(result.$matched, "");
     });
 
     it("test raw opt present", () => {
@@ -53,29 +52,29 @@ describe("Opt", () => {
         const is = inputStateFromString(content);
         const result = mg.matchPrefix(is, {}, {}) as PatternMatch;
         // console.log(JSON.stringify(result));
-        assert(result.$matched === "x");
+        assert.strictEqual(result.$matched, "x");
     });
 
     it("not pull up single property", () => {
         const content = "x";
         const nested = Microgrammar.fromDefinitions({
-                x: new Literal("x"),
-            },
+            x: new Literal("x"),
+        },
         );
         const mg = Microgrammar.fromDefinitions({
-                x: optional(nested),
-            },
+            x: optional(nested),
+        },
         );
 
         const result = mg.firstMatch(content) as any;
-        assert(result.x.x === "x");
+        assert.strictEqual(result.x.x, "x");
     });
 
     it("pull up single property", () => {
         const content = "x";
         const nested = Microgrammar.fromDefinitions({
-                x: new Literal("x"),
-            },
+            x: new Literal("x"),
+        },
         );
         const mg = Microgrammar.fromDefinitions({
             _x: optional(nested),
@@ -84,7 +83,7 @@ describe("Opt", () => {
 
         const result = mg.firstMatch(content) as any;
         assert(result);
-        assert(result.x === "x");
+        assert.strictEqual(result.x, "x");
     });
 
 });

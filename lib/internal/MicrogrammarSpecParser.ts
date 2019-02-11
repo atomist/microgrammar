@@ -7,13 +7,18 @@ import { Literal } from "../Primitives";
 
 import { WhiteSpaceHandler } from "../Config";
 import { FromStringOptions } from "../FromStringOptions";
-import { isPatternMatch } from "../PatternMatch";
+import {
+    isSuccessfulMatchReport,
+} from "../MatchReport";
+import { MicrogrammarParseError } from "../MicrogrammarParseError";
 import { Break } from "./Break";
 import {
     CompleteFromStringOptions,
     completeWithDefaults,
 } from "./CompleteFromStringOptions";
-import { exactMatch } from "./ExactMatch";
+import {
+    exactMatchReport,
+} from "./ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,
@@ -40,11 +45,12 @@ export class MicrogrammarSpecParser {
     public fromString(spec: string, components: object, options: FromStringOptions): Concat {
         const optionsToUse = completeWithDefaults(options);
         const specToUse = this.preprocess(spec, optionsToUse);
-        const match = exactMatch<MicrogrammarSpec>(specGrammar(optionsToUse), specToUse);
-        if (!isPatternMatch(match)) {
-            throw new Error(`Unable to parse microgrammar: ${specToUse}`);
+        const report = exactMatchReport(specGrammar(optionsToUse), specToUse);
+        if (!isSuccessfulMatchReport(report)) {
+            throw new MicrogrammarParseError(`Unable to parse microgrammar: ${specToUse}`,
+                report.toExplanationTree());
         }
-        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(match,
+        const matcherSequence1 = this.definitionSpecsFromMicrogrammarSpec(report.toValueStructure<MicrogrammarSpec>(),
             // tslint:disable-next-line:no-boolean-literal-compare
             (components as WhiteSpaceHandler).$consumeWhiteSpaceBetweenTokens !== false);
         const matcherSequence2 = this.populateSpecifiedElements(components, matcherSequence1);
