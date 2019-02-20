@@ -76,7 +76,7 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
  */
 export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     if (!isSuccessfulMatchReport(mr)) {
-        throw new Error("Unimplemented");
+        throw new Error("Match was not successful");
     }
     return mr.toParseTree();
 }

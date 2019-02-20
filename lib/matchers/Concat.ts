@@ -180,8 +180,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
     }
 
     public matchPrefixReport(initialInputState: InputState,
-                             thisMatchContext,
-                             parseContext): MatchReport {
+        thisMatchContext,
+        parseContext): MatchReport {
         const bindingTarget: Record<string, any> = {};
         const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
@@ -259,9 +259,9 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 }
 
 function applyComputation(stepName: string,
-                          compute: (arg: Record<string, any>, ...others: any) => any,
-                          argument: Record<string, any>,
-                          additionalArgs: any[] = [],
+    compute: (arg: Record<string, any>, ...others: any) => any,
+    argument: Record<string, any>,
+    additionalArgs: any[] = [],
 ): ComputeEffectsReport {
     const beforeProperties = Object.entries(argument).map(([k, v]) => {
         return {
@@ -332,7 +332,7 @@ export class NamedMatcher implements Matcher {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        return toMatchPrefixResult(this.ml.matchPrefixReport(is, thisMatchContext, parseContext));
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
     }
 
     public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {

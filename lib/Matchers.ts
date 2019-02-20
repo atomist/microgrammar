@@ -7,12 +7,11 @@ import { MatchReport } from "./MatchReport";
  * If you want to name your matches, implement this.
  */
 export interface Term {
-
     readonly $id?: string;
 }
 
 /**
- * Core matching logic interface. Only the matchPrefix method must be implemented
+ * Core matching logic interface. Only the matchPrefixReport method must be implemented
  * to implement a matcher. Optional properties and functions
  * can help make matching more efficient.
  */
@@ -27,9 +26,10 @@ export interface MatchingLogic extends Term {
     readonly requiredPrefix?: string;
 
     /**
-     * Core matching method. Can we match at the present point in the
-     * given InputState? Context arguments may be used by matchers that
-     * require knowledge of current match or global context.
+     * Former core matching method.
+     * Now, this should be a wrapper around matchPrefixReport
+     * Implement as:
+     *      toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
      * @param is input state
      * @param thisMatchContext context for this match, beginning from the top level and
      * passed into nested matchers
