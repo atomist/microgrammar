@@ -10,7 +10,6 @@ import {
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 export interface FailedMatchReport {
-    kind: "real";
     offset: number;
     matched?: string;
     matcher: MatchingLogic; // is all of this really necessary?
@@ -20,7 +19,6 @@ export interface FailedMatchReport {
 }
 
 export interface SuccessfulMatchReport {
-    kind: "real";
     offset: number;
     matcher: MatchingLogic; // is all of this really necessary?
     successful: true;
@@ -37,7 +35,7 @@ export function isSuccessfulMatchReport(fmr: MatchReport): fmr is SuccessfulMatc
 }
 
 export function isFailedMatchReport(fmr: MatchReport): fmr is FailedMatchReport {
-    return fmr.kind === "real" && !fmr.successful;
+    return !fmr.successful;
 }
 
 /**
@@ -78,9 +76,6 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
 export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     if (!isSuccessfulMatchReport(mr)) {
         throw new Error("Unimplemented");
-    }
-    if (!mr.toParseTree) {
-        throw new Error("toParseTree not found on " + mr.kind);
     }
     return mr.toParseTree();
 }
