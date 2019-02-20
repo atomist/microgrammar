@@ -9,22 +9,23 @@ import {
 } from "./PatternMatch";
 import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
-export interface FailedMatchReport {
+export interface AnyMatchReport {
     offset: number;
     matched?: string;
     matcher: MatchingLogic; // is all of this really necessary?
-    successful: false;
+    successful: boolean;
     description?: string; // should be "reason"
     toExplanationTree(): MatchExplanationTreeNode;
 }
 
-export interface SuccessfulMatchReport {
-    offset: number;
-    matcher: MatchingLogic; // is all of this really necessary?
+export interface FailedMatchReport extends AnyMatchReport {
+    successful: false;
+}
+
+export interface SuccessfulMatchReport extends AnyMatchReport {
     successful: true;
     matched: string;
     endingOffset: number;
-    toExplanationTree(): MatchExplanationTreeNode;
     toPatternMatch<T>(): PatternMatch & T;
     toParseTree(): TreeNodeCompatible;
     toValueStructure<T = any>(): T;
