@@ -25,7 +25,7 @@
   "types": "./index.d.ts",
   "dependencies": {
     "json-stringify-safe": "^5.0.1",
-    "lodash": "^4.17.11"
+    "stringify-tree": "^1.0.2"
   },
   "devDependencies": {
     "@types/chai": "^3.5.0",
@@ -41,8 +41,7 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.12.0",
     "typedoc": "^0.13.0",
-    "typescript": "^3.2.2",
-    "stringify-tree": "^1.0.2"
+    "typescript": "^3.2.2"
   },
   "directories": {
     "test": "test"
