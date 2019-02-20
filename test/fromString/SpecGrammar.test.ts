@@ -1,23 +1,28 @@
 import assert = require("power-assert");
 import { DefaultFromStringOptions } from "../../lib/internal/CompleteFromStringOptions";
-import { exactMatch } from "../../lib/internal/ExactMatch";
+import {
+    exactMatch,
+    perfectMatch,
+} from "../../lib/internal/ExactMatch";
 import {
     MicrogrammarSpec,
     specGrammar,
 } from "../../lib/internal/SpecGrammar";
+import { isSuccessfulMatchReport } from "../../lib/MatchReport";
 import { isPatternMatch } from "../../lib/PatternMatch";
 
 describe("SpecGrammar", () => {
 
     it("can parse a series of literals and references", () => {
         const microgrammarSpecString = "->${fruit}<-";
-        const specMatch = exactMatch<MicrogrammarSpec>(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
-        if (isPatternMatch(specMatch)) {
-            assert(specMatch.these.length === 1);
-            assert.deepEqual(specMatch.matchedStructure(),
-               {
+        const specMatch = perfectMatch(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
+        if (isSuccessfulMatchReport(specMatch)) {
+            const vs = specMatch.toValueStructure<MicrogrammarSpec>();
+            assert.strictEqual(vs.these.length, 1);
+            assert.deepEqual(vs,
+                {
                     these: [{
-                        literal: "->", element: {elementName: "fruit"},
+                        literal: "->", element: { elementName: "fruit" },
                     }]
                     , trailing: "<-",
                 });
@@ -30,11 +35,11 @@ describe("SpecGrammar", () => {
         const specString = "->${fruit}${arrow}${drink}!";
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar(DefaultFromStringOptions), specString);
         if (isPatternMatch(specMatch)) {
-            assert(specMatch.these.length === 3);
-            assert(specMatch.these[0].element.elementName === "fruit");
-            assert(specMatch.these[1].element.elementName === "arrow");
-            assert(specMatch.these[2].element.elementName === "drink");
-            assert(specMatch.trailing === "!");
+            assert.strictEqual(specMatch.these.length, 3);
+            assert.strictEqual(specMatch.these[0].element.elementName, "fruit");
+            assert.strictEqual(specMatch.these[1].element.elementName, "arrow");
+            assert.strictEqual(specMatch.these[2].element.elementName, "drink");
+            assert.strictEqual(specMatch.trailing, "!");
         } else {
             assert.fail();
         }

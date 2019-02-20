@@ -1,9 +1,11 @@
 import { expect } from "chai";
-import * as assert from "power-assert";
 import { fail } from "power-assert";
+import * as assert from "power-assert";
+import { stringifyTree } from "stringify-tree";
 import { Integer } from "../lib";
 import { WhiteSpaceSensitive } from "../lib/Config";
 import { MatchingLogic } from "../lib/Matchers";
+import { toExplanationTree } from "../lib/MatchReport";
 import {
     MatchingMachine,
     Microgrammar,
@@ -75,7 +77,7 @@ describe("Microgrammar", () => {
             interface Person { forename: string; surname: string; }
             const person = microgrammar<Person>(
                 { phrase: "${forename} ${surname}", terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ } });
-            const employee = microgrammar<{person: Person, id: number}>({
+            const employee = microgrammar<{ person: Person, id: number }>({
                 person,
                 id: Integer,
             });
@@ -114,8 +116,8 @@ describe("Microgrammar", () => {
         });
         const result = validMg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
-        assert(result[0].$matched === "foo");
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].$matched, "foo");
     });
 
     it("prevents invalid call to function", () => {
@@ -139,9 +141,9 @@ describe("Microgrammar", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.name === "foo");
+        assert.strictEqual(r0.name, "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
@@ -219,7 +221,7 @@ describe("Microgrammar", () => {
             notxml: "notxml",
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
     });
 
     it("2 elements: whitespace sensitive", () => {
@@ -232,7 +234,7 @@ describe("Microgrammar", () => {
             notxml: "notxml",
         });
         const result = mg.findMatches(content);
-        assert(result.length === 0);
+        assert.strictEqual(result.length, 0);
     });
 
     it("stop after match with arrow function", () => {
@@ -303,12 +305,12 @@ describe("Microgrammar", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(result[0].$matched === content);
-        assert(r0.first.name === "first");
-        assert(r0.first.$matched === "<first>");
-        assert(r0.second.name === "second");
+        assert.strictEqual(result[0].$matched, content);
+        assert.strictEqual(r0.first.name, "first");
+        assert.strictEqual(r0.first.$matched, "<first>");
+        assert.strictEqual(r0.second.name, "second");
         // Now access match for the name
         const nameMatch = r0.second.$valueMatches.name as PatternMatch;
 
@@ -320,10 +322,10 @@ describe("Microgrammar", () => {
         // }
 
         // console.log(`yo [${JSON.stringify(r0.second)}]`);
-        assert(nameMatch.$value === "second");
+        assert.strictEqual(nameMatch.$value, "second");
         // console.log("not yo");
-        assert(nameMatch.$matched === nameMatch.$value);
-        assert(nameMatch.$offset === "<first><".length);
+        assert.strictEqual(nameMatch.$matched, nameMatch.$value);
+        assert.strictEqual(nameMatch.$offset, "<first><".length);
     });
 
     it("1 XML elements via nested microgrammar with optional not present", () => {
@@ -345,10 +347,10 @@ describe("Microgrammar", () => {
         expect(result.length).to.equal(1);
         const r0 = result[0];
         assert(isPatternMatch(r0));
-        assert(r0.$matched === content);
+        assert.strictEqual(r0.$matched, content);
         assert(r0.first);
-        assert(r0.first.$matched === "<first>");
-        assert(r0.second === undefined);
+        assert.strictEqual(r0.first.$matched, "<first>");
+        assert.strictEqual(r0.second, undefined);
     });
 
     it("2 XML elements via nested microgrammar with whitespace", () => {
@@ -431,9 +433,9 @@ describe("Microgrammar", () => {
         if (matches.length !== 1) {
             throw new Error(`Expected 1 matches, not ${matches.length}`);
         }
-        assert(matches[0]._separator === undefined, "_ properties don't get bound");
-        assert(matches[0].dogs.length === 0);
-        assert(matches[0].cats.length === 0);
+        assert.strictEqual(matches[0]._separator, undefined, "_ properties don't get bound");
+        assert.strictEqual(matches[0].dogs.length, 0);
+        assert.strictEqual(matches[0].cats.length, 0);
     });
 
     it("extract non-empty rep structure", () => {
@@ -441,7 +443,7 @@ describe("Microgrammar", () => {
         if (matches.length !== 1) {
             throw new Error(`Expected 1 matches, not ${matches.length}`);
         }
-        assert(matches[0]._separator === undefined);
+        assert.strictEqual(matches[0]._separator, undefined);
         expect(matches[0].dogs).to.have.members(["Fido"]);
         expect(matches[0].cats).to.have.members(["Felix", "Oscar"]);
     });
@@ -477,7 +479,7 @@ describe("Microgrammar", () => {
             pigs: nested,
         });
         const matches = mg.findMatches("Fido **** Felix, Oscar****Porker") as any[];
-        assert(matches.length === 1);
+        assert.strictEqual(matches.length, 1);
         const m = matches[0];
         expect(m.cats).to.have.members(["Felix", "Oscar"]);
         expect(m.pigs.pigs).to.have.members(["Porker"]);

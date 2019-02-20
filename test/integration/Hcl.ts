@@ -47,7 +47,7 @@ describe("Parsing HCL", () => {
         const matches = mg.findMatches(sample);
         // console.log("found these from a string: ");
         // matches.forEach((m: any) => console.log(`${m.key} = ${m.value}`));
-        assert(matches.length === 5);
+        assert.strictEqual(matches.length , 5);
     });
 
     it("should find number key/value pairs from definitions", () => {
@@ -59,9 +59,9 @@ describe("Parsing HCL", () => {
 
         const matches = mg2.findMatches(sample);
         // matches.forEach((m: any) => console.log(`${m.key} = ${m.value}`))
-        assert(matches.length === 1);
+        assert.strictEqual(matches.length , 1);
         const m: any = matches[0];
-        assert(m.key === "count");
-        assert(m.value === 2);
+        assert.strictEqual(m.key , "count");
+        assert.strictEqual(m.value , 2);
     });
 });

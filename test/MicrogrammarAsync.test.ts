@@ -34,8 +34,8 @@ describe("Microgrammar async", () => {
         });
         const result = await validMg.findMatchesAsync(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
-        assert(result[0].$matched === "foo");
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].$matched, "foo");
     });
 
     it("XML element", async () => {
@@ -47,9 +47,9 @@ describe("Microgrammar async", () => {
         });
         const result = await mg.findMatchesAsync(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
         const r0 = result[0] as any;
-        assert(r0.name === "foo");
+        assert.strictEqual(r0.name, "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
 
@@ -157,12 +157,12 @@ describe("Microgrammar async", () => {
             notxml: "notxml",
         });
         const result = await mg.findMatchesAsync(content);
-        assert(result.length === 1);
+        assert.strictEqual(result.length, 1);
     });
 
     it("2 elements: whitespace sensitive", async () => {
         const content = "<first> notxml";
-        const mg = Microgrammar.fromDefinitions<{namex: string, notxml: string}>({
+        const mg = Microgrammar.fromDefinitions<{ namex: string, notxml: string }>({
             ...WhiteSpaceSensitive,
             _lx: "<",
             namex: /[a-zA-Z0-9]+/,
@@ -170,7 +170,7 @@ describe("Microgrammar async", () => {
             notxml: "notxml",
         });
         const result = await mg.findMatchesAsync(content);
-        assert(result.length === 0);
+        assert.strictEqual(result.length, 0);
     });
 
 });

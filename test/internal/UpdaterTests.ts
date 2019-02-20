@@ -21,8 +21,8 @@ describe("updating matches", () => {
         const result = XmlGrammar().findMatches(content) as any;
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.second = "<newSecond>";
-        assert(updater.second === "<newSecond>");
-        assert(updater.newContent() === "<first><newSecond>");
+        assert.strictEqual(updater.second , "<newSecond>");
+        assert.strictEqual(updater.newContent() , "<first><newSecond>");
     });
 
     it("should update a nested value", () => {
@@ -30,8 +30,8 @@ describe("updating matches", () => {
         const result = XmlGrammar().findMatches(content) as any;
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.second.name = "newSecond";
-        assert(updater.second.name === "newSecond");
-        assert(updater.newContent() === "<first><newSecond>");
+        assert.strictEqual(updater.second.name , "newSecond");
+        assert.strictEqual(updater.newContent() , "<first><newSecond>");
     });
 
     it("can update the entire match", () => {
@@ -40,6 +40,6 @@ describe("updating matches", () => {
         assert(result[0].$offset !== undefined);
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.replaceAll("newSecond");
-        assert(updater.newContent() === "newSecond");
+        assert.strictEqual(updater.newContent() , "newSecond");
     });
 });

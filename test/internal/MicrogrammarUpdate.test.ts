@@ -27,11 +27,11 @@ describe("MicrogrammarUpdateTest", () => {
         const result = xmlGrammar().findMatches(content) as any;
         const updater = Microgrammar.updatableMatch(result[0], content);
         updater.second = "<newSecond>";
-        assert(updater.newContent() === "<first><newSecond>");
+        assert.strictEqual(updater.newContent(), "<first><newSecond>");
         const cs = new ChangeSet(content);
         assert(result[0].second.$valueMatches.name);
         cs.change(result[0].second.$valueMatches.name, "newSecond");
-        assert(cs.updated() === "<first><newSecond>");
+        assert.strictEqual(cs.updated(), "<first><newSecond>");
     });
 
     it("update nested element", () => {
@@ -50,10 +50,10 @@ describe("MicrogrammarUpdateTest", () => {
         const updater = Microgrammar.updatableMatch(result[0], line);
         updater.address.number = 45;
         const firstUpdate = updater.newContent();
-        assert(firstUpdate === line.replace("46", "45"));
+        assert.strictEqual(firstUpdate, line.replace("46", "45"));
         updater.name = "Jackson";
         const secondUpdate = updater.newContent();
-        assert(secondUpdate === firstUpdate.replace("Jenny", "Jackson"));
+        assert.strictEqual(secondUpdate, firstUpdate.replace("Jenny", "Jackson"));
     });
 
     it("update deeply nested element", () => {
@@ -74,16 +74,16 @@ describe("MicrogrammarUpdateTest", () => {
         });
         const line = "Jenny 46 Coonamble, Chatswood 2067 AU";
         const result = person.findMatches(line) as any;
-        assert(result[0].address.suburb.country.code === "AU");
+        assert.strictEqual(result[0].address.suburb.country.code, "AU");
         const updater = Microgrammar.updatableMatch(result[0], line);
         updater.address.number = 45;
         const firstUpdate = updater.newContent();
-        assert(firstUpdate === line.replace("46", "45"));
+        assert.strictEqual(firstUpdate, line.replace("46", "45"));
         updater.name = "Jackson";
         const secondUpdate = updater.newContent();
-        assert(secondUpdate === firstUpdate.replace("Jenny", "Jackson"));
+        assert.strictEqual(secondUpdate, firstUpdate.replace("Jenny", "Jackson"));
         updater.address.suburb.country.code = "CA";
-        assert(updater.newContent() === secondUpdate.replace("AU", "CA"));
+        assert.strictEqual(updater.newContent(), secondUpdate.replace("AU", "CA"));
     });
 
     it("update multiple deeply nested elements in succession", () => {
@@ -104,14 +104,14 @@ describe("MicrogrammarUpdateTest", () => {
         });
         const line = "Jenny 46 Coonamble, Chatswood 2067 AU/David 12 Somewhere, Someplace 40387 US";
         const results = person.findMatches(line) as any;
-        assert(results.length === 2);
+        assert.strictEqual(results.length, 2);
         const updatable = Microgrammar.updatable<any>(results, line);
         updatable.matches[0].address.suburb.postcode = "2000";
-        assert(updatable.matches[0].address.suburb.postcode === "2000");
+        assert.strictEqual(updatable.matches[0].address.suburb.postcode, "2000");
 
         updatable.matches[1].address.suburb.postcode = "1234";
         updatable.matches[0].address.suburb.country.code = "CA";
-        assert(updatable.updated() ===
+        assert.strictEqual(updatable.updated(),
             "Jenny 46 Coonamble, Chatswood 2000 CA/David 12 Somewhere, Someplace 1234 US");
     });
 
@@ -133,10 +133,10 @@ describe("MicrogrammarUpdateTest", () => {
         });
         const line = "Jenny 46 Coonamble, Chatswood 2067 AU/David 12 Somewhere, Someplace 40387 US";
         const results = person.findMatches(line) as any;
-        assert(results.length === 2);
+        assert.strictEqual(results.length, 2);
         const updatable = Microgrammar.updatable<any>(results, line);
         updatable.matches[0].address.suburb = "tarantula";
-        assert(updatable.updated() ===
+        assert.strictEqual(updatable.updated(),
             "Jenny 46 Coonamble, tarantula/David 12 Somewhere, Someplace 40387 US");
     });
 
@@ -158,12 +158,12 @@ describe("MicrogrammarUpdateTest", () => {
         });
         const line = "Jenny 46 Coonamble, Chatswood 2067 AU/David 12 Somewhere, Someplace 40387 US";
         const results = person.findMatches(line) as any;
-        assert(results.length === 2);
+        assert.strictEqual(results.length, 2);
         const updatable = Microgrammar.updatable<any>(results, line);
         updatable.matches[0].address.suburb = "tarantula";
         // TODO this should work intuitively, but doesn't. Probably address through documentation
-        // assert(updatable.matches[0].address.suburb === "tarantula");
-        assert(updatable.matches[0].address.suburb.postcode === undefined);
+        // assert.strictEqual(updatable.matches[0].address.suburb , "tarantula");
+        assert.strictEqual(updatable.matches[0].address.suburb.postcode, undefined);
         assert.throws(
             () => updatable.matches[0].address.suburb.postcode = "2067/24");
     });
@@ -179,13 +179,12 @@ describe("MicrogrammarUpdateTest", () => {
 
         const match: any = mg.firstMatch(input);
         if (isSuccessfulMatch(match)) {
-            const mmmm = match.match as any;
-            assert(mmmm.listItems.commaSeparated[0] === "carrots");
+            assert.strictEqual((match as any).listItems.commaSeparated[0], "carrots");
 
             // how about we also accept a microgrammar as the first arg? ... and all firstMatch on it?
-            const updater: any = Microgrammar.updatableMatch(mmmm, input);
+            const updater: any = Microgrammar.updatableMatch(match, input);
             updater.listItems.commaSeparated[0] = "garbage";
-            assert(updater.newContent() === "I love garbage, apples, lizards, bananas");
+            assert.strictEqual(updater.newContent(), "I love garbage, apples, lizards, bananas");
 
         } else {
             assert.fail("Didn't match");

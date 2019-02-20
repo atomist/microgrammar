@@ -12,9 +12,9 @@ describe("FromStringOptions", () => {
         });
         const result = mg.findMatches(content);
         // console.log("Result is " + JSON.stringify(result));
-        assert(result.length === 1);
-        assert(result[0].$matched === content);
-        assert(result[0].num === 63);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].$matched , content);
+        assert.strictEqual(result[0].num , 63);
     });
 
     it("skip over two strings of discardable content", () => {
@@ -23,9 +23,9 @@ describe("FromStringOptions", () => {
             num: Integer,
         });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].$matched === content);
-        assert(result[0].num === 63);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].$matched , content);
+        assert.strictEqual(result[0].num , 63);
     });
 
     it("allows custom ellipsis", () => {
@@ -34,9 +34,9 @@ describe("FromStringOptions", () => {
             num: Integer,
         }, { ellipsis: "⤞"});
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].$matched === content);
-        assert(result[0].num === 63);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].$matched , content);
+        assert.strictEqual(result[0].num , 63);
     });
 
     it("allows custom component prefix", () => {
@@ -45,9 +45,9 @@ describe("FromStringOptions", () => {
             num: Integer,
         }, { componentPrefix: "#" });
         const result = mg.findMatches(content);
-        assert(result.length === 1);
-        assert(result[0].$matched === content);
-        assert(result[0].num === 63);
+        assert.strictEqual(result.length , 1);
+        assert.strictEqual(result[0].$matched , content);
+        assert.strictEqual(result[0].num , 63);
     });
 
 });

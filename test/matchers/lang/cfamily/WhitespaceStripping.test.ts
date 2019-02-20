@@ -8,28 +8,28 @@ describe("Whitespace stripping", () => {
         const src =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().stripWhitespace(src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("should strip leading newline", () => {
         const src =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().stripWhitespace("\n" + src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("should strip leading tabs and drop trailing newline", () => {
         const src =
             `public class Foo{}`;
         const stripped = new CFamilyLangHelper().stripWhitespace("\t\t" + src + "\n");
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("should replace 3 unnecessary spaces with none", () => {
         const src =
             `public class Foo {    }`;
         const stripped = new CFamilyLangHelper().stripWhitespace(src);
-        assert(stripped === "public class Foo{}");
+        assert.strictEqual(stripped , "public class Foo{}");
     });
 
 });

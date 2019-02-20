@@ -1,4 +1,16 @@
+import * as stringify from "json-stringify-safe";
+import {
+    SkipCapable,
+    WhiteSpaceHandler,
+} from "../Config";
 import { InputState } from "../InputState";
+import { Break } from "../internal/Break";
+import { successfulMatchReport } from "../internal/matchReport/terminalMatchReport";
+import {
+    ComputeEffectsReport,
+    successfulTreeMatchReport,
+} from "../internal/matchReport/treeMatchReport";
+import { readyToMatch } from "../internal/Whitespace";
 import {
     LazyMatchingLogic,
     Matcher,
@@ -6,28 +18,26 @@ import {
     Term,
 } from "../Matchers";
 import {
-    isSuccessfulMatch,
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../MatchPrefixResult";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+    toMatchPrefixResult,
+} from "../MatchReport";
 import { Microgrammar } from "../Microgrammar";
 import {
     isSpecialMember,
-    PatternMatch,
-    TreePatternMatch,
 } from "../PatternMatch";
 import {
     Literal,
     Regex,
 } from "../Primitives";
-
 import {
-    SkipCapable,
-    WhiteSpaceHandler,
-} from "../Config";
-import { Break } from "../internal/Break";
-import { readyToMatch } from "../internal/Whitespace";
+    failedTreeMatchReport,
+    namedChild,
+    TreeChild,
+} from "./../internal/matchReport/treeMatchReport";
 
 /**
  * Represents something that can be passed into a microgrammar
@@ -100,6 +110,8 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
 
     public readonly matchSteps: MatchStep[] = [];
 
+    public readonly parseNodeName = "Concat";
+
     // Used to check first matcher. We want to do that to check
     // for required prefix etc.
     private firstMatcher: Matcher;
@@ -167,69 +179,123 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
         return this.firstMatcher.requiredPrefix;
     }
 
-    public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        const bindingTarget = {};
-        const matches: PatternMatch[] = [];
+    public matchPrefixReport(initialInputState: InputState,
+        thisMatchContext,
+        parseContext): MatchReport {
+        const bindingTarget: Record<string, any> = {};
+        const matches: TreeChild[] = [];
         let currentInputState = initialInputState;
         let matched = "";
-        const allReportResults: MatchPrefixResult[] = [];
+        const computeEffects: ComputeEffectsReport[] = [];
         for (const step of this.matchSteps) {
             if (isMatcher(step)) {
                 const eat = readyToMatch(currentInputState, this.$consumeWhiteSpaceBetweenTokens);
+                if (!!eat.skipped) {
+                    matches.push(whitespaceChildMatch(eat.skipped, this, currentInputState.offset));
+                }
                 currentInputState = eat.state;
                 matched += eat.skipped;
 
-                const reportResult = step.matchPrefix(currentInputState, thisMatchContext, parseContext);
-                allReportResults.push(reportResult);
-                if (isSuccessfulMatch(reportResult)) {
-                    const report = reportResult.match;
-                    matches.push(report);
-                    currentInputState = currentInputState.consume(report.$matched,
-                        `Concat step [${reportResult.$matcherId}] matched ${reportResult.$matched}`);
-                    matched += report.$matched;
-                    if (reportResult.capturedStructure) {
-                        // Bind the nested structure if necessary
-                        bindingTarget[step.$id] = reportResult.capturedStructure;
-                    } else {
-                        // otherwise, save the matcher's value.
-                        bindingTarget[step.$id] = report.$value;
-                    }
+                const report = step.matchPrefixReport(currentInputState, thisMatchContext, parseContext);
+                if (isSuccessfulMatchReport(report)) {
+                    matches.push(namedChild(step.$id, report));
+                    currentInputState = currentInputState.consume(report.matched,
+                        `Concat step [${report.matcher.$id}] matched ${report.matched}`);
+                    matched += report.matched;
+                    bindingTarget[step.$id] = report.toValueStructure();
                 } else {
-                    return MatchFailureReport.from({
-                        $matcherId: this.$id,
-                        $offset: initialInputState.offset,
-                        $matched: matched,
-                        cause: `Failed at step '${step.name}' due to ${(reportResult as any).description}`,
-                        children: allReportResults,
+                    return failedTreeMatchReport(this, {
+                        originalOffset: initialInputState.offset,
+                        parseNodeName: this.parseNodeName,
+                        matched,
+                        reason: `Failed at step '${step.name}'`,
+                        successes: matches,
+                        failureName: step.name,
+                        failureReport: report,
+                        extraProperties: bindingTarget,
+                        computeEffects,
                     });
                 }
             } else {
                 // It's a function taking the contexts.
                 // See if we should stop matching.
                 if (isMatchVeto(step)) {
+                    const effects = applyComputation(step.$id, step.veto, bindingTarget, [thisMatchContext, parseContext]);
+                    computeEffects.push(effects);
                     // tslint:disable-next-line:no-boolean-literal-compare
-                    if (step.veto(bindingTarget, thisMatchContext, parseContext) === false) {
-                        return new MatchFailureReport(this.$id, initialInputState.offset, matched,
-                            `Match vetoed by ${step.$id}`);
+                    if (effects.computeResult === false) {
+                        return failedTreeMatchReport(this, {
+                            originalOffset: initialInputState.offset,
+                            parseNodeName: this.parseNodeName,
+                            failingOffset: currentInputState.offset,
+                            matched,
+                            failureName: step.$id,
+                            reason: `Match vetoed by ${step.$id}`,
+                            successes: matches,
+                            extraProperties: bindingTarget,
+                            computeEffects,
+                        });
                     }
                 } else {
-                    bindingTarget[step.$id] = step.compute(bindingTarget);
+                    const effects = applyComputation(step.$id, step.compute, bindingTarget);
+                    computeEffects.push(effects);
                 }
             }
         }
-        return matchPrefixSuccess(new TreePatternMatch(
-            this.$id,
+        return successfulTreeMatchReport(this, {
             matched,
-            initialInputState.offset,
-            this.matchSteps.filter(m => (m as any).matchPrefix) as Matcher[],
-            matches,
-            bindingTarget), bindingTarget);
+            parseNodeName: this.parseNodeName,
+            offset: initialInputState.offset,
+            children: matches,
+            extraProperties: bindingTarget,
+            computeEffects,
+        });
+    }
+
+    public matchPrefix(initialInputState: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(initialInputState, thisMatchContext, parseContext));
     }
 
 }
 
+function applyComputation(stepName: string,
+    compute: (arg: Record<string, any>, ...others: any) => any,
+    argument: Record<string, any>,
+    additionalArgs: any[] = [],
+): ComputeEffectsReport {
+    const beforeProperties = Object.entries(argument).map(([k, v]) => {
+        return {
+            name: k,
+            before: stringify(v),
+        };
+    });
+    const computeResult = compute(argument, ...additionalArgs);
+    if (computeResult !== undefined) {
+        argument[stepName] = computeResult;
+    }
+    const newProperties = Object.keys(argument).filter(n => !beforeProperties.find(bp => bp.name === n));
+    const alteredProperties = beforeProperties.filter(bp => {
+        return bp.before !== stringify(argument[bp.name]);
+    }).map(bp => bp.name);
+    return {
+        stepName,
+        computeResult,
+        newProperties,
+        alteredProperties,
+    };
+}
+
 function isMatcher(s: MatchStep): s is Matcher {
-    return (s as Matcher).matchPrefix !== undefined;
+    return (s as Matcher).matchPrefixReport !== undefined;
+}
+
+function whitespaceChildMatch(skipped: string, matcher: Concat, offset: number): TreeChild {
+    const matchReport = successfulMatchReport(matcher, {
+        parseNodeName: "Whitespace",
+        matched: skipped,
+        offset,
+    });
+    return { explicit: false, matchReport };
 }
 
 /**
@@ -246,7 +312,7 @@ export function toMatchingLogic(o: TermDef): MatchingLogic {
         return new Literal(o);
     } else if ((o as RegExp).exec) {
         return new Regex(o as RegExp);
-    } else if ((o as MatchingLogic).matchPrefix) {
+    } else if ((o as MatchingLogic).matchPrefixReport) {
         return o as MatchingLogic;
     } else if ((o as Microgrammar<any>).findMatches) {
         return (o as Microgrammar<any>).matcher;
@@ -266,7 +332,11 @@ export class NamedMatcher implements Matcher {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
-        return this.ml.matchPrefix(is, thisMatchContext, parseContext) as PatternMatch;
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
+        return this.ml.matchPrefixReport(is, thisMatchContext, parseContext);
     }
 
     public canStartWith(char: string): boolean {

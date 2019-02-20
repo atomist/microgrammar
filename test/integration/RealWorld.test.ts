@@ -13,7 +13,7 @@ describe("Real world usage", () => {
 
     it("no methods found", () => {
         const methods = new MethodSignatureGrammar().methodSignature.findMatches("");
-        assert(methods.length === 0);
+        assert.strictEqual(methods.length , 0);
     });
 
     it("method found", () => {
@@ -22,12 +22,12 @@ describe("Real world usage", () => {
         return "Hello REST Microservice World";
     }"`);
         const match = methods[0] as any;
-        assert(match.$matched === "public String home() {");
-        assert(match.annotations.length === 0);
-        assert(match.modifier === "public");
-        assert(match.returnType === "String");
-        assert(match.name === "home");
-        assert(match.params.length === 0);
+        assert.strictEqual(match.$matched , "public String home() {");
+        assert.strictEqual(match.annotations.length , 0);
+        assert.strictEqual(match.modifier , "public");
+        assert.strictEqual(match.returnType , "String");
+        assert.strictEqual(match.name , "home");
+        assert.strictEqual(match.params.length , 0);
     });
 
     it("method found with annotations", () => {
@@ -37,13 +37,13 @@ describe("Real world usage", () => {
         return "Hello REST Microservice World";
     }`);
         const match = methods[0] as any;
-        assert(match.$matched === "@RequestMapping\n    public String home() {");
-        assert(match.annotations.length === 1);
-        assert(match.annotations[0].annotation.name === "RequestMapping");
-        assert(match.modifier === "public");
-        assert(match.returnType === "String");
-        assert(match.name === "home");
-        assert(match.params.length === 0);
+        assert.strictEqual(match.$matched , "@RequestMapping\n    public String home() {");
+        assert.strictEqual(match.annotations.length , 1);
+        assert.strictEqual(match.annotations[0].annotation.name , "RequestMapping");
+        assert.strictEqual(match.modifier , "public");
+        assert.strictEqual(match.returnType , "String");
+        assert.strictEqual(match.name , "home");
+        assert.strictEqual(match.params.length , 0);
     });
 
     it("method found with parameters", () => {
@@ -52,15 +52,15 @@ describe("Real world usage", () => {
         return "Hello " + target;
     }`);
         const match = methods[0] as any;
-        assert(match.$matched === "public String home(String target) {");
-        assert(match.annotations.length === 0);
-        assert(match.modifier === "public");
-        assert(match.returnType === "String");
-        assert(match.name === "home");
-        assert(match.params.length === 1);
-        assert(match.params[0].name === "target");
-        assert(match.params[0].type === "String");
-        assert(match.params[0].annotations.length === 0);
+        assert.strictEqual(match.$matched , "public String home(String target) {");
+        assert.strictEqual(match.annotations.length , 0);
+        assert.strictEqual(match.modifier , "public");
+        assert.strictEqual(match.returnType , "String");
+        assert.strictEqual(match.name , "home");
+        assert.strictEqual(match.params.length , 1);
+        assert.strictEqual(match.params[0].name , "target");
+        assert.strictEqual(match.params[0].type , "String");
+        assert.strictEqual(match.params[0].annotations.length , 0);
     });
 
     it("handle complex grammar with nesting", () => {
@@ -69,16 +69,16 @@ describe("Real world usage", () => {
         return "Hello " + target;
     }`);
         const match = methods[0] as any;
-        assert(match.$matched === "public String home(@PathVariable String target) {");
-        assert(match.name === "home");
-        assert(match.annotations.length === 0);
-        assert(match.modifier === "public");
-        assert(match.returnType === "String");
-        assert(match.params.length === 1);
-        assert(match.params[0].name === "target");
-        assert(match.params[0].type === "String");
-        assert(match.params[0].annotations.length === 1);
-        assert(match.params[0].annotations[0].annotation.name === "PathVariable");
+        assert.strictEqual(match.$matched , "public String home(@PathVariable String target) {");
+        assert.strictEqual(match.name , "home");
+        assert.strictEqual(match.annotations.length , 0);
+        assert.strictEqual(match.modifier , "public");
+        assert.strictEqual(match.returnType , "String");
+        assert.strictEqual(match.params.length , 1);
+        assert.strictEqual(match.params[0].name , "target");
+        assert.strictEqual(match.params[0].type , "String");
+        assert.strictEqual(match.params[0].annotations.length , 1);
+        assert.strictEqual(match.params[0].annotations[0].annotation.name , "PathVariable");
     });
 
 });

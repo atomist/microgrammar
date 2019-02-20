@@ -20,8 +20,8 @@ describe("Microgrammar.exactMatch", () => {
         const result = mg.exactMatch(content);
         if (isPatternMatch(result)) {
             assert(result);
-            assert(result.$matched === content);
-            assert(result.name === "thing");
+            assert.strictEqual(result.$matched , content);
+            assert.strictEqual(result.name , "thing");
         } else {
             assert.fail();
         }

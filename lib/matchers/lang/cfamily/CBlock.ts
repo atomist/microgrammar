@@ -1,11 +1,14 @@
 import { InputState } from "../../../InputState";
 import { inputStateFromString } from "../../../internal/InputStateFactory";
+import { successfulMatchReport } from "../../../internal/matchReport/terminalMatchReport";
 import { MatchingLogic } from "../../../Matchers";
 import {
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "../../../MatchPrefixResult";
-import { TerminalPatternMatch } from "../../../PatternMatch";
+import {
+    MatchReport,
+    toMatchPrefixResult,
+} from "../../../MatchReport";
 import { Concat } from "../../Concat";
 import { LangStateMachine } from "../LangStateMachine";
 import { CFamilyStateMachine } from "./CFamilyStateMachine";
@@ -36,6 +39,10 @@ export class CBlock implements MatchingLogic {
     }
 
     public matchPrefix(is: InputState, thisMatchContext, parseContext): MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext, parseContext): MatchReport {
         const sm = this.stateMachineFactory();
         let depth = 1;
         let currentIs = is;
@@ -63,15 +70,15 @@ export class CBlock implements MatchingLogic {
             }
         }
         if (!this.inner) {
-            return matchPrefixSuccess(new TerminalPatternMatch(
-                this.$id,
+            return successfulMatchReport(this, {
+                parseNodeName: "CBlock",
                 matched,
-                is.offset,
-                matched));
+                offset: is.offset,
+            });
         }
 
         // We supply the offset to preserve it in this match
-        return this.inner.matchPrefix(inputStateFromString(matched, undefined, is.offset), thisMatchContext, parseContext);
+        return this.inner.matchPrefixReport(inputStateFromString(matched, undefined, is.offset), thisMatchContext, parseContext);
     }
 }
 

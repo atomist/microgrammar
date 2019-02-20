@@ -1,16 +1,28 @@
 import { InputState } from "./InputState";
+import { failedMatchReport } from "./internal/matchReport/failedMatchReport";
+import { successfulMatchReport } from "./internal/matchReport/terminalMatchReport";
+import {
+    wrappingFailedMatchReport,
+    wrappingMatchReport,
+} from "./internal/matchReport/wrappingMatchReport";
 import { MatchingLogic } from "./Matchers";
 import { toMatchingLogic } from "./matchers/Concat";
 import {
-    isSuccessfulMatch,
-    MatchFailureReport,
     MatchPrefixResult,
-    matchPrefixSuccess,
 } from "./MatchPrefixResult";
 import {
+    FailedMatchReport,
+    isFailedMatchReport,
+    isSuccessfulMatchReport,
+    MatchExplanationTreeNode,
+    MatchReport,
+    SuccessfulMatchReport,
+    toMatchPrefixResult,
+} from "./MatchReport";
+import {
     PatternMatch,
-    UndefinedPatternMatch,
 } from "./PatternMatch";
+import { TreeNodeCompatible } from "./TreeNodeCompatible";
 
 /**
  * Optional match on the given matcher
@@ -23,6 +35,11 @@ export function optional(o: any): MatchingLogic {
 
 export class Opt implements MatchingLogic {
 
+    get $id() {
+        return `Opt[${this.matcher.$id}]`;
+    }
+    public readonly parseNodeName = "Optional";
+
     private readonly matcher: MatchingLogic;
 
     /**
@@ -33,22 +50,82 @@ export class Opt implements MatchingLogic {
         this.matcher = toMatchingLogic(o);
     }
 
-    get $id() {
-        return `Opt[${this.matcher.$id}]`;
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
     }
 
-    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
             // console.log(`Match from Opt on exhausted stream`);
-            return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
+            return successfulMatchReport(this, {
+                matched: "",
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                valueRepresented: { value: undefined },
+                reason: "Input stream is exhausted. Good thing this was optional.",
+            });
         }
 
-        const maybe = this.matcher.matchPrefix(is, thisMatchContext, parseContext);
-        if (isSuccessfulMatch(maybe)) {
-            return maybe;
+        const maybe = this.matcher.matchPrefixReport(is, thisMatchContext, parseContext);
+        if (isSuccessfulMatchReport(maybe)) {
+            return wrappingMatchReport(this, { parseNodeName: this.parseNodeName, inner: maybe });
         }
-        return matchPrefixSuccess(new UndefinedPatternMatch(this.$id, is.offset));
+        return new WrappingEmptyMatchReport(this,
+            this.parseNodeName,
+            maybe,
+        );
     }
+}
+
+class WrappingEmptyMatchReport implements SuccessfulMatchReport {
+    public readonly successful = true;
+    public readonly kind = "real";
+    public readonly matched = "";
+    public readonly offset: number;
+    public readonly endingOffset: number;
+
+    constructor(public readonly matcher: MatchingLogic,
+                private readonly parseNodeName: string,
+                private readonly inner: FailedMatchReport) {
+        this.offset = inner.offset;
+        this.endingOffset = inner.offset;
+    }
+
+    public toPatternMatch<T>(): PatternMatch & T {
+        const pm: PatternMatch = {
+            $matcherId: this.matcher.$id,
+            $matched: this.matched,
+            $offset: this.offset,
+            $value: undefined,
+            matchedStructure: <TT>() => undefined as TT, // really should be T
+        };
+        // hack for compatibility with isSuccessfulMatch
+        (pm as any).$successfulMatch = true;
+        return pm as (PatternMatch & T);
+    }
+    public toParseTree(): TreeNodeCompatible {
+        return {
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: [],
+        };
+    }
+    public toValueStructure<T>(): T {
+        return undefined;
+    }
+    public toExplanationTree(): MatchExplanationTreeNode {
+        return {
+            reason: "Did not match, but that's OK; it's optional.",
+            $name: this.parseNodeName,
+            $value: this.matched,
+            $offset: this.offset,
+            $children: [this.inner.toExplanationTree()],
+            successful: true,
+        };
+    }
+
 }
 
 /**
@@ -68,6 +145,7 @@ export function firstOf(a: any, b: any, ...matchers: any[]): MatchingLogic {
 export class Alt implements MatchingLogic {
 
     public readonly matchers: MatchingLogic[];
+    public readonly parseNodeName = "Alternative";
 
     constructor(a: any, b: any, ...matchers: any[]) {
         const matchObjects = [a, b].concat(matchers);
@@ -79,20 +157,39 @@ export class Alt implements MatchingLogic {
         return `Alt(${this.matchers.map(m => m.$id).join(",")})`;
     }
 
-    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
+    public matchPrefix(is: InputState, thisMatchContext: {}, parseContext: {}):
+        MatchPrefixResult {
+        return toMatchPrefixResult(this.matchPrefixReport(is, thisMatchContext, parseContext));
+    }
+
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
         if (is.exhausted()) {
-            return new MatchFailureReport(this.$id, is.offset, "");
+            return failedMatchReport(this, {
+                offset: is.offset,
+                parseNodeName: this.parseNodeName,
+                reason: "Input exhausted",
+            });
         }
 
-        const failedMatches: MatchPrefixResult[] = [];
+        const failedMatches: FailedMatchReport[] = [];
         for (const matcher of this.matchers) {
-            const m = matcher.matchPrefix(is, thisMatchContext, parseContext);
-            if (isSuccessfulMatch(m)) {
-                return m;
+            const m = matcher.matchPrefixReport(is, thisMatchContext, parseContext);
+            if (isSuccessfulMatchReport(m)) {
+                return wrappingMatchReport(this, {
+                    inner: m,
+                    additional: failedMatches,
+                    parseNodeName: this.parseNodeName,
+                });
+            } else if (isFailedMatchReport(m)) {
+                failedMatches.push(m);
             }
-            failedMatches.push(m);
         }
-        return MatchFailureReport.from({ $matcherId: this.$id, $offset: is.offset, children: failedMatches });
+        return failedMatchReport(this, {
+            parseNodeName: this.parseNodeName,
+            offset: is.offset,
+            children: failedMatches,
+            reason: "All alternatives failed",
+        });
     }
 }
 
@@ -104,52 +201,58 @@ export class Alt implements MatchingLogic {
 export function when(
     o: any,
     matchTest: (pm: PatternMatch) => boolean,
-    inputStateTest: (is: InputState) => boolean = is => true,
-) {
+    inputStateTest: (is: InputState) => boolean = () => true,
+): MatchingLogic {
+    const output = new WhenMatcher(toMatchingLogic(o), matchTest, inputStateTest);
 
-    const matcher = toMatchingLogic(o);
-    const conditionalMatcher = {} as any;
-
-    conditionalMatcher.$id = `When[${matcher}]`;
-
-    // Copy other properties
     for (const prop in o) {
         if (o.hasOwnProperty(prop)) {
-            conditionalMatcher[prop] = o[prop];
+            output[prop] = o[prop];
         }
     }
+    return output;
+}
+class WhenMatcher implements MatchingLogic {
 
-    function conditionalMatch(is: InputState, thisMatchContext: {}, parseContext: {}): MatchPrefixResult {
-        if (!inputStateTest(is)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
-                $offset: is.offset,
-                cause: "Input state test returned false",
+    public readonly $id: string;
+
+    constructor(public readonly inner: MatchingLogic,
+                public readonly matchTest: (pm: PatternMatch) => boolean,
+                public readonly inputStateTest: (is: InputState) => boolean) {
+        this.$id = `When[${inner.$id}]`;
+        this.canStartWith = inner.canStartWith;
+    }
+    public canStartWith?(char: string): boolean;
+
+    public matchPrefixReport(is: InputState, thisMatchContext: {}, parseContext: {}): MatchReport {
+        if (!this.inputStateTest(is)) {
+            return failedMatchReport(this, {
+                parseNodeName: "When",
+                offset: is.offset,
+                reason: "Input state test returned false",
             });
         }
-        const result = matcher.matchPrefix(is, thisMatchContext, parseContext);
-        if (!isSuccessfulMatch(result)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
-                $offset: is.offset,
-                children: [result],
-                cause: (result as MatchFailureReport).description,
+        const result = this.inner.matchPrefixReport(is, thisMatchContext, parseContext);
+        if (!isSuccessfulMatchReport(result)) {
+            return wrappingFailedMatchReport(this, {
+                offset: is.offset,
+                inner: result,
             });
         }
-        if (!matchTest(result.match)) {
-            return MatchFailureReport.from({
-                $matcherId: conditionalMatcher.$id,
-                $offset: is.offset,
-                $matched: result.$matched,
-                children: [result],
-                cause: "Match test returned false",
+        if (!this.matchTest(result.toPatternMatch())) {
+            return wrappingFailedMatchReport(this, {
+                offset: is.offset,
+                inner: result,
+                reason: "Match test returned false",
             });
         }
-        return result;
+        return successfulMatchReport(this, {
+            matched: result.matched, offset: result.offset,
+            valueRepresented: { value: result.toPatternMatch().$value },
+            parseNodeName: "When",
+        });
     }
 
-    conditionalMatcher.matchPrefix = conditionalMatch;
-    conditionalMatcher.requiredPrefix = matcher.requiredPrefix;
-    conditionalMatcher.canStartWith = matcher.canStartWith;
-    return conditionalMatcher;
+    public matchPrefix(a, b, c) { return toMatchPrefixResult(this.matchPrefixReport(a, b, c)); }
+
 }

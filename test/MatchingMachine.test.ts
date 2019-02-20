@@ -120,20 +120,20 @@ class Sun:
         mm.consume(input);
 
         const moonClass = mm.matches[0] as any;
-        assert(moonClass.name === "Moon", "Moon class should have a name");
+        assert.strictEqual(moonClass.name, "Moon", "Moon class should have a name");
 
         const moonMethod1 = mm.matches[1] as any;
-        assert(moonMethod1.name === "call", "Name should be call");
+        assert.strictEqual(moonMethod1.name, "call", "Name should be call");
 
         const moonMethod2 = mm.matches[2] as any;
-        assert(moonMethod2.name === "land", "Name should be land");
+        assert.strictEqual(moonMethod2.name, "land", "Name should be land");
 
         const sunClass = mm.matches[3] as any;
-        assert(sunClass.name === "Sun", "Name should be Sun");
+        assert.strictEqual(sunClass.name, "Sun", "Name should be Sun");
 
-        assert(mm.matches.length === 5);
+        assert.strictEqual(mm.matches.length, 5);
         const sunMethod1 = mm.matches[4] as any;
-        assert(sunMethod1.name === "blowup", "Name should be blowup");
+        assert.strictEqual(sunMethod1.name, "blowup", "Name should be blowup");
     });
 
     it("track XML structure without dependencyManagement", () => {
@@ -155,8 +155,8 @@ class Sun:
     function parsePomWithTracker(pom: string) {
         const xt = new XmlTracker();
         xt.consume(pom);
-        assert(xt.dependencies.length === 1);
-        assert(xt.dependencies[0].group === "com.foo.bar");
+        assert.strictEqual(xt.dependencies.length, 1);
+        assert.strictEqual(xt.dependencies[0].group, "com.foo.bar");
     }
 
     it("captures correct offsets for observed matches", () => {
@@ -177,11 +177,11 @@ class Sun:
         const input = "foo -bar foo foo foo bar foo bar baz";
         const mm = new SaveMethodsFromClass();
         mm.consume(input);
-        assert(mm.bars.length === 3);
+        assert.strictEqual(mm.bars.length, 3);
         let lastOffset = -1;
         mm.bars.forEach(pm => {
-            assert(pm.$value === "bar");
-            assert(input.substring(pm.$offset, pm.$offset + 3) === "bar");
+            assert.strictEqual(pm.$value, "bar");
+            assert.strictEqual(input.substring(pm.$offset, pm.$offset + 3), "bar");
             assert(pm.$offset !== lastOffset);
             lastOffset = pm.$offset;
         });

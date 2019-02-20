@@ -22,7 +22,10 @@ import {
 } from "./Grammar";
 import { ChangeSet } from "./internal/ChangeSet";
 import { DefaultInputState } from "./internal/DefaultInputState";
-import { exactMatch } from "./internal/ExactMatch";
+import {
+    exactMatch,
+    perfectMatch,
+} from "./internal/ExactMatch";
 import { InputStateManager } from "./internal/InputStateManager";
 import { MicrogrammarSpecParser } from "./internal/MicrogrammarSpecParser";
 import {
@@ -30,6 +33,11 @@ import {
     MicrogrammarUpdates,
 } from "./internal/MicrogrammarUpdates";
 import { readyToMatch } from "./internal/Whitespace";
+import {
+    isSuccessfulMatchReport,
+    MatchReport,
+    toPatternMatchOrDismatchReport,
+} from "./MatchReport";
 import { InputStream } from "./spi/InputStream";
 import { StringInputStream } from "./spi/StringInputStream";
 
@@ -206,9 +214,21 @@ export class Microgrammar<T> implements Grammar<T> {
      * @param parseContext context for the whole parsing operation
      * @param l listeners observing input characters as they are read
      * @return {PatternMatch&T}
+     * @Deprecated prefer perfectMatch
      */
     public exactMatch(input: string | InputStream, parseContext = {}, l?: Listeners): PatternMatch & T | DismatchReport {
-        return exactMatch<T>(this.matcher, input, parseContext, l);
+        return toPatternMatchOrDismatchReport<T>(this.perfectMatch(input, parseContext, l));
+    }
+
+    /**
+     * Return a MatchReport. if it is successful, call .toValueStructure<T>() to get the match value.
+     * Otherwise, call .toExplanationTree() to get a report of why it didn't match.
+     * @param input
+     * @param parseContext context for the whole parsing operation
+     * @param l listeners observing input characters as they are read
+     */
+    public perfectMatch(input: string | InputStream, parseContext = {}, l?: Listeners): MatchReport {
+        return perfectMatch(this.matcher, input, parseContext, l);
     }
 
 }
@@ -262,15 +282,15 @@ export class MatchingMachine {
                 this.observer).state;
 
             const previousIs = currentInputState;
-            const tryMatch = currentMatcher.matchPrefix(currentInputState, {}, parseContext);
+            const tryMatch = currentMatcher.matchPrefixReport(currentInputState, {}, parseContext);
 
             // We can't accept empty matches as genuine at this level:
             // For example, if the matcher is just a Rep or Alt
-            if (isSuccessfulMatch(tryMatch) && tryMatch.$matched !== "") {
-                const match = tryMatch.match;
+            if (isSuccessfulMatchReport(tryMatch) && tryMatch.matched !== "") {
+                const match = tryMatch.toPatternMatch();
                 // Enrich with the name
                 (match as any).$name = match.$matcherId;
-                currentMatcher = toMatchingLogic(this.onMatch(match));
+                currentMatcher = toMatchingLogic(this.onMatch(match)); // this sneakily puts it in class instance state
                 currentInputState = currentInputState.consume(match.$matched,
                     `Microgrammar after match on [${match.$matched} from [${match.$matcherId}]`);
             } else {
@@ -281,15 +301,15 @@ export class MatchingMachine {
             }
             if (this.observer) {
                 // There are two cases: If we matched, we need to look multiple times in the input
-                if (isSuccessfulMatch(tryMatch) && this.omg) {
-                    const matches = this.omg.findMatches(tryMatch.$matched);
+                if (isSuccessfulMatchReport(tryMatch) && this.omg) {
+                    const matches = this.omg.findMatches(tryMatch.matched);
                     for (const m of matches) {
                         currentMatcher = toMatchingLogic(this.observeMatch(m));
                     }
                 } else {
-                    const observerMatch = this.observer.matchPrefix(previousIs, {}, parseContext);
-                    if (isSuccessfulMatch(observerMatch)) {
-                        currentMatcher = toMatchingLogic(this.observeMatch(observerMatch.match));
+                    const observerMatch = this.observer.matchPrefixReport(previousIs, {}, parseContext);
+                    if (isSuccessfulMatchReport(observerMatch)) {
+                        currentMatcher = toMatchingLogic(this.observeMatch(observerMatch.toPatternMatch()));
                     }
                 }
             }
@@ -357,12 +377,12 @@ export function* matchesIn(matcher: any, input: string | InputStream, parseConte
             (matchingLogic as any).$consumeWhiteSpaceBetweenTokens === true,
             matchingLogic).state;
 
-        const tryMatch = matchingLogic.matchPrefix(currentInputState, {}, parseContext);
+        const tryMatch = matchingLogic.matchPrefixReport(currentInputState, {}, parseContext);
 
         // We can't accept empty matches as genuine at this level:
         // For example, if the matcher is just a Rep or Alt
-        if (isSuccessfulMatch(tryMatch) && tryMatch.$matched !== "") {
-            const m = tryMatch.match;
+        if (isSuccessfulMatchReport(tryMatch) && tryMatch.matched !== "") {
+            const m = tryMatch.toPatternMatch();
             // Enrich with the name
             (m as any).$name = m.$matcherId;
             yield m;

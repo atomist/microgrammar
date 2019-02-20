@@ -23,7 +23,10 @@
   ],
   "main": "./index.js",
   "types": "./index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "json-stringify-safe": "^5.0.1",
+    "lodash": "^4.17.11"
+  },
   "devDependencies": {
     "@types/chai": "^3.5.0",
     "@types/mocha": "^5.2.5",

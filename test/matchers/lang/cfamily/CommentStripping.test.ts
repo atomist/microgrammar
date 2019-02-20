@@ -10,7 +10,7 @@ describe("Comment stripping", () => {
             public class Foo { }
             `;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src);
+        assert.strictEqual(stripped , src);
     });
 
     it("should strip out trailing comment", () => {
@@ -20,7 +20,7 @@ describe("Comment stripping", () => {
             `;
         const src = comment + "\n" + block;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src.replace(comment, ""));
+        assert.strictEqual(stripped , src.replace(comment, ""));
     });
 
     it("should strip multiple lines of // comments", () => {
@@ -31,7 +31,7 @@ describe("Comment stripping", () => {
             `;
         const src = comment1 + "\n" + comment2 + "\n" + block;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src.replace(comment1, "").replace(comment2, ""));
+        assert.strictEqual(stripped , src.replace(comment1, "").replace(comment2, ""));
     });
 
     it("should strip out C style comment on one line", () => {
@@ -41,7 +41,7 @@ describe("Comment stripping", () => {
             `;
         const src = comment + "\n" + block;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src.replace(comment, ""));
+        assert.strictEqual(stripped , src.replace(comment, ""));
     });
 
     it("should strip C style comment on multiple lines", () => {
@@ -54,7 +54,7 @@ describe("Comment stripping", () => {
             `;
         const src = comment + "\n" + block;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src.replace(comment, ""));
+        assert.strictEqual(stripped , src.replace(comment, ""));
     });
 
     it("should handle Javadoc comment", () => {
@@ -67,7 +67,7 @@ describe("Comment stripping", () => {
             `;
         const src = comment + "\n" + block;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped === src.replace(comment, ""));
+        assert.strictEqual(stripped , src.replace(comment, ""));
     });
 
     it("should handle comments in parameters", () => {
@@ -78,10 +78,10 @@ describe("Comment stripping", () => {
             ) { }
             `;
         const stripped = new CFamilyLangHelper().stripComments(src);
-        assert(stripped.charAt(0) === "p");
-        assert(stripped.charAt(stripped.length - 1) === src.charAt(src.length - 1));
+        assert.strictEqual(stripped.charAt(0) , "p");
+        assert.strictEqual(stripped.charAt(stripped.length - 1) , src.charAt(src.length - 1));
         const expected = src.replace(comment, "");
-        assert(new CFamilyLangHelper().stripWhitespace(stripped) ===
+        assert.strictEqual(new CFamilyLangHelper().stripWhitespace(stripped) ,
             new CFamilyLangHelper().stripWhitespace(expected), "\n" + stripped + "\n" + expected);
     });
 
