@@ -19,14 +19,14 @@ import { inputStateFromStream } from "./InputStateFactory";
 import { failedMatchReport } from "./matchReport/failedMatchReport";
 
 export function exactMatch<T>(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): PatternMatch & T | DismatchReport {
+                              parseContext = {},
+                              l?: Listeners): PatternMatch & T | DismatchReport {
     return toPatternMatchOrDismatchReport<T>(perfectMatch(matcher, input, parseContext, l));
 }
 
 export function perfectMatch(matcher: MatchingLogic, input: string | InputStream,
-    parseContext = {},
-    l?: Listeners): MatchReport {
+                             parseContext = {},
+                             l?: Listeners): MatchReport {
     const inputState = inputStateFromStream(toInputStream(input), l);
 
     const result = matcher.matchPrefixReport(inputState, {}, parseContext);
