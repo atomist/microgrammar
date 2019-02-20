@@ -54,7 +54,7 @@ describe("toValueStructure", () => {
         });
 
         const inputString = "foo bar";
-        const report = mg.exactMatchReport(inputString);
+        const report = mg.perfectMatch(inputString);
         const vs = toValueStructure(report);
 
         assert.deepEqual(vs, {
@@ -71,7 +71,7 @@ describe("toValueStructure", () => {
         });
 
         const inputString = "foo bar";
-        const report = mg.exactMatchReport(inputString);
+        const report = mg.perfectMatch(inputString);
         const vs = toValueStructure(report);
 
         assert.deepEqual(vs, {

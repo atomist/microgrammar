@@ -8,7 +8,7 @@ describe("Elements default to non-greedy any", () => {
     it("does not require every named element to be defined", () => {
         const content = "->banana<- ";
         const mg = Microgrammar.fromString("->${fruit}<-");
-        const result = mg.exactMatchReport(content);
+        const result = mg.perfectMatch(content);
         if (isSuccessfulMatchReport(result)) {
             const mmmm: any = result.toValueStructure();
             assert.strictEqual(mmmm.fruit, "banana");

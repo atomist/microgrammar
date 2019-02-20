@@ -43,7 +43,7 @@ describe("toParseTree", () => {
         });
 
         const inputString = "foo bar";
-        const report = mg.exactMatchReport(inputString);
+        const report = mg.perfectMatch(inputString);
         const treeNode = toParseTree(report);
 
         assert.strictEqual(treeNode.$name, "Concat");

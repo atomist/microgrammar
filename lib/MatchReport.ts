@@ -71,7 +71,7 @@ export function toPatternMatchOrDismatchReport<T>(mr: MatchReport):
  * and Rep adds nodes for all its elements.
  * Synthetic elements are empty elements are not included; each node
  * maps to content in the file.
- * @param mr match report from Grammar.exactMatchReport
+ * @param mr match report from Grammar.perfectMatch
  */
 export function toParseTree(mr: MatchReport): TreeNodeCompatible {
     if (!isSuccessfulMatchReport(mr)) {
@@ -97,7 +97,7 @@ export interface MatchExplanationTreeNode extends TreeNodeCompatible {
  * Return a tree which explains the activity of the matching, both
  * what matched and what didn't. Empty matches are included, and failed
  * matches are included. Use this to figure out why something matched (or didn't).
- * @param mr a MatchReport from Grammar.exactMatchReport
+ * @param mr a MatchReport from Grammar.perfectMatch
  */
 export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
     return mr.toExplanationTree();
@@ -107,7 +107,7 @@ export function toExplanationTree(mr: MatchReport): MatchExplanationTreeNode {
  * Return the values extracted from a match. For any match constructed with
  * `microgrammar(...)` this will return an object with a property for each term.
  * Synthetic properties are included.
- * @param mr a MatchReport from Grammar.exactMatchReport
+ * @param mr a MatchReport from Grammar.perfectMatch
  */
 export function toValueStructure<T = any>(mr: MatchReport): T {
     if (isSuccessfulMatchReport(mr)) {

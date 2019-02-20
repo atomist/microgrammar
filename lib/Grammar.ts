@@ -70,7 +70,7 @@ export interface Grammar<T> extends Term {
      * @param parseContext context for the whole parsing operation
      * @param l listeners observing input characters as they are read
      * @return {PatternMatch&T}
-     * @deprecated use exactMatchReport; wrap in toPatternMatchOrDismatchReport if needed
+     * @deprecated use perfectMatch; wrap in toPatternMatchOrDismatchReport if needed
      */
     exactMatch(input: string | InputStream, parseContext?: object, l?: Listeners): PatternMatch & T | DismatchReport;
 
@@ -82,6 +82,6 @@ export interface Grammar<T> extends Term {
      * @param l listeners observing input characters as they are read
      * @return MatchReport
      */
-    exactMatchReport(input: string | InputStream, parseContext?: object, l?: Listeners): MatchReport;
+    perfectMatch(input: string | InputStream, parseContext?: object, l?: Listeners): MatchReport;
 
 }

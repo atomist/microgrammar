@@ -91,7 +91,7 @@ describe("Failing matches report useful stuff", () => {
             },
         });
         const inputString = "banana apple";
-        const report = mg.exactMatchReport(inputString);
+        const report = mg.perfectMatch(inputString);
         const treeNode = toExplanationTree(report);
 
         const overwrittenNode = childNamed("banana", treeNode);

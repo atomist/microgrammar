@@ -17,7 +17,7 @@ import {
     completeWithDefaults,
 } from "./CompleteFromStringOptions";
 import {
-    exactMatchReport,
+    perfectMatch,
 } from "./ExactMatch";
 import {
     MicrogrammarSpec,
@@ -45,7 +45,7 @@ export class MicrogrammarSpecParser {
     public fromString(spec: string, components: object, options: FromStringOptions): Concat {
         const optionsToUse = completeWithDefaults(options);
         const specToUse = this.preprocess(spec, optionsToUse);
-        const report = exactMatchReport(specGrammar(optionsToUse), specToUse);
+        const report = perfectMatch(specGrammar(optionsToUse), specToUse);
         if (!isSuccessfulMatchReport(report)) {
             throw new MicrogrammarParseError(`Unable to parse microgrammar: ${specToUse}`,
                 report.toExplanationTree());

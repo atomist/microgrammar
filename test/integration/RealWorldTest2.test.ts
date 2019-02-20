@@ -63,7 +63,7 @@ describe("GrammarWithOnlyARep", () => {
 
     // it("makes a parse tree", () => {
     //     const src = `@ChangeControlled @Donkey("24", name = "Eeyore")`;
-    //     const report = GrammarWithOnlyARep.exactMatchReport(src);
+    //     const report = GrammarWithOnlyARep.perfectMatch(src);
     //     if (isSuccessfulMatchReport(report)) {
     //         console.log(stringifyTree(report.toParseTree(), n => `${n.$name} [${n.$value}]`, n => n.$children));
     //         console.log(JSON.stringify(report.toValueStructure(), null, 2))
@@ -75,7 +75,7 @@ describe("GrammarWithOnlyARep", () => {
 
     // it("makes an explanation tree", () => {
     //     const src = `@ChangeControlled @Donkey["24", name = "Eeyore")`;
-    //     const report = GrammarWithOnlyARep.exactMatchReport(src);
+    //     const report = GrammarWithOnlyARep.perfectMatch(src);
     //     if (isFailedMatchReport(report)) {
     //         console.log(stringifyExplanationTree(report.toExplanationTree()));
     //     } else {

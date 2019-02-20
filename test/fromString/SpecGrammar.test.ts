@@ -2,7 +2,7 @@ import assert = require("power-assert");
 import { DefaultFromStringOptions } from "../../lib/internal/CompleteFromStringOptions";
 import {
     exactMatch,
-    exactMatchReport,
+    perfectMatch,
 } from "../../lib/internal/ExactMatch";
 import {
     MicrogrammarSpec,
@@ -15,10 +15,10 @@ describe("SpecGrammar", () => {
 
     it("can parse a series of literals and references", () => {
         const microgrammarSpecString = "->${fruit}<-";
-        const specMatch = exactMatchReport(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
+        const specMatch = perfectMatch(specGrammar(DefaultFromStringOptions), microgrammarSpecString);
         if (isSuccessfulMatchReport(specMatch)) {
             const vs = specMatch.toValueStructure<MicrogrammarSpec>();
-            assert.strictEqual(vs.these.length , 1);
+            assert.strictEqual(vs.these.length, 1);
             assert.deepEqual(vs,
                 {
                     these: [{
@@ -35,11 +35,11 @@ describe("SpecGrammar", () => {
         const specString = "->${fruit}${arrow}${drink}!";
         const specMatch = exactMatch<MicrogrammarSpec>(specGrammar(DefaultFromStringOptions), specString);
         if (isPatternMatch(specMatch)) {
-            assert.strictEqual(specMatch.these.length , 3);
-            assert.strictEqual(specMatch.these[0].element.elementName , "fruit");
-            assert.strictEqual(specMatch.these[1].element.elementName , "arrow");
-            assert.strictEqual(specMatch.these[2].element.elementName , "drink");
-            assert.strictEqual(specMatch.trailing , "!");
+            assert.strictEqual(specMatch.these.length, 3);
+            assert.strictEqual(specMatch.these[0].element.elementName, "fruit");
+            assert.strictEqual(specMatch.these[1].element.elementName, "arrow");
+            assert.strictEqual(specMatch.these[2].element.elementName, "drink");
+            assert.strictEqual(specMatch.trailing, "!");
         } else {
             assert.fail();
         }
