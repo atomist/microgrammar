@@ -65,9 +65,12 @@ describe("GrammarWithOnlyARep", () => {
         const src = `@ChangeControlled @Donkey("24", name = "Eeyore")`;
         const report = GrammarWithOnlyARep.perfectMatch(src);
         if (isSuccessfulMatchReport(report)) {
-            console.log(stringifyTree(report.toParseTree(), n => `${n.$name} [${n.$value}]`, n => n.$children));
-            console.log(JSON.stringify(report.toValueStructure(), null, 2))
-            console.log(stringifyExplanationTree(report.toExplanationTree()));
+            const printParseTree = stringifyTree(report.toParseTree(), n => `${n.$name} [${n.$value}]`, n => n.$children);
+            const printValueStructure = JSON.stringify(report.toValueStructure(), null, 2);
+            const printExplanationTree = stringifyExplanationTree(report.toExplanationTree());
+            // console.log(printValueStructure);
+            // console.log(printParseTree);
+            // console.log(printExplanationTree);
         } else {
             assert.fail("did not match");
         }
@@ -77,7 +80,8 @@ describe("GrammarWithOnlyARep", () => {
         const src = `@ChangeControlled @Donkey["24", name = "Eeyore")`;
         const report = GrammarWithOnlyARep.perfectMatch(src);
         if (isFailedMatchReport(report)) {
-            console.log(stringifyExplanationTree(report.toExplanationTree()));
+            const printExplanationTree = stringifyExplanationTree(report.toExplanationTree());
+            // console.log(printExplanationTree);
         } else {
             assert.fail("should not match");
         }
