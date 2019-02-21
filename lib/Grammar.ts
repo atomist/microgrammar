@@ -12,7 +12,7 @@ import {
     SkipCapable,
     WhiteSpaceHandler,
 } from "./Config";
-import { MatchReport } from "./MatchReport";
+import { MatchReport, SuccessfulMatchReport } from "./MatchReport";
 
 export type AllowableTermDef<PARAMS> = (TermDef | ((ctx: PARAMS & any) => any) | { [index: string]: any });
 

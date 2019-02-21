@@ -36,6 +36,7 @@ import { readyToMatch } from "./internal/Whitespace";
 import {
     isSuccessfulMatchReport,
     MatchReport,
+    SuccessfulMatchReport,
     toPatternMatchOrDismatchReport,
 } from "./MatchReport";
 import { InputStream } from "./spi/InputStream";
@@ -157,7 +158,17 @@ export class Microgrammar<T> implements Grammar<T> {
      * @param {Listeners} l
      * @return {Iterable<PatternMatch>}
      */
-    public matchIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
+    public matchIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch & T> {
+        const mrIterable = matchesIn(this, input, parseContext, l);
+        const newIt = function*(): Iterable<PatternMatch & T> {
+            for (const elt of mrIterable) {
+                yield elt.toPatternMatch<T>();
+            }
+        };
+        return newIt();
+    }
+
+    public matchReportIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<SuccessfulMatchReport> {
         return matchesIn(this, input, parseContext, l);
     }
 
@@ -187,11 +198,16 @@ export class Microgrammar<T> implements Grammar<T> {
      */
     public async findMatchesAsync(input: string | InputStream,
                                   parseContext?: {}): Promise<Array<T & PatternMatch>> {
-        const matches = [];
+        return (await this.findMatchReportsAsync(input, parseContext)).map(mr => mr.toPatternMatch<T>());
+    }
+
+    public async findMatchReportsAsync(input: string | InputStream,
+                                       parseContext?: {}): Promise<SuccessfulMatchReport[]> {
+        const matches: SuccessfulMatchReport[] = [];
         for (const m of matchesIn(this.matcher, input, parseContext)) {
             matches.push(m);
         }
-        return matches as Array<T & PatternMatch>;
+        return matches;
     }
 
     /**
@@ -366,7 +382,7 @@ class LazyMatcher extends MatchingMachine {
  * @param {Listeners} l
  * @return {Iterable<PatternMatch>}
  */
-export function* matchesIn(matcher: any, input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
+export function* matchesIn(matcher: any, input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<SuccessfulMatchReport> {
     const matchingLogic = toMatchingLogic(matcher);
     const stream = toInputStream(input);
     const stateManager = new InputStateManager(stream);
@@ -385,7 +401,7 @@ export function* matchesIn(matcher: any, input: string | InputStream, parseConte
             const m = tryMatch.toPatternMatch();
             // Enrich with the name
             (m as any).$name = m.$matcherId;
-            yield m;
+            yield tryMatch;
             //  = toMatchingLogic(this.onMatch(match));
             currentInputState = currentInputState.consume(m.$matched,
                 `Microgrammar after match on [${m.$matched} from [${m.$matcherId}]`);
