@@ -31,6 +31,10 @@ export interface SuccessfulMatchReport extends AnyMatchReport {
     toValueStructure<T = any>(): T;
 }
 
+export function toUpdatableStructure<T>(mr: SuccessfulMatchReport): T {
+    return mr.toValueStructure();
+}
+
 export function isSuccessfulMatchReport(fmr: MatchReport): fmr is SuccessfulMatchReport {
     return fmr.successful;
 }

@@ -1,4 +1,3 @@
-import { PatternMatch } from "../PatternMatch";
 
 function replaceFirstAfter(content: string, offset: number, old: string, replacement: string) {
     return content.substring(0, offset) + content.substring(offset).replace(old, replacement);
@@ -11,7 +10,7 @@ export class ChangeSet {
 
     constructor(private readonly initialContent: string) { }
 
-    public change(match: PatternMatch, to: string) {
+    public change(match: { $offset: number, $matched: string, $matcherId: string }, to: string) {
         const change = new Change(match, to);
         // Don't add twice: update
         const found = this.changes.filter(c => c.match === match);
@@ -47,7 +46,7 @@ export class ChangeSet {
 
 class Change {
 
-    constructor(public match: PatternMatch, public to: string) {
+    constructor(public match: { $offset: number, $matched: string, $matcherId: string }, public to: string) {
         if (match.$offset === undefined) {
             throw new Error(`No offset on match with id [${match.$matcherId}]: matched=[${match.$matched}]`);
         }

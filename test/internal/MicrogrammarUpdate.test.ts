@@ -5,8 +5,10 @@ import { Opt } from "../../lib/Ops";
 
 import * as assert from "power-assert";
 
+import { SuccessfulMatchReport, toUpdatableStructure } from "../../lib/MatchReport";
 import { Integer } from "../../lib/Primitives";
 import { RepSep } from "../../lib/Rep";
+import { applyChanges } from "../../lib/internal/matchReport/updatableStructure";
 
 describe("MicrogrammarUpdateTest", () => {
 
@@ -22,17 +24,21 @@ describe("MicrogrammarUpdateTest", () => {
         });
     }
 
-    // it("update name in late element at start", () => {
-    //     const content = "<first><second>";
-    //     const result: MatchReport[] = xmlGrammar().findMatchReports(content);
-    //     const valueStructure = Microgrammar.updatableMatch(result[0], content);
-    //     updater.second = "<newSecond>";
-    //     assert.strictEqual(updater.newContent(), "<first><newSecond>");
-    //     const cs = new ChangeSet(content);
-    //     assert(result[0].second.$valueMatches.name);
-    //     cs.change(result[0].second.$valueMatches.name, "newSecond");
-    //     assert.strictEqual(cs.updated(), "<first><newSecond>");
-    // });
+    interface XmlNode {
+        first: string;
+        second?: string;
+    }
+
+    it("update name in late element at start", () => {
+        const content = "<first><second>";
+        const result: XmlNode[] = iterateIntoArray(xmlGrammar().matchReportIterator(content))
+            .map(s => toUpdatableStructure<XmlNode>(s)); // the type specification will move to matchReportIterator
+        const updatableStructure = result[0];
+        updatableStructure.second = "<newSecond>";
+        assert.strictEqual(applyChanges([updatableStructure], content), "<first><newSecond>");
+        // we also want to be able to get the deltas. Check those
+    });
+    // also test updating an opt that wasn't there :-)
 
     it("update nested element", () => {
         const person = Microgrammar.fromDefinitions({
@@ -157,7 +163,8 @@ describe("MicrogrammarUpdateTest", () => {
             },
         });
         const line = "Jenny 46 Coonamble, Chatswood 2067 AU/David 12 Somewhere, Someplace 40387 US";
-        const results = person.findMatches(line) as any;
+        const results = person.findMatches(line);
+
         assert.strictEqual(results.length, 2);
         const updatable = Microgrammar.updatable<any>(results, line);
         updatable.matches[0].address.suburb = "tarantula";
@@ -192,3 +199,11 @@ describe("MicrogrammarUpdateTest", () => {
     });
 
 });
+
+function iterateIntoArray<T>(iterable: Iterable<T>): T[] {
+    const output: T[] = [];
+    for (const i of iterable) {
+        output.push(i);
+    }
+    return output;
+}

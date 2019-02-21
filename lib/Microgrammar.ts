@@ -158,11 +158,11 @@ export class Microgrammar<T> implements Grammar<T> {
      * @param {Listeners} l
      * @return {Iterable<PatternMatch>}
      */
-    public matchIterator(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch> {
+    public matchIterator<T = any>(input: string | InputStream, parseContext = {}, l?: Listeners): Iterable<PatternMatch & T> {
         const mrIterable = matchesIn(this, input, parseContext, l);
-        const newIt = function* (): Iterable<PatternMatch> {
+        const newIt = function* (): Iterable<PatternMatch & T> {
             for (const elt of mrIterable) {
-                yield elt.toPatternMatch();
+                yield elt.toPatternMatch<T>();
             }
         };
         return newIt();
@@ -198,11 +198,16 @@ export class Microgrammar<T> implements Grammar<T> {
      */
     public async findMatchesAsync(input: string | InputStream,
         parseContext?: {}): Promise<Array<T & PatternMatch>> {
-        const matches = [];
+        return (await this.findMatchReportsAsync(input, parseContext)).map(mr => mr.toPatternMatch<T>());
+    }
+
+    public async findMatchReportsAsync(input: string | InputStream,
+        parseContext?: {}): Promise<SuccessfulMatchReport[]> {
+        const matches: SuccessfulMatchReport[] = [];
         for (const m of matchesIn(this.matcher, input, parseContext)) {
             matches.push(m);
         }
-        return matches as Array<T & PatternMatch>;
+        return matches;
     }
 
     /**
