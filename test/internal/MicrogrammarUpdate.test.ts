@@ -4,7 +4,10 @@ import { Opt } from "../../lib/Ops";
 
 import * as assert from "power-assert";
 
-import { applyChanges, toUpdatableStructure } from "../../lib/internal/matchReport/updatableStructure";
+import {
+    applyChanges,
+    toUpdatableStructure,
+} from "../../lib/internal/matchReport/updatableStructure";
 import { Integer } from "../../lib/Primitives";
 import { RepSep } from "../../lib/Rep";
 
