@@ -11,6 +11,7 @@ import {
 } from "../../PatternMatch";
 import { TreeNodeCompatible } from "./../../TreeNodeCompatible";
 import { failedMatchReport } from "./failedMatchReport";
+import { UpdatableStructureInternal } from "./updatableStructure";
 import {
     SuccessfulMatchReportWrapper,
     wrappingMatchReport,
@@ -142,8 +143,8 @@ class TreeMatchReport implements SuccessfulMatchReport {
         this.applyComputeEffects(output);
         return output as T;
     }
-    public toExplanationTree(): MatchExplanationTreeNode {
 
+    public toExplanationTree(): MatchExplanationTreeNode {
         const happiness = this.children.map(c =>
             wrapChild(this.matcher, c, computationsThatAlter(c, this.computeEffects, this.extraProperties)).toExplanationTree());
 
@@ -153,6 +154,60 @@ class TreeMatchReport implements SuccessfulMatchReport {
             reason: this.reason,
             $children: happiness,
         };
+    }
+
+    public toUpdatableStructure<T>(): T {
+        const target = {
+            $deltas: [],
+            $innerValues: {} as T,
+            $alreadyUpdated: [],
+        };
+        for (const child of this.children) {
+            if (!child.explicit) {
+                continue;
+            }
+            if (isSpecialMember(child.name)) {
+                continue;
+            }
+
+            target.$innerValues[child.name] = child.matchReport.toValueStructure(); // todo: nest updatable ones
+
+            Object.defineProperty(target, child.name, {
+                get() {
+                    if (target.$alreadyUpdated.includes(child.name)) {
+                        throw new Error(`You have already changed the value of ${child.name}; don't retrieve it`);
+                    }
+                    return target.$innerValues[child.name];
+                },
+                set(newValue) {
+                    target.$deltas.push({
+                        $offset: child.matchReport.offset,
+                        $matched: child.matchReport.matched,
+                        $matcherId: child.matchReport.matcher.$id,
+                        to: newValue,
+                    });
+                    target.$alreadyUpdated.push(child.name);
+                },
+            });
+
+        }
+        const propertyValues = this.extraProperties;
+        this.computeEffects.forEach(ce => {
+            [...ce.alteredProperties, ...ce.newProperties]
+                .filter(p => !isSpecialMember(p))
+                .forEach(p => {
+                    Object.defineProperty(target, p, {
+                        get() {
+                            return propertyValues[p];
+                        },
+                        set(newValue) {
+                            throw new Error(`Cannot update computed property ${p}`);
+                        },
+                    });
+                });
+        });
+
+        return target as any as UpdatableStructureInternal & T;
     }
 
     private applyComputeEffects(target: Record<string, any>) {

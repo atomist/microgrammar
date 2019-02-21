@@ -1,14 +1,12 @@
-import { ChangeSet } from "../../lib/internal/ChangeSet";
 import { isSuccessfulMatch } from "../../lib/MatchPrefixResult";
 import { Microgrammar } from "../../lib/Microgrammar";
 import { Opt } from "../../lib/Ops";
 
 import * as assert from "power-assert";
 
-import { SuccessfulMatchReport, toUpdatableStructure } from "../../lib/MatchReport";
+import { applyChanges, toUpdatableStructure } from "../../lib/internal/matchReport/updatableStructure";
 import { Integer } from "../../lib/Primitives";
 import { RepSep } from "../../lib/Rep";
-import { applyChanges } from "../../lib/internal/matchReport/updatableStructure";
 
 describe("MicrogrammarUpdateTest", () => {
 

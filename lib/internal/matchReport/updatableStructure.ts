@@ -1,4 +1,5 @@
-import { flatten } from "lodash.flatten";
+import * as flatten from "lodash.flatten";
+import { SuccessfulMatchReport } from "../../MatchReport";
 import { ChangeSet } from "../ChangeSet";
 
 interface Delta {
@@ -8,7 +9,7 @@ interface Delta {
     to: string;
 }
 
-interface UpdatableStructureInternal {
+export interface UpdatableStructureInternal {
     $deltas: Delta[];
 }
 function isUpdatableStructure(thing: any): thing is UpdatableStructureInternal {
@@ -27,4 +28,11 @@ export function applyChanges<T>(updatableStructures: T[], originalContent: strin
     }
 
     return changeSet.updated();
+}
+
+export function toUpdatableStructure<T>(mr: SuccessfulMatchReport): T {
+    if ((mr as any).toUpdatableStructure) {
+        return (mr as any).toUpdatableStructure() as T;
+    }
+    throw new Error("I don't know how to do that yet on " + mr.matcher.$id);
 }
