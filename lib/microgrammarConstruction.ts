@@ -1,3 +1,4 @@
+import { FromStringOptions } from "./FromStringOptions";
 import {
     AnyKeysOf,
     Grammar,
@@ -21,6 +22,16 @@ export interface MicrogrammarDefinition<T> {
      * Definitions of the productions in this grammar
      */
     terms?: TermsDefinition<T>;
+
+    /**
+     * Configure special characters in fromString.
+     * Defaults to:
+     * {
+     *    ellipsis: "...",
+     *    componentPrefix: "$", // so terms are designated like ${name}
+     * }
+     */
+    options?: FromStringOptions;
 }
 
 /**
@@ -34,7 +45,7 @@ export function microgrammar<T>(definition: MicrogrammarDefinition<T> | TermsDef
         return Microgrammar.fromDefinitions(definition as any);
     }
     if (!!definition.phrase) {
-        return Microgrammar.fromString(definition.phrase, definition.terms);
+        return Microgrammar.fromString(definition.phrase, definition.terms, definition.options);
     }
     return Microgrammar.fromDefinitions(definition.terms);
 }

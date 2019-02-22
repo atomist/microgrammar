@@ -64,7 +64,10 @@ describe("Microgrammar", () => {
 
         it("should infer from definitions and string", () => {
             const mg = microgrammar<{ forename: string, surname: string }>(
-                { phrase: "${forename} ${surname}", terms: { forename: "forename", surname: /.*/ } });
+                {
+                    phrase: `#{forename} #{surname}`,
+                    terms: { forename: "forename", surname: /.*/ },
+                });
             // This will never match, but is just to test for compilation
             const match = mg.firstMatch("");
             if (match) {
@@ -76,7 +79,11 @@ describe("Microgrammar", () => {
         it("should support composition", () => {
             interface Person { forename: string; surname: string; }
             const person = microgrammar<Person>(
-                { phrase: "${forename} ${surname}", terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ } });
+                {
+                    phrase: "#{forename} #{surname}",
+                    terms: { forename: /[a-zA-Z]+/, surname: /[a-zA-Z]+/ },
+                    options: { componentPrefix: "#" },
+                });
             const employee = microgrammar<{ person: Person, id: number }>({
                 person,
                 id: Integer,
