@@ -37,7 +37,10 @@ export {
     MatchExplanationTreeNode,
 } from "./lib/MatchReport";
 
-export { MicrogrammarParseError } from "./lib/MicrogrammarParseError";
+export {
+    MicrogrammarParseError,
+    stringifyExplanationTree,
+} from "./lib/MicrogrammarParseError";
 
 export * from "./lib/Microgrammar";
 
