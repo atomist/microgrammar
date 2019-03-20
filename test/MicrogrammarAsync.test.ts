@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import * as assert from "power-assert";
 import { WhiteSpaceSensitive } from "../lib/Config";
+import { SuccessfulMatchReport } from "../lib/MatchReport";
 import {
     matchesIn,
     Microgrammar,
@@ -15,10 +16,10 @@ describe("Microgrammar async", () => {
         const mg = Microgrammar.fromDefinitions({
             name: "foo",
         });
-        const result = await mg.findMatchesAsync(content);
+        const result = await mg.findMatchReportsAsync(content);
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
-        expect(result[0].$matched).to.equal("foo");
+        expect(result[0].matched).to.equal("foo");
     });
 
     function makeMg() {
@@ -32,10 +33,10 @@ describe("Microgrammar async", () => {
         const validMg = Microgrammar.fromDefinitions({
             content: makeMg(),
         });
-        const result = await validMg.findMatchesAsync(content);
+        const result = await validMg.findMatchReportsAsync(content);
         // console.log("Result is " + JSON.stringify(result));
         assert.strictEqual(result.length, 1);
-        assert.strictEqual(result[0].$matched, "foo");
+        assert.strictEqual(result[0].matched, "foo");
     });
 
     it("XML element", async () => {
@@ -48,7 +49,7 @@ describe("Microgrammar async", () => {
         const result = await mg.findMatchesAsync(content);
         // console.log("Result is " + JSON.stringify(result));
         assert.strictEqual(result.length, 1);
-        const r0 = result[0] as any;
+        const r0 = result[0];
         assert.strictEqual(r0.name, "foo");
         // expect(r0.matched).to.equal("<foo>")
     });
@@ -59,7 +60,7 @@ describe("Microgrammar async", () => {
             name: /[a-zA-Z0-9]+/,
             _rx: ">",
         });
-        const result = [];
+        const result: SuccessfulMatchReport[] = [];
         const matches = matchesIn(mg, content);
         for (const m of matches) {
             result.push(m);
@@ -67,11 +68,11 @@ describe("Microgrammar async", () => {
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(2);
         const r0 = result[0];
-        expect(r0.name).to.equal(first);
+        expect(r0.toValueStructure().name).to.equal(first);
         // expect(r0.matched).to.equal("<foo>")
         const r1 = result[1];
-        expect(r1.name).to.equal(second);
-        expect(r1.$matched).to.equal("<bar>");
+        expect(r1.toValueStructure().name).to.equal(second);
+        expect(r1.matched).to.equal("<bar>");
         // expect(r1.name.matched).to.equal("bar");
     }
 
@@ -81,19 +82,19 @@ describe("Microgrammar async", () => {
             name: /[a-zA-Z0-9]+/,
             _rx: ">",
         });
-        const result = [];
-        const matches = mg.matchIterator(content);
+        const result: SuccessfulMatchReport[] = [];
+        const matches = mg.matchReportIterator(content);
         for (const m of matches) {
             result.push(m);
         }
         // console.log("Result is " + JSON.stringify(result));
         expect(result.length).to.equal(2);
         const r0 = result[0];
-        expect(r0.name).to.equal(first);
+        expect(r0.toValueStructure().name).to.equal(first);
         // expect(r0.matched).to.equal("<foo>")
         const r1 = result[1];
-        expect(r1.name).to.equal(second);
-        expect(r1.$matched).to.equal("<bar>");
+        expect(r1.toValueStructure().name).to.equal(second);
+        expect(r1.matched).to.equal("<bar>");
         // expect(r1.name.matched).to.equal("bar");
     }
 
@@ -140,12 +141,12 @@ describe("Microgrammar async", () => {
             first: element,
             second: element,
         });
-        const result = await mg.findMatchesAsync(content);
+        const result = await mg.findMatchReportsAsync(content);
         // console.log("xxx Result is " + JSON.stringify(result));
         expect(result.length).to.equal(1);
-        const r0 = result[0] as any;
-        expect(r0.$matched).to.equal(content);
-        expect(r0.first.namex).to.equal("first");
+        const r0 = result[0];
+        expect(r0.matched).to.equal(content);
+        expect(r0.toValueStructure().first.namex).to.equal("first");
     });
 
     it("2 elements: whitespace insensitive", async () => {

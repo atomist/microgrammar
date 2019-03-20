@@ -25,6 +25,7 @@
   "types": "./index.d.ts",
   "dependencies": {
     "json-stringify-safe": "^5.0.1",
+    "lodash.flatten": "^4.4.0",
     "stringify-tree": "^1.0.2"
   },
   "devDependencies": {
