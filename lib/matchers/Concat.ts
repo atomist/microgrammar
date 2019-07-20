@@ -161,7 +161,7 @@ export class Concat implements Concatenation, LazyMatchingLogic, WhiteSpaceHandl
                     }
                 }
             }
-            this.firstMatcher = this.matchSteps.filter(s => isMatcher(s))[0] as Matcher;
+            this.firstMatcher = this.matchSteps.filter(isMatcher)[0] as Matcher;
         }
     }
 

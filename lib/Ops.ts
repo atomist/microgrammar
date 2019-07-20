@@ -149,7 +149,7 @@ export class Alt implements MatchingLogic {
 
     constructor(a: any, b: any, ...matchers: any[]) {
         const matchObjects = [a, b].concat(matchers);
-        this.matchers = matchObjects.map(m => toMatchingLogic(m));
+        this.matchers = matchObjects.map(toMatchingLogic);
     }
 
     // tslint:disable-next-line:member-ordering

@@ -44,7 +44,7 @@ export abstract class PatternMatch {
 }
 
 export function isPatternMatch(mpr: PatternMatch | DismatchReport): mpr is PatternMatch {
-    return mpr != null && mpr !== undefined && (mpr as PatternMatch).$value !== undefined;
+    return mpr != undefined && mpr !== undefined && (mpr as PatternMatch).$value !== undefined;
 }
 
 /**
@@ -66,7 +66,7 @@ export abstract class TreePatternMatch extends PatternMatch {
 }
 
 export function isTreePatternMatch(om: PatternMatch): om is TreePatternMatch {
-    return om != null && (om as TreePatternMatch).submatches !== undefined;
+    return om != undefined && (om as TreePatternMatch).submatches !== undefined;
 }
 
 /**
@@ -82,7 +82,7 @@ export function isSpecialMember(name: string) {
 
 function justTheData(match: object): any {
     if (Array.isArray(match)) {
-        return match.map(m => justTheData(m));
+        return match.map(justTheData);
     }
 
     if (typeof match !== "object") {
