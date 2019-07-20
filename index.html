@@ -1,0 +1,501 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@atomist/microgrammar</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@atomist/microgrammar</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @atomist/microgrammar</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="-atomist-microgrammar">@atomist/microgrammar</h1>
+				<p><a href="https://app.atomist.com/workspace/T29E48P34"><img src="http://badge.atomist.com/T29E48P34/atomist/microgrammar/92d2035b-575e-41c4-9088-996dc70d69c2" alt="atomist sdm goals"></a>
+				<a href="https://www.npmjs.com/package/@atomist/microgrammar"><img src="https://img.shields.io/npm/v/@atomist/microgrammar.svg" alt="npm version"></a></p>
+				<p>Parsing library written in <a href="https://www.typescriptlang.org/" title="TypeScript">TypeScript</a>, filling the large gap
+					between the sweet spots of regular expressions and full-blown
+					<a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form" title="Backus–Naur Form">BNF</a> or equivalent grammars.  It can parse and cleanly update
+				structured content.</p>
+				<h2 id="concepts">Concepts</h2>
+				<p><strong>Microgrammars</strong> are a powerful way of parsing structured content
+					such as source code, described in this <a href="http://web.stanford.edu/~mlfbrown/paper.pdf" title="How to build static checking systems using orders of magnitude less code Brown et al., ASPLOS 2016">Stanford paper</a>.
+					Microgrammars are designed to recognize structures in a string or
+					stream and extract their content: For example, to recognize a Java
+					method that has a particular annotation and to extract particular
+					parameters. They are more powerful and <a href="https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags#answer-1732454">typically more
+					readable</a> than <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expressions</a> for complex
+				cases, although they can be built using regular expressions.</p>
+				<p>Atomist microgrammars go beyond the Stanford paper example in that
+					they permit <em>updating</em> as well as matching, preserving positions. They
+					also draw inspiration from other experience and sources such as the
+				old <a href="https://en.wikipedia.org/wiki/SNOBOL" title="SNOBOL Programming Language">SNOBOL programming language</a>.</p>
+				<h2 id="examples">Examples</h2>
+				<p>There are two styles of use:</p>
+				<ul>
+					<li>From <em>definitions</em>: Defining a grammar in JavaScript objects representing the subcomponents (lower level productions)</li>
+					<li>From strings: Defining a grammar in a string that resembles input
+					that will be matched</li>
+				</ul>
+				<p>A microgrammar has a return type defined by its definitions. Each match implements this interface and also the <code>PatternMatch</code> interface, which exposes the offset within the input and matched value, which may differ from the exposed typed value. (For example, a <code>Person</code> might have a <code>forename</code> and <code>surname</code>, but its <code>$matched</code> value might include the entire matched string with whitespace.) The fields of the <code>PatternMatch</code> interface begin with a <code>$</code> to ensure that they are out of band.</p>
+				<p>When you&#39;ve defined a microgrammar, you can use it to match input: usually a string.</p>
+				<p>Generator-style iteration is usually most efficient, and looks like this:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> matches = myMicrogrammar.matchIterator(inputString);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> match of matches) {
+    <span class="hljs-comment">// Do with match. You can jump out of the generator here.</span>
+}</code></pre>
+				<p>You can also get all matches in one pass, like this:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> matches = myMicrogrammar.findMatches(inputString);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> match of matches) {
+    <span class="hljs-comment">// Do with match</span>
+}</code></pre>
+				<p>If you are seeking only one match, you can use a method that returns a match or <code>undefined</code>, as follows:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> match = myMicrogrammar.firstMatch(inputString);
+<span class="hljs-keyword">if</span> (match) {
+    <span class="hljs-comment">// Do with match</span>
+}</code></pre>
+				<h3 id="definitions-style">Definitions style</h3>
+				<p>Here&#39;s a simple example:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> mg = microgrammar&lt;{name: <span class="hljs-built_in">string</span>, age: <span class="hljs-built_in">number</span>}&gt;({
+    name: <span class="hljs-regexp">/[a-zA-Z0-9]+/</span>,
+    _col: <span class="hljs-string">":"</span>,
+    age: Integer
+});
+
+<span class="hljs-keyword">const</span> results = mg.findMatches(<span class="hljs-string">"-celine:61 greg*^ tom::: mandy:11"</span>);
+assert(result.length === <span class="hljs-number">2</span>);
+<span class="hljs-keyword">const</span> first = results[<span class="hljs-number">0</span>];
+assert(first.$matched === <span class="hljs-string">"celine:61"</span>);
+<span class="hljs-comment">// The offset of this match was the 1st character, as the 0th was discarded</span>
+assert(first.$offset === <span class="hljs-number">1</span>);
+assert(first.name === <span class="hljs-string">"celine"</span>);
+assert(first.age === <span class="hljs-number">61</span>);</code></pre>
+				<p>Some notes:</p>
+				<ul>
+					<li>A microgrammar definition is typically an object literal, with its
+						properties being matched in turn. This is like <strong>concatenation</strong>
+					in a BNF grammar.</li>
+					<li>Matcher property values can be regular expressions (like
+						<code>/[a-zA-Z0-9]+/</code> here), string literals (like <code>:</code>), or custom
+						matchers (like <code>Integer</code>). It&#39;s easy to define custom matchers for
+					use in composition.</li>
+					<li>All properties need to match for the whole microgrammar to match.</li>
+					<li>Properties that match are bound to the result, unless their names begin with <code>_</code>, in which
+					case the values are discarded.</li>
+					<li>Certain out of band values, beginning with <code>$</code>, are added to the
+					results, showing the exact text that matched, the offset etc.</li>
+					<li>When using TypeScript, microgrammar returns can be strongly typed. In this case we&#39;ve
+						used an anonymous type, but we could also use an interface. We
+					could also use untyped, JavaScript style.</li>
+					<li>Matching skips junk such as <code>greg*^ tom:::</code>. In this case, <code>greg</code>
+						and <code>tom:</code> will look like the start of valid matches, but the
+						first will fail when it can&#39;t match a <code>:</code> and the second when
+					there isn&#39;t a digit after the colon.</li>
+					<li>We can match against a string or a stream. In this case we&#39;ve used
+						a string. In stream matching, we&#39;d be more likely to use one an
+						API offering callbacks rather than building an array, so we don&#39;t
+					need to hold all our matches in memory at once.</li>
+				</ul>
+				<p>Of course, such a simple example could easily be handled by a regular
+					expression and capture groups. But the power becomes apparent with
+				nested productions and more elaborate matchers.</p>
+				<p>A more complex example, showing composition:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> CLASS_NAME = <span class="hljs-regexp">/[a-zA-Z_$][a-zA-Z0-9_$]+/</span>;
+
+<span class="hljs-comment">// Any annotation we're not interested in</span>
+<span class="hljs-keyword">const</span> DiscardedAnnotation = {
+    _at: <span class="hljs-string">"@"</span>,
+    _annotationName: CLASS_NAME,
+    _content: optional(JavaParenthesizedExpression),
+};
+
+<span class="hljs-keyword">const</span> SpringBootApp = microgrammar&lt;{ name: <span class="hljs-built_in">string</span> }&gt;({
+    _app: <span class="hljs-string">"@SpringBootApplication"</span>,
+    _content: optional(JavaParenthesizedExpression),
+    _otherAnnotations: zeroOrMore(DiscardedAnnotation),
+    _visibility: optional(<span class="hljs-string">"public"</span>),
+    _class: <span class="hljs-string">"class"</span>,
+    name: CLASS_NAME,
+});</code></pre>
+				<p>This will match content like this:</p>
+				<pre><code class="language-java"><span class="hljs-meta">@SpringBootApplication</span>
+<span class="hljs-meta">@Foo</span>
+<span class="hljs-meta">@Bar</span>(name = <span class="hljs-string">"Baz"</span>, magicParam = <span class="hljs-number">31754</span>)
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MySpringBootApplication</span></span></code></pre>
+				<p>Notes:</p>
+				<ul>
+					<li><code>JavaParenthesizedExpression</code> is a built-in matcher constant that
+						matches any valid Java content within <code>(...)</code>. It uses a state
+					machine. It&#39;s easy to write such custom matchers.</li>
+					<li>By default, microgrammars are tolerant of whitespace, treating it
+						as a token separator. This is the behavior we want when parsing
+					most languages or configuration formats.</li>
+					<li>Because the other properties have names beginning with <code>_</code>, only
+						the class name (<code>MySpringBootApplication</code> in our example) is bound
+						to the result. We care about the structure of the rest of the
+						class declaration, but we don&#39;t need to extract other values in
+					this particular case.</li>
+				</ul>
+				<h3 id="string-style">String style</h3>
+				<p>This is a higher level usage model in which a string resembling the
+					desired input but with variable placeholders is used to define the
+				grammar.</p>
+				<p>This style is ideally suited for simpler grammars. For example:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> ValuePredicateGrammar = microgrammar&lt;Predicate&gt;({
+    phrase: <span class="hljs-string">"@${name}='${value}'"</span>});</code></pre>
+				<p>It can be combined with the definitional style through providing
+					optional definitions for the named fields. For example, to constrain
+				the match on a name in the above example using a regular expression:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> ValuePredicateGrammar = microgrammar&lt;Predicate&gt;({
+    phrase: <span class="hljs-string">"@${name}='${value}'"</span>, 
+    terms: {
+        name: <span class="hljs-regexp">/[a-z]+/</span>
+    }
+});</code></pre>
+				<p>As with the object definitional style, whitespace is ignored by default.</p>
+				<p>Further documentation can be found in the
+					<a href="docs/reference.md">reference</a>.  You can also take a look at the tests
+				in this repository.</p>
+				<h2 id="alternatives-and-when-to-use-microgrammars">Alternatives and when to use microgrammars</h2>
+				<p>Microgrammars have obvious similarities to <a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form" title="Backus–Naur Form">BNF grammars</a>, but
+				differ in some important respects:</p>
+				<ul>
+					<li>They are intended to match and explain <em>parts</em> of the input, rather
+					than the whole input</li>
+					<li>They excel at skipping content they are uninterested in</li>
+					<li>They are not necessarily context free</li>
+					<li>They do not need to construct a full AST, although they construct
+						ASTs for structures they do match. Thus they can easily cope with
+					partially structured data, happily skipping over incomprehensible content</li>
+				</ul>
+				<p>Similarities are:</p>
+				<ul>
+					<li>The idea of <strong>productions</strong></li>
+					<li>Composability, including the ability to reuse productions in
+					different grammars</li>
+					<li>Operations such as <em>alternative</em>, <em>optional</em> and <em>rep</em>, that
+					enable building complex structures.</li>
+				</ul>
+				<p>Compared to regular expressions, microgrammars are:</p>
+				<ul>
+					<li>Capable of handing greater complexity</li>
+					<li>More composable</li>
+					<li>Higher level, able to use regular expressions as building blocks</li>
+					<li>Capable of expressing nested structures</li>
+					<li>Arbitrarily extensible through TypeScript function predicates and
+					custom <strong>matchers</strong></li>
+				</ul>
+				<p>While it would be overkill to use a microgrammar for something that
+					can be expressed in a simple regex, microgrammars tend to be clearer
+				for complex cases.</p>
+				<h2 id="usage">Usage</h2>
+				<p>The <a href="https://www.npmjs.com/package/@atomist/microgrammar" title="@atomist/microgrammar Node.js Package"><code>@atomist/microgrammar</code> package</a> contains both the
+					TypeScript typings and compiled JavaScript.  You can use this project
+				by adding the dependency in your <code>package.json</code>.</p>
+				<pre><code>$ <span class="hljs-built_in">npm</span> install --save @atomist/microgrammar</code></pre><h2 id="troubleshooting">Troubleshooting</h2>
+				<p>If you struggle to make your microgrammars match, please refer to the <a href="docs/trouble.md" title="Troubleshooting microgrammars">troubleshooting page</a>.</p>
+				<h2 id="performance-considerations">Performance considerations</h2>
+				<p>See <a href="docs/performance.md" title="Writing efficient microgrammars">Writing efficient microgrammars</a>.</p>
+				<h2 id="support">Support</h2>
+				<p>General support questions should be discussed in the <code>#support</code>
+				channel in the <a href="https://join.atomist.com/" title="Atomist Community Slack">Atomist community Slack workspace</a>.</p>
+				<p>If you find a problem, please create an <a href="https://github.com/atomist/microgrammar/issues">issue</a>.</p>
+				<h2 id="development">Development</h2>
+				<p>You will need to install <a href="https://nodejs.org/" title="Node.js">Node.js</a> to build and test this
+				project.</p>
+				<h3 id="build-and-test">Build and test</h3>
+				<p>Install dependencies.</p>
+				<pre><code>$ npm <span class="hljs-keyword">install</span></code></pre><p>Use the <code>build</code> package script to compile, test, lint, and build the
+				documentation.</p>
+				<pre><code>$ npm <span class="hljs-keyword">run</span><span class="bash"> build</span></code></pre><h3 id="release">Release</h3>
+				<p>Releases are handled via the <a href="https://github.com/atomist/atomist-sdm" title="Atomist Software Delivery Machine">Atomist SDM</a>.  Just press
+				the &#39;Approve&#39; button in the Atomist dashboard or Slack.</p>
+				<hr>
+				<p>Created by <a href="https://atomist.com/" title="Atomist - How Teams Deliver Software">Atomist</a>.
+				Need Help?  <a href="https://join.atomist.com/" title="Atomist Community Slack">Join our Slack workspace</a>.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_config_.html">"lib/<wbr>Config"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_fromstringoptions_.html">"lib/<wbr>From<wbr>String<wbr>Options"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_grammar_.html">"lib/<wbr>Grammar"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_inputstate_.html">"lib/<wbr>Input<wbr>State"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchprefixresult_.html">"lib/<wbr>Match<wbr>Prefix<wbr>Result"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchreport_.html">"lib/<wbr>Match<wbr>Report"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_.html">"lib/<wbr>Matchers"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_microgrammar_.html">"lib/<wbr>Microgrammar"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_microgrammarparseerror_.html">"lib/<wbr>Microgrammar<wbr>Parse<wbr>Error"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_ops_.html">"lib/<wbr>Ops"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_patternmatch_.html">"lib/<wbr>Pattern<wbr>Match"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_primitives_.html">"lib/<wbr>Primitives"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_rep_.html">"lib/<wbr>Rep"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_treenodecompatible_.html">"lib/<wbr>Tree<wbr>Node<wbr>Compatible"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_index_.html">"lib/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_break_.html">"lib/internal/<wbr>Break"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_changeset_.html">"lib/internal/<wbr>Change<wbr>Set"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_completefromstringoptions_.html">"lib/internal/<wbr>Complete<wbr>From<wbr>String<wbr>Options"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_defaultinputstate_.html">"lib/internal/<wbr>Default<wbr>Input<wbr>State"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_exactmatch_.html">"lib/internal/<wbr>Exact<wbr>Match"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_inputstatefactory_.html">"lib/internal/<wbr>Input<wbr>State<wbr>Factory"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_inputstatemanager_.html">"lib/internal/<wbr>Input<wbr>State<wbr>Manager"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_matcherprinter_.html">"lib/internal/<wbr>Matcher<wbr>Printer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_microgrammarspecparser_.html">"lib/internal/<wbr>Microgrammar<wbr>Spec<wbr>Parser"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_microgrammarupdates_.html">"lib/internal/<wbr>Microgrammar<wbr>Updates"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_specgrammar_.html">"lib/internal/<wbr>Spec<wbr>Grammar"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_whitespace_.html">"lib/internal/<wbr>Whitespace"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_matchreport_failedmatchreport_.html">"lib/internal/match<wbr>Report/failed<wbr>Match<wbr>Report"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_matchreport_terminalmatchreport_.html">"lib/internal/match<wbr>Report/terminal<wbr>Match<wbr>Report"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_matchreport_treematchreport_.html">"lib/internal/match<wbr>Report/tree<wbr>Match<wbr>Report"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_internal_matchreport_wrappingmatchreport_.html">"lib/internal/match<wbr>Report/wrapping<wbr>Match<wbr>Report"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_concat_.html">"lib/matchers/<wbr>Concat"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_functions_.html">"lib/matchers/<wbr>Functions"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_langhelper_.html">"lib/matchers/lang/<wbr>Lang<wbr>Helper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_langstatemachine_.html">"lib/matchers/lang/<wbr>Lang<wbr>State<wbr>Machine"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_cblock_.html">"lib/matchers/lang/cfamily/CBlock"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_cfamilylanghelper_.html">"lib/matchers/lang/cfamily/CFamily<wbr>Lang<wbr>Helper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_cfamilystatemachine_.html">"lib/matchers/lang/cfamily/CFamily<wbr>State<wbr>Machine"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_delimitedliteral_.html">"lib/matchers/lang/cfamily/<wbr>Delimited<wbr>Literal"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_nestingdepthstatemachine_.html">"lib/matchers/lang/cfamily/<wbr>Nesting<wbr>Depth<wbr>State<wbr>Machine"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_states_.html">"lib/matchers/lang/cfamily/<wbr>States"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_java_javabody_.html">"lib/matchers/lang/cfamily/java/<wbr>Java<wbr>Body"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_lang_cfamily_javascript_regexpliteral_.html">"lib/matchers/lang/cfamily/javascript/regexp<wbr>Literal"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_skip_skip_.html">"lib/matchers/skip/<wbr>Skip"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_matchers_snobol_span_.html">"lib/matchers/snobol/<wbr>Span"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_microgrammarconstruction_.html">"lib/microgrammar<wbr>Construction"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_spi_inputstream_.html">"lib/spi/<wbr>Input<wbr>Stream"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_spi_stringinputstream_.html">"lib/spi/<wbr>String<wbr>Input<wbr>Stream"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_support_abstractstatemachine_.html">"lib/support/<wbr>Abstract<wbr>State<wbr>Machine"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
