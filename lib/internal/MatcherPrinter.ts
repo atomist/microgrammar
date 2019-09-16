@@ -27,7 +27,7 @@ function isConcat(ml: MatchingLogic): ml is Concat {
 export function print(ml: MatchingLogic): string {
     if (isConcat(ml)) {
         const matcherSteps: Matcher[] =
-            ml.matchSteps.filter(isMatcher).map(m => m as Matcher);
+            ml.matchSteps.filter(isMatcher).map(m => m);
         return matcherSteps.map(print).join(" ");
     } else if (isLiteral(ml)) {
         return ml.literal;
