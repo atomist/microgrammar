@@ -8,6 +8,8 @@ between the sweet spots of regular expressions and full-blown
 [BNF][bnf] or equivalent grammars.  It can parse and cleanly update
 structured content.
 
+[API Doc](https://atomist.github.io/microgrammar/)
+
 [ts]: https://www.typescriptlang.org/ (TypeScript)
 
 ## Concepts
